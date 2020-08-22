@@ -9,7 +9,7 @@ Features:</br>
 - Briv Stack Calculator [github.com/Deatho0ne]</br>
 - Manual starting/stopping adventures</br>
   - (Sometimes can fix stuck accounts)</br>
-- Can reload game client on crash</br>
+- Can reload game client on crash (Steam only)</br>
 </br>
 Requirements:</br>
 Steam install, or able to enter your user_id & hash from another platform.</br>
