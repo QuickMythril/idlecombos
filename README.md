@@ -1,5 +1,5 @@
 # idlecombos
-Helper Utility for Idle Champions, written in AHK.</br>
+Companion App for Idle Champions, written in AHK.</br>
 </br>
 Features:</br>
 - Simple account statistics display</br>
