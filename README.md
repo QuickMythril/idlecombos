@@ -1,6 +1,11 @@
 # idlecombos
-Companion App for Idle Champions, written in AHK.</br>
+IdleCombos-latest.zip (current AHK files)</br>
+IdleCombos.exe (current standalone exe)</br>
+IdleCombos.#.#.#.ahk (current AHK version history)</br>
+json.ahk (json parsing, included in zip & exe)</br>
+README.md (this file)</br>
 </br>
+Companion App for Idle Champions, written in AHK.</br>
 Features:</br>
 - Simple account statistics display</br>
 - Easy buying/opening many chests</br>
