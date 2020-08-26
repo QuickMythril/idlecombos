@@ -5,6 +5,7 @@ IdleCombos.#.#.#.ahk (current AHK version history)</br>
 json.ahk (json parsing, included in zip & exe)</br>
 README.md (this file)</br>
 </br>
+<img src="https://i.imgur.com/iu1Qbsj.png"></br>
 Companion App for Idle Champions, written in AHK.</br>
 Features:</br>
 - Simple account statistics display</br>
