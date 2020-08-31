@@ -24,4 +24,4 @@ Includes:</br>
 json.ahk [github.com/Chunjee]</br>
 </br>
 Discord Support Server:</br>
-<a href="https://discord.com/invite/6tZuC3H">https://discord.com/invite/6tZuC3H</a>
+<a href="https://discord.com/invite/N3U8xtB">https://discord.com/invite/N3U8xtB</a>
