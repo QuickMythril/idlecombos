@@ -21,4 +21,7 @@ Requirements:</br>
 Steam install, or able to enter your user_id & hash if on another platform.</br>
 </br>
 Includes:</br>
-json.ahk [github.com/Chunjee]
+json.ahk [github.com/Chunjee]</br>
+</br>
+Discord Support Server:</br>
+<a href="https://discord.com/invite/6tZuC3H">https://discord.com/invite/6tZuC3H</a>
