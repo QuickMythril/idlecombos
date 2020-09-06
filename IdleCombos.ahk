@@ -738,9 +738,10 @@ Open_Chests(chestid) {
 				newshinies := newshinies lastshiny
 			}
 		}
-		MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
 	}
+	MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
 	tempsavesetting := 0
+	tempnosavesetting := 0
 	switch chestid {
 	case "1": chestsopened := (CurrentSilvers - chestresults.chests_remaining)
 	case "2": chestsopened := (CurrentGolds - chestresults.chests_remaining)
