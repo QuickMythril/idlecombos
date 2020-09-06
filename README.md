@@ -1,7 +1,6 @@
 # idlecombos
-IdleCombos-latest.zip (current AHK files)</br>
 IdleCombos.exe (current standalone exe)</br>
-IdleCombos.#.#.#.ahk (current AHK version history)</br>
+IdleCombos.ahk (current AHK version)</br>
 json.ahk (json parsing, included in zip & exe)</br>
 README.md (this file)</br>
 </br>
