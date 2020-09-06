@@ -1,7 +1,7 @@
 # idlecombos
 IdleCombos.exe (current standalone exe)</br>
 IdleCombos.ahk (current AHK version)</br>
-json.ahk (json parsing, included in zip & exe)</br>
+json.ahk (json parsing, included exe)</br>
 README.md (this file)</br>
 </br>
 <img src="https://i.imgur.com/iu1Qbsj.png"></br>
