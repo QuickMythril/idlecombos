@@ -1,19 +1,12 @@
 ﻿#include JSON.ahk
-;Added in 1.1.1:
-;-used COMB-INAT-IONS are now saved along with the response in code log file.
+;Fixed in 1.1.2:
+;-Repeated results when opening chests now shows only once.
 
-;Changed in 1.1.1:
-;-Available Gems now display chest value in Silvers instead of Golds.
-;-Setting to always save chest and code results defaults to ON.
-
-;Fixed in 1.1.1:
-;-Feat and Shiny results from chests now displays properly.
-
-;Known issues in 1.1.1:
+;Known issues in 1.1.2:
 ;-"CNE Support Ticket" not working properly
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.1.1"
+global VersionNumber := "1.1.2"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
