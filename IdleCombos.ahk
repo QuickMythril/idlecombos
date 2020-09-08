@@ -1,5 +1,8 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
+;Fixed in 1.2.1:
+;-Fixed Combination results issues
+
 ;Added in 1.2:
 ;-Open as many chests as you can afford (Buy+Open together)
 ;-Message box displays Combination results
@@ -15,7 +18,7 @@
 
 ;Special thanks to all the idle dragons who've inspired and assisted me...
 ;-...and to those who continue to do so!
-global VersionNumber := "1.2"
+global VersionNumber := "1.2.1"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -515,6 +518,7 @@ Redeem_Codes:
 		codeparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&code=" sCode
 		rawresults := ServerCall("redeemcoupon", codeparams)
 		coderesults := JSON.parse(rawresults)
+		codeactions := JSON.parse(coderesults.actions)
 		if (coderesults.failure_reason == "Outdated instance id") {
 			MsgBox, 4, , % "Outdated instance id. Update from server?"
 			IfMsgBox, Yes
@@ -538,11 +542,11 @@ Redeem_Codes:
 		else if (coderesults.failure_reason == "This offer has expired") {
 			expiredcodes := expiredcodes sCode "`n"
 		}
-		else if (coderesults.actions.chest_type_id == 2) {
-			codegolds += coderesults.actions.count
+		else if (codeactions.chest_type_id == 2) {
+			codegolds += codeactions.count
 		}
-		else if (otherchests coderesults.actions.chest_type_id) {
-			otherchests := otherchests coderesults.actions.chest_type_id ", "
+		else if (otherchests codeactions.chest_type_id) {
+			otherchests := otherchests codeactions.chest_type_id ", "
 		}			
 		CodeCount := % (CodeCount-1)
 		if (CurrentSettings.alwayssavecodes) {
