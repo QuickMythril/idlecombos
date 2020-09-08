@@ -1,12 +1,21 @@
-﻿#include JSON.ahk
-;Fixed in 1.1.2:
-;-Repeated results when opening chests now shows only once.
+﻿#include %A_ScriptDir%
+#include JSON.ahk
+;Added in 1.2:
+;-Open as many chests as you can afford (Buy+Open together)
+;-Message box displays Combination results
+;-Current adventure displays Patron Name (not id #)
 
-;Known issues in 1.1.2:
+;Fixed in 1.2:
+;-Incomplete patron challenges return to red after new week
+;-Log now scrolls to bottom on launch
+;-Fixed error when running from Recent Files
+
+;Known issues in 1.2:
 ;-"CNE Support Ticket" not working properly
 
-;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.1.2"
+;Special thanks to all the idle dragons who've inspired and assisted me...
+;-...and to those who continue to do so!
+global VersionNumber := "1.2"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -36,13 +45,13 @@ global UserHash := 0
 global InstanceID := 0
 global UserDetails := []
 global ActiveInstance := 0
-global CurrentAdventure := 0
-global CurrentPatron := 0
+global CurrentAdventure := ""
+global CurrentPatron := ""
 global AchievementInfo := "This page intentionally left blank.`n`n`n`n"
 global BlessingInfo := "`n`n`n`n"
 ;Inventory globals
 global CurrentGems := ""
-global AvailableGolds := ""
+global AvailableChests := ""
 global SpentGems := ""
 global CurrentGolds := ""
 global CurrentSilvers := ""
@@ -71,21 +80,21 @@ global BrivZone := 0
 ;565.2 = 83.15 double ;mine
 ;238.8 = 83.7 single
 ;Patron globals
-global MirtVariants := 0
-global MirtCompleted := 0
-global MirtVariantTotal := 0
-global MirtFPCurrency := 0
-global MirtChallenges := 0
-global VajraVariants := 0
-global VajraCompleted := 0
-global VajraVariantTotal := 0
-global VajraFPCurrency := 0
-global VajraChallenges := 0
-global StrahdVariants := 0
-global StrahdCompleted := 0
-global StrahdVariantTotal := 0
-global StrahdFPCurrency := 0
-global StrahdChallenges := 0
+global MirtVariants := ""
+global MirtCompleted := ""
+global MirtVariantTotal := ""
+global MirtFPCurrency := ""
+global MirtChallenges := ""
+global VajraVariants := ""
+global VajraCompleted := ""
+global VajraVariantTotal := ""
+global VajraFPCurrency := ""
+global VajraChallenges := ""
+global StrahdVariants := ""
+global StrahdCompleted := ""
+global StrahdVariantTotal := ""
+global StrahdFPCurrency := ""
+global StrahdChallenges := ""
 
 ;GUI globals
 global oMyGUI := ""
@@ -144,6 +153,7 @@ if (LaunchGameonStart == "1") {
 	FirstRun := 0
 }
 oMyGUI.Update()
+SendMessage, 0x115, 7, 0, Edit1, A
 return
 ;END:	default run commands
 
@@ -216,14 +226,14 @@ class MyGui {
 		
 		Gui, Tab, Adventures
 		Gui, MyWindow:Add, Text, x15 y33 w90, Current Adventure:
-		Gui, MyWindow:Add, Text, vCurrentAdventure x+2 w25 right, % CurrentAdventure
+		Gui, MyWindow:Add, Text, vCurrentAdventure x+2 w50, % CurrentAdventure
 		Gui, MyWindow:Add, Text, x15 y+p w90, Current Patron:
-		Gui, MyWindow:Add, Text, vCurrentPatron x+2 w25 right, % CurrentPatron
+		Gui, MyWindow:Add, Text, vCurrentPatron x+2 w50, % CurrentPatron
 		
 		Gui, Tab, Inventory
 		Gui, MyWindow:Add, Text, x15 y33 w70, Current Gems:
 		Gui, MyWindow:Add, Text, vCurrentGems x+2 w75 right, % CurrentGems
-		Gui, MyWindow:Add, Text, vAvailableGolds x+10 w190, % AvailableGolds
+		Gui, MyWindow:Add, Text, vAvailableChests x+10 w190, % AvailableChests
 		Gui, MyWindow:Add, Text, x15 y+p w70, (Spent Gems):
 		Gui, MyWindow:Add, Text, vSpentGems x+2 w75 right, % SpentGems
 		
@@ -315,49 +325,49 @@ class MyGui {
 	}
 	
 	Update() {
-		GuiControl, , OutputText, % OutputText, w250 h210
+		GuiControl, MyWindow:, OutputText, % OutputText, w250 h210
 		SendMessage, 0x115, 7, 0, Edit1
-		GuiControl, , CrashProtectStatus, % CrashProtectStatus, w250 h210
-		GuiControl, , AchievementInfo, % AchievementInfo, w250 h210
-		GuiControl, , BlessingInfo, % BlessingInfo, w250 h210
-		GuiControl, , LastUpdated, % LastUpdated, w250 h210
+		GuiControl, MyWindow:, CrashProtectStatus, % CrashProtectStatus, w250 h210
+		GuiControl, MyWindow:, AchievementInfo, % AchievementInfo, w250 h210
+		GuiControl, MyWindow:, BlessingInfo, % BlessingInfo, w250 h210
+		GuiControl, MyWindow:, LastUpdated, % LastUpdated, w250 h210
 		;adventures
-		GuiControl, , CurrentAdventure, % CurrentAdventure, w250 h210
-		GuiControl, , CurrentPatron, % CurrentPatron, w250 h210
+		GuiControl, MyWindow:, CurrentAdventure, % CurrentAdventure, w250 h210
+		GuiControl, MyWindow:, CurrentPatron, % CurrentPatron, w250 h210
 		;inventory
-		GuiControl, , CurrentGems, % CurrentGems, w250 h210
-		GuiControl, , SpentGems, % SpentGems, w250 h210
-		GuiControl, , CurrentGolds, % CurrentGolds, w250 h210
-		GuiControl, , CurrentSilvers, % CurrentSilvers, w250 h210
-		GuiControl, , CurrentTGPs, % CurrentTGPs, w250 h210
-		GuiControl, , NextTGPDrop, % NextTGPDrop, w250 h210
-		GuiControl, , AvailableTGs, % AvailableTGs, w250 h210
-		GuiControl, , AvailableGolds, % AvailableGolds, w250 h210
-		GuiControl, , CurrentSmBounties, % CurrentSmBounties, w250 h210
-		GuiControl, , CurrentMdBounties, % CurrentMdBounties, w250 h210
-		GuiControl, , CurrentLgBounties, % CurrentLgBounties, w250 h210
-		GuiControl, , AvailableTokens, % AvailableTokens, w250 h210
-		GuiControl, , AvailableFPs, % AvailableFPs, w250 h210
-		GuiControl, , CurrentTinyBS, % CurrentTinyBS, w250 h210
-		GuiControl, , CurrentSmBS, % CurrentSmBS, w250 h210
-		GuiControl, , CurrentMdBS, % CurrentMdBS, w250 h210
-		GuiControl, , CurrentLgBS, % CurrentLgBS, w250 h210
-		GuiControl, , AvailableBSLvs, % AvailableBSLvs, w250 h210
+		GuiControl, MyWindow:, CurrentGems, % CurrentGems, w250 h210
+		GuiControl, MyWindow:, SpentGems, % SpentGems, w250 h210
+		GuiControl, MyWindow:, CurrentGolds, % CurrentGolds, w250 h210
+		GuiControl, MyWindow:, CurrentSilvers, % CurrentSilvers, w250 h210
+		GuiControl, MyWindow:, CurrentTGPs, % CurrentTGPs, w250 h210
+		GuiControl, MyWindow:, NextTGPDrop, % NextTGPDrop, w250 h210
+		GuiControl, MyWindow:, AvailableTGs, % AvailableTGs, w250 h210
+		GuiControl, MyWindow:, AvailableChests, % AvailableChests, w250 h210
+		GuiControl, MyWindow:, CurrentSmBounties, % CurrentSmBounties, w250 h210
+		GuiControl, MyWindow:, CurrentMdBounties, % CurrentMdBounties, w250 h210
+		GuiControl, MyWindow:, CurrentLgBounties, % CurrentLgBounties, w250 h210
+		GuiControl, MyWindow:, AvailableTokens, % AvailableTokens, w250 h210
+		GuiControl, MyWindow:, AvailableFPs, % AvailableFPs, w250 h210
+		GuiControl, MyWindow:, CurrentTinyBS, % CurrentTinyBS, w250 h210
+		GuiControl, MyWindow:, CurrentSmBS, % CurrentSmBS, w250 h210
+		GuiControl, MyWindow:, CurrentMdBS, % CurrentMdBS, w250 h210
+		GuiControl, MyWindow:, CurrentLgBS, % CurrentLgBS, w250 h210
+		GuiControl, MyWindow:, AvailableBSLvs, % AvailableBSLvs, w250 h210
 		;patrons
-		GuiControl, , MirtVariants, % MirtVariants, w250 h210
-		GuiControl, , MirtChallenges, % MirtChallenges, w250 h210
-		GuiControl, , MirtFPCurrency, % MirtFPCurrency, w250 h210
-		GuiControl, , VajraVariants, % VajraVariants, w250 h210
-		GuiControl, , VajraChallenges, % VajraChallenges, w250 h210
-		GuiControl, , VajraFPCurrency, % VajraFPCurrency, w250 h210
-		GuiControl, , StrahdVariants, % StrahdVariants, w250 h210
-		GuiControl, , StrahdChallenges, % StrahdChallenges, w250 h210
-		GuiControl, , StrahdFPCurrency, % StrahdFPCurrency, w250 h210
+		GuiControl, MyWindow:, MirtVariants, % MirtVariants, w250 h210
+		GuiControl, MyWindow:, MirtChallenges, % MirtChallenges, w250 h210
+		GuiControl, MyWindow:, MirtFPCurrency, % MirtFPCurrency, w250 h210
+		GuiControl, MyWindow:, VajraVariants, % VajraVariants, w250 h210
+		GuiControl, MyWindow:, VajraChallenges, % VajraChallenges, w250 h210
+		GuiControl, MyWindow:, VajraFPCurrency, % VajraFPCurrency, w250 h210
+		GuiControl, MyWindow:, StrahdVariants, % StrahdVariants, w250 h210
+		GuiControl, MyWindow:, StrahdChallenges, % StrahdChallenges, w250 h210
+		GuiControl, MyWindow:, StrahdFPCurrency, % StrahdFPCurrency, w250 h210
 		;settings
-		GuiControl, , GetDetailsonStart, % GetDetailsonStart, w250 h210
-		GuiControl, , LaunchGameonStart, % LaunchGameonStart, w250 h210
-		GuiControl, , AlwaysSaveChests, % AlwaysSaveChests, w250 h210
-		GuiControl, , AlwaysSaveCodes, % AlwaysSaveCodes, w250 h210
+		GuiControl, MyWindow:, GetDetailsonStart, % GetDetailsonStart, w250 h210
+		GuiControl, MyWindow:, LaunchGameonStart, % LaunchGameonStart, w250 h210
+		GuiControl, MyWindow:, AlwaysSaveChests, % AlwaysSaveChests, w250 h210
+		GuiControl, MyWindow:, AlwaysSaveCodes, % AlwaysSaveCodes, w250 h210
 		;this.Show() - removed
 	}
 }
@@ -471,11 +481,11 @@ Open_Codes:
 {
 	Gui, CodeWindow:New
 	Gui, CodeWindow:+Resize -MaximizeBox
-	Gui, CodeWindow:Show, w220 h220, Codes
-	Gui, CodeWindow:Add, Edit, r12 vCodestoEnter w180 x20 y20, IDLE-CHAM-PION-SNOW
+	Gui, CodeWindow:Show, w230 h220, Codes
+	Gui, CodeWindow:Add, Edit, r12 vCodestoEnter w190 x20 y20, IDLE-CHAM-PION-SNOW
 	Gui, CodeWindow:Add, Button, gRedeem_Codes, Submit
-	Gui, CodeWindow:Add, Text, x+6 vCodesPending, Codes pending: 0
-	Gui, CodeWindow:Add, Button, x+18 gClose_Codes, Close
+	Gui, CodeWindow:Add, Text, w100 x+6 vCodesPending, Codes pending: 0
+	Gui, CodeWindow:Add, Button, x+4 gClose_Codes, Close
 	return
 }
 
@@ -487,6 +497,10 @@ Redeem_Codes:
 	CodeCount := CodeList.Length()
 	CodesPending := "Codes pending: " CodeCount
 	GuiControl, , CodesPending, % CodesPending, w250 h210
+	usedcodes := ""
+	expiredcodes := ""
+	codegolds := 0
+	otherchests := ""
 	for k, v in CodeList
 	{
 		v := StrReplace(v, "`r")
@@ -500,6 +514,36 @@ Redeem_Codes:
 		}
 		codeparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&code=" sCode
 		rawresults := ServerCall("redeemcoupon", codeparams)
+		coderesults := JSON.parse(rawresults)
+		if (coderesults.failure_reason == "Outdated instance id") {
+			MsgBox, 4, , % "Outdated instance id. Update from server?"
+			IfMsgBox, Yes
+			{
+				GetUserDetails()
+				Gui, CodeWindow:Default
+				while (InstanceID == 0) {
+					sleep, 2000
+				}
+				codeparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&code=" sCode
+				rawresults := ServerCall("redeemcoupon", codeparams)
+				coderesults := JSON.parse(rawresults)
+			}
+			else {
+				return
+			}
+		}
+		if (coderesults.failure_reason == "You have already redeemed this combination.") {
+			usedcodes := usedcodes sCode "`n"
+		}
+		else if (coderesults.failure_reason == "This offer has expired") {
+			expiredcodes := expiredcodes sCode "`n"
+		}
+		else if (coderesults.actions.chest_type_id == 2) {
+			codegolds += coderesults.actions.count
+		}
+		else if (otherchests coderesults.actions.chest_type_id) {
+			otherchests := otherchests coderesults.actions.chest_type_id ", "
+		}			
 		CodeCount := % (CodeCount-1)
 		if (CurrentSettings.alwayssavecodes) {
 			FileAppend, %sCode%`n, %RedeemCodeLogFile%
@@ -518,8 +562,26 @@ Redeem_Codes:
 		GuiControl, , CodesPending, % CodesPending, w250 h210
 	}
 	CodesPending := "Codes submitted!"
+	codemessage := ""
+	if !(usedcodes == "") {
+		codemessage := codemessage "Already used:`n" usedcodes "`n"
+	}
+	if !(expiredcodes == "") {
+		codemessage := codemessage "Expired:`n" expiredcodes "`n"
+	}
+	if (codegolds > 0) {
+		codemessage := codemessage "Gold Chests:`n" codegolds "`n"
+	}
+	if !(otherchests == "") {
+		codemessage := codemessage "Other chests:`n" otherchests "`n"
+	}
+	if (codemessage == "") {
+		codemessage := "No Results."
+	}
 	GuiControl, , CodesPending, % CodesPending, w250 h210
-	;GetUserDetails() ;not working?
+	GetUserDetails()
+	oMyGUI.Update()
+	MsgBox % codemessage
 	return
 }
 
@@ -554,6 +616,40 @@ Clear_Log:
 		return
 	}
 	return
+}
+
+Buy_Extra_Chests(chestid,extracount) {
+	chestparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&chest_type_id=" chestid "&count="
+	gemsspent := 0
+	while (extracount > 0) {
+		SB_SetText("Chests remaining to purchase: " extracount)
+		if (extracount < 100) {
+			rawresults := ServerCall("buysoftcurrencychest", chestparams extracount)
+			extracount -= extracount
+		}
+		else {
+			rawresults := ServerCall("buysoftcurrencychest", chestparams "99")
+			extracount -= 99
+		}
+		chestresults := JSON.parse(rawresults)
+		if (chestresults.success == "0") {
+			MsgBox % "Error: " rawresults
+			UpdateLogTime()
+			FileAppend, (%CurrentTime%) Gems spent: %gemsspent%`n, %OutputLogFile%
+			FileRead, OutputText, %OutputLogFile%
+			oMyGUI.Update()
+			GetUserDetails()
+			SB_SetText("Chests remaining: " count " (Error: " chestresults.failure_reason ")")
+			return
+		}
+		gemsspent += chestresults.currency_spent
+		Sleep 1000
+	}
+	UpdateLogTime()
+	FileAppend, (%CurrentTime%) Gems spent: %gemsspent%`n, %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	SB_SetText("Chest purchase completed.")
+	return gemsspent
 }
 
 Buy_Chests(chestid) {
@@ -645,8 +741,8 @@ Open_Chests(chestid) {
 		MsgBox % "Need User ID & Hash."
 		FirstRun()
 	}
-	if (!CurrentGolds && !CurrentSilvers) {
-		MsgBox, 4, , No chests detected.  Check server for user details?
+	if (!CurrentGolds && !CurrentSilvers && !CurrentGems) {
+		MsgBox, 4, , No chests or gems detected.  Check server for user details?
 		IfMsgBox, Yes
 		{
 			GetUserDetails()
@@ -655,23 +751,31 @@ Open_Chests(chestid) {
 	switch chestid
 	{
 		case 1: {
-			InputBox, count, Opening Chests, % "How many Silver Chests?`n(Max: " CurrentSilvers ")", , 200, 180
+			InputBox, count, Opening Chests, % "How many Silver Chests?`n(Owned: " CurrentSilvers ")`n(Max: " (CurrentSilvers + Floor(CurrentGems/50)) ")", , 200, 180
 			if ErrorLevel
 				return
 			if (count > CurrentSilvers) {
-				MsgBox, 4, , Insufficient chests detected for opening.`nContinue anyway?
-				IfMsgBox No
+				MsgBox, 4, , % "Spend " ((count - CurrentSilvers)*50) " gems to purchase " (count - CurrentSilvers) " chests before opening?"
+				extracount := (count - CurrentSilvers)
+				IfMsgBox, Yes
+					extraspent := Buy_Extra_Chests(1,extracount)
+				else {
 					return
+				}
 			}
 		}
 		case 2: {
-			InputBox, count, Opening Chests, % "How many Gold Chests?`n(Max: " CurrentGolds ")", , 200, 180
+			InputBox, count, Opening Chests, % "How many Gold Chests?`n(Owned: " CurrentGolds ")`n(Max: " (CurrentGolds + Floor(CurrentGems/500)) ")", , 200, 180
 			if ErrorLevel
 				return
 			if (count > CurrentGolds) {
-				MsgBox, 4, , Insufficient chests detected for opening.`nContinue anyway?
-				IfMsgBox No
+				MsgBox, 4, , % "Spend " ((count - CurrentGolds)*500) " gems to purchase " (count - CurrentGolds) " chests before opening?"
+				extracount := (count - CurrentGolds)
+				IfMsgBox, Yes
+					extraspent := Buy_Extra_Chests(2,extracount)
+				else {
 					return
+				}
 			}
 		}
 		default: {
@@ -713,11 +817,11 @@ Open_Chests(chestid) {
 			MsgBox % "New Feats:`n" newfeats "New Shinies:`n" newshinies
 			MsgBox % "Error: " rawresults
 			switch chestid {
-			case "1": chestsopened := (CurrentSilvers - chestresults.chests_remaining)
-			case "2": chestsopened := (CurrentGolds - chestresults.chests_remaining)
+			case "1": chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
+			case "2": chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
 			}
 			UpdateLogTime()
-			FileAppend, (%CurrentTime%) Chests Opened: %chestsopened%`n, %OutputLogFile%
+			FileAppend, % "(" CurrentTime ") Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 			FileRead, OutputText, %OutputLogFile%
 			oMyGUI.Update()
 			GetUserDetails()
@@ -743,11 +847,11 @@ Open_Chests(chestid) {
 	tempsavesetting := 0
 	tempnosavesetting := 0
 	switch chestid {
-	case "1": chestsopened := (CurrentSilvers - chestresults.chests_remaining)
-	case "2": chestsopened := (CurrentGolds - chestresults.chests_remaining)
+	case "1": chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
+	case "2": chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
 	}
 	UpdateLogTime()
-	FileAppend, (%CurrentTime%) Chests Opened: %chestsopened%`n, %OutputLogFile%
+	FileAppend, % "(" CurrentTime ") Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	FileRead, OutputText, %OutputLogFile%
 	oMyGUI.Update()
 	GetUserDetails()
@@ -878,6 +982,7 @@ GetIDFromWRL() {
 }
 	
 GetUserDetails() {
+	Gui, MyWindow:Default
 	SB_SetText("Please wait a moment...")
 	getuserparams := "&instance_key=1&user_id=" UserID "&hash=" UserHash
 	rawdetails := ServerCall("getuserdetails", getuserparams)
@@ -903,7 +1008,7 @@ ParseAdventureData() {
 	for k, v in UserDetails.details.game_instances
 		if (v.game_instance_id == ActiveInstance) {
 			CurrentAdventure := v.current_adventure_id
-			CurrentPatron := v.current_patron_id
+			CurrentPatron := PatronFromID(v.current_patron_id)
 		}
 	;
 }
@@ -954,7 +1059,7 @@ ParseInventoryData() {
 		case 33: CurrentMdBS := v.inventory_amount
 		case 34: CurrentLgBS := v.inventory_amount
 	}
-	AvailableGolds := "= " Floor(CurrentGems/50) " Silver Chests"
+	AvailableChests := "= " Floor(CurrentGems/50) " Silver Chests"
 	tokencount := (CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
 	AvailableTokens := "= " tokencount " Tokens"
 	AvailableFPs := "(" Floor(tokencount/2500) " Free Plays)"
@@ -1036,36 +1141,72 @@ CheckPatronProgress() {
 		Gui, Font, cGreen
 		GuiControl, Font, MirtFPCurrency
 	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, MirtFPCurrency
+	}
 	if (VajraFPCurrency = "5000") {
 		Gui, Font, cGreen
+		GuiControl, Font, VajraFPCurrency
+	}
+	else {
+		Gui, Font, cRed
 		GuiControl, Font, VajraFPCurrency
 	}
 	if (StrahdFPCurrency = "5000") {
 		Gui, Font, cGreen
 		GuiControl, Font, StrahdFPCurrency
 	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, StrahdFPCurrency
+	}
 	if (MirtChallenges = "10") {
 		Gui, Font, cGreen
+		GuiControl, Font, MirtChallenges
+	}
+	else {
+		Gui, Font, cRed
 		GuiControl, Font, MirtChallenges
 	}
 	if (VajraChallenges = "10") {
 		Gui, Font, cGreen
 		GuiControl, Font, VajraChallenges
 	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, VajraChallenges
+	}
 	if (StrahdChallenges = "10") {
 		Gui, Font, cGreen
+		GuiControl, Font, StrahdChallenges
+	}
+	else {
+		Gui, Font, cRed
 		GuiControl, Font, StrahdChallenges
 	}
 	if (MirtCompleted = MirtVariantTotal) {
 		Gui, Font, cGreen
 		GuiControl, Font, MirtVariants
 	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, MirtVariants
+	}
 	if (VajraCompleted = VajraVariantTotal) {
 		Gui, Font, cGreen
 		GuiControl, Font, VajraVariants
 	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, VajraVariants
+	}
 	if (StrahdCompleted = StrahdVariantTotal) {
 		Gui, Font, cGreen
+		GuiControl, Font, StrahdVariants
+	}
+	else {
+		Gui, Font, cRed
 		GuiControl, Font, StrahdVariants
 	}
 }
@@ -1232,6 +1373,17 @@ Discord_Clicked:
 {
 	Run, % "https://discord.com/invite/N3U8xtB"
 	return
+}
+
+PatronFromID(patronid) {
+	switch patronid {
+		case "0": namefromid := "None"
+		case "1": namefromid := "Mirt"
+		case "2": namefromid := "Vajra"
+		case "3": namefromid := "Strahd"
+		case "4": namefromid := "Zariel"
+	}
+	return namefromid
 }
 
 ChampFromID(id) {
