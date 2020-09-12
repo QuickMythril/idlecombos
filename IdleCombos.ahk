@@ -1,30 +1,28 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
-;Fixed in 1.2.1:
-;-Fixed Combination results issues
+;Added in 1.3:
+;-Able to use Blacksmith Contracts
+;-Highest Gear Level shown
+;-Zorbu, BV, and Môrgæn lifetime stat tracking
+;-Patron Unlock progress shown when Locked
+;-Displays background Adventure/Patron
+;-Displays current and background Area
+;-Able to start/end background adventure
+;-Added list of Champ ID number in Help menu
 
-;Added in 1.2:
-;-Open as many chests as you can afford (Buy+Open together)
-;-Message box displays Combination results
-;-Current adventure displays Patron Name (not id #)
+;Fixed in 1.3
+;-Added warning when ending adventure
+;-Removed "New Feats" from opening Silvers
 
-;Fixed in 1.2:
-;-Incomplete patron challenges return to red after new week
-;-Log now scrolls to bottom on launch
-;-Fixed error when running from Recent Files
-
-;Known issues in 1.2:
-;-"CNE Support Ticket" not working properly
-
-;Special thanks to all the idle dragons who've inspired and assisted me...
-;-...and to those who continue to do so!
-global VersionNumber := "1.2.1"
+;Special thanks to all the idle dragons who inspired and assisted me!
+global VersionNumber := "1.3"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
 global SettingsFile := "idlecombosettings.json"
 global UserDetailsFile := "userdetails.json"
 global ChestOpenLogFile := "chestopenlog.json"
+global BlacksmithLogFile := "blacksmithlog.json"
 global RedeemCodeLogFile := "redeemcodelog.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
@@ -36,6 +34,7 @@ global GetDetailsonStart := 0
 global LaunchGameonStart := 0
 global FirstRun := 1
 global AlwaysSaveChests := 0
+global AlwaysSaveContracts := 0
 global AlwaysSaveCodes := 0
 
 ;Server globals
@@ -49,9 +48,15 @@ global InstanceID := 0
 global UserDetails := []
 global ActiveInstance := 0
 global CurrentAdventure := ""
+global CurrentArea := ""
 global CurrentPatron := ""
-global AchievementInfo := "This page intentionally left blank.`n`n`n`n"
-global BlessingInfo := "`n`n`n`n"
+global BackgroundAdventure := ""
+global BackgroundArea := ""
+global BackgroundPatron := ""
+global AchievementInfo := "This page intentionally left blank.`n`n`n`n`n`n"
+global BlessingInfo := "`n`n`n`n`n`n"
+global ChampDetails := ""
+global TotalChamps := 0
 ;Inventory globals
 global CurrentGems := ""
 global AvailableChests := ""
@@ -73,31 +78,30 @@ global CurrentLgBS := ""
 global AvailableBSLvs := ""
 ;Loot globals
 global EpicGearCount := 0
-;global BrivRarity := 0
-;global BrivGild := 0
-;global BrivEnchant := 0
 global BrivSlot4 := 0
 global BrivZone := 0
-;940.2 = 65.01 triple
-;749.4 = 53.09 triple
-;565.2 = 83.15 double ;mine
-;238.8 = 83.7 single
 ;Patron globals
 global MirtVariants := ""
 global MirtCompleted := ""
 global MirtVariantTotal := ""
 global MirtFPCurrency := ""
 global MirtChallenges := ""
+global MirtRequires := ""
+global MirtCosts := ""
 global VajraVariants := ""
 global VajraCompleted := ""
 global VajraVariantTotal := ""
 global VajraFPCurrency := ""
 global VajraChallenges := ""
+global VajraRequires := ""
+global VajraCosts := ""
 global StrahdVariants := ""
 global StrahdCompleted := ""
 global StrahdVariantTotal := ""
 global StrahdFPCurrency := ""
 global StrahdChallenges := ""
+global StrahdRequires := ""
+global StrahdCosts := ""
 
 ;GUI globals
 global oMyGUI := ""
@@ -123,7 +127,7 @@ if (!oMyGUI) {
 }
 ;First run checks and setup
 if !FileExist(SettingsFile) {
-	newsettings := JSON.stringify({"firstrun":0,"user_id":0,"hash":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecodes":1})
+	newsettings := JSON.stringify({"firstrun":0,"user_id":0,"hash":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
 	FileAppend, %newsettings%, %SettingsFile%
 	UpdateLogTime()
 	FileAppend, (%CurrentTime%) Settings file "idlecombosettings.json" created.`n, %OutputLogFile%
@@ -147,6 +151,7 @@ else {
 GetDetailsonStart := CurrentSettings.getdetailsonstart
 LaunchGameonStart := CurrentSettings.launchgameonstart
 AlwaysSaveChests := CurrentSettings.alwayssavechests
+AlwaysSaveContracts := CurrentSettings.alwayssavecontracts
 AlwaysSaveCodes := CurrentSettings.alwayssavecodes
 if (GetDetailsonStart == "1") {
 	GetUserDetails()
@@ -177,23 +182,30 @@ class MyGui {
 		Menu, FileSubmenu, Add, E&xit IdleCombos, Exit_Clicked
 		Menu, IdleMenu, Add, &File, :FileSubmenu
 		
-		Menu, BuyChestsSubmenu, Add, &Gold, Buy_Gold
-		Menu, BuyChestsSubmenu, Add, &Silver, Buy_Silver
-		Menu, ToolsSubmenu, Add, &Buy Chests, :BuyChestsSubmenu
-		Menu, OpenChestsSubmenu, Add, &Gold, Open_Gold
-		Menu, OpenChestsSubmenu, Add, &Silver, Open_Silver
-		Menu, ToolsSubmenu, Add, &Open Chests, :OpenChestsSubmenu
+		Menu, ChestsSubmenu, Add, Buy Gold, Buy_Gold
+		Menu, ChestsSubmenu, Add, Buy Silver, Buy_Silver
+		Menu, ChestsSubmenu, Add, Open Gold, Open_Gold
+		Menu, ChestsSubmenu, Add, Open Silver, Open_Silver
+		Menu, ToolsSubmenu, Add, &Chests, :ChestsSubmenu
+		Menu, BlacksmithSubmenu, Add, Use Tiny Contracts, Tiny_Blacksmith
+		Menu, BlacksmithSubmenu, Add, Use Small Contracts, Sm_Blacksmith
+		Menu, BlacksmithSubmenu, Add, Use Medium Contracts, Med_Blacksmith
+		Menu, BlacksmithSubmenu, Add, Use Large Contracts, Lg_Blacksmith
+		Menu, ToolsSubmenu, Add, &Blacksmith, :BlacksmithSubmenu
 		Menu, ToolsSubmenu, Add, &Redeem Codes, Open_Codes
 		Menu, AdvSubmenu, Add, &Load New Adv, LoadAdventure
 		Menu, AdvSubmenu, Add, &End Current Adv, EndAdventure
+		Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
+		Menu, AdvSubmenu, Add, End Current BG Adv, EndBGAdventure
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
-		Menu, ToolsSubmenu, Add, BrivStack &Calculator, Briv_Calc
+		Menu, ToolsSubmenu, Add, Briv &Stack Calculator, Briv_Calc
 		Menu, IdleMenu, Add, &Tools, :ToolsSubmenu
 		
 		Menu, HelpSubmenu, Add, &Run Setup, FirstRun
 		Menu, HelpSubmenu, Add, Clear &Log, Clear_Log
 		Menu, HelpSubmenu, Add, CNE &Support Ticket, Open_Ticket
 		Menu, HelpSubmenu, Add
+		Menu, HelpSubmenu, Add, &List Champ IDs, List_ChampIDs
 		Menu, HelpSubmenu, Add, &About IdleCombos, About_Clicked
 		Menu, HelpSubmenu, Add, &Discord Support Server, Discord_Clicked
 		Menu, IdleMenu, Add, &Help, :HelpSubmenu
@@ -209,7 +221,7 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 		
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w380, Summary|Adventures|Inventory||Patrons|Modrons|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w380, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
 		Gui, Tab
 		
 		row_y := row_y + 25
@@ -225,13 +237,21 @@ class MyGui {
 		
 		Gui, Tab, Summary
 		Gui, MyWindow:Add, Text, vAchievementInfo x15 y33 w300, % AchievementInfo
-		Gui, MyWindow:Add, Text, vBlessingInfo x15 y+p w300, % BlessingInfo
+		Gui, MyWindow:Add, Text, vBlessingInfo x200 y33 w300, % BlessingInfo
 		
 		Gui, Tab, Adventures
-		Gui, MyWindow:Add, Text, x15 y33 w90, Current Adventure:
+		Gui, MyWindow:Add, Text, x15 y33 w120, Current Adventure:
 		Gui, MyWindow:Add, Text, vCurrentAdventure x+2 w50, % CurrentAdventure
-		Gui, MyWindow:Add, Text, x15 y+p w90, Current Patron:
+		Gui, MyWindow:Add, Text, x15 y+p w120, Current Patron:
 		Gui, MyWindow:Add, Text, vCurrentPatron x+2 w50, % CurrentPatron
+		Gui, MyWindow:Add, Text, x15 y+p w120, Current Area:
+		Gui, MyWindow:Add, Text, vCurrentArea x+2 w50, % CurrentArea
+		Gui, MyWindow:Add, Text, x15 y76 w120, Background Adventure:
+		Gui, MyWindow:Add, Text, vBackgroundAdventure x+2 w50, % BackgroundAdventure
+		Gui, MyWindow:Add, Text, x15 y+p w120, Background Patron:
+		Gui, MyWindow:Add, Text, vBackgroundPatron x+2 w50, % BackgroundPatron
+		Gui, MyWindow:Add, Text, x15 y+p w120, Background Area:
+		Gui, MyWindow:Add, Text, vBackgroundArea x+2 w50, % BackgroundArea
 		
 		Gui, Tab, Inventory
 		Gui, MyWindow:Add, Text, x15 y33 w70, Current Gems:
@@ -270,36 +290,41 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vCurrentLgBS x+2 w35 right, % CurrentLgBS
 		
 		Gui, Tab, Patrons
-		Gui, MyWindow:Add, Text, x15 y33 w70, Mirt Variants:
-		Gui, MyWindow:Add, Text, vMirtVariants x+2 w75 right cRed, % MirtVariants
-		Gui, MyWindow:Add, Text, x15 y+p w110, Mirt FP Currency:
-		Gui, MyWindow:Add, Text, vMirtFPCurrency x+2 w35 right cRed, % MirtFPCurrency
-		Gui, MyWindow:Add, Text, x15 y+p w110, Mirt Challenges:
-		Gui, MyWindow:Add, Text, vMirtChallenges x+2 w35 right cRed, % MirtChallenges
+		Gui, MyWindow:Add, Text, x15 y33 w75, Mirt Variants:
+		Gui, MyWindow:Add, Text, vMirtVariants x+p w75 right cRed, % MirtVariants
+		Gui, MyWindow:Add, Text, x15 y+p w95, Mirt FP Currency:
+		Gui, MyWindow:Add, Text, vMirtFPCurrency x+p w55 right cRed, % MirtFPCurrency
+		Gui, MyWindow:Add, Text, vMirtRequires x+2 w200 right, % MirtRequires
+		Gui, MyWindow:Add, Text, x15 y+p w95, Mirt Challenges:
+		Gui, MyWindow:Add, Text, vMirtChallenges x+p w55 right cRed, % MirtChallenges
+		Gui, MyWindow:Add, Text, vMirtCosts x+2 w200 right, % MirtCosts
 		
-		Gui, MyWindow:Add, Text, x15 y+5+p w70, Vajra Variants:
-		Gui, MyWindow:Add, Text, vVajraVariants x+2 w75 right cRed, % VajraVariants
-		Gui, MyWindow:Add, Text, x15 y+p w110, Vajra FP Currency:
-		Gui, MyWindow:Add, Text, vVajraFPCurrency x+2 w35 right cRed, % VajraFPCurrency
-		Gui, MyWindow:Add, Text, x15 y+p w110, Vajra Challenges:
-		Gui, MyWindow:Add, Text, vVajraChallenges x+2 w35 right cRed, % VajraChallenges
+		Gui, MyWindow:Add, Text, x15 y+5+p w75, Vajra Variants:
+		Gui, MyWindow:Add, Text, vVajraVariants x+p w75 right cRed, % VajraVariants
+		Gui, MyWindow:Add, Text, x15 y+p w95, Vajra FP Currency:
+		Gui, MyWindow:Add, Text, vVajraFPCurrency x+p w55 right cRed, % VajraFPCurrency
+		Gui, MyWindow:Add, Text, vVajraRequires x+2 w200 right, % VajraRequires
+		Gui, MyWindow:Add, Text, x15 y+p w95, Vajra Challenges:
+		Gui, MyWindow:Add, Text, vVajraChallenges x+p w55 right cRed, % VajraChallenges
+		Gui, MyWindow:Add, Text, vVajraCosts x+2 w200 right, % VajraCosts
 		
 		Gui, MyWindow:Add, Text, x15 y+5+p w75, Strahd Variants:
-		Gui, MyWindow:Add, Text, vStrahdVariants x+2 w70 right cRed, % StrahdVariants
-		Gui, MyWindow:Add, Text, x15 y+p w110, Strahd FP Currency:
-		Gui, MyWindow:Add, Text, vStrahdFPCurrency x+2 w35 right cRed, % StrahdFPCurrency
-		Gui, MyWindow:Add, Text, x15 y+p w110, Strahd Challenges:
-		Gui, MyWindow:Add, Text, vStrahdChallenges x+2 w35 right cRed, % StrahdChallenges
+		Gui, MyWindow:Add, Text, vStrahdVariants x+p w75 right cRed, % StrahdVariants
+		Gui, MyWindow:Add, Text, x15 y+p w95, Strahd FP Currency:
+		Gui, MyWindow:Add, Text, vStrahdFPCurrency x+p w55 right cRed, % StrahdFPCurrency
+		Gui, MyWindow:Add, Text, vStrahdRequires x+2 w200 right, % StrahdRequires
+		Gui, MyWindow:Add, Text, x15 y+p w95, Strahd Challenges:
+		Gui, MyWindow:Add, Text, vStrahdChallenges x+p w55 right cRed, % StrahdChallenges
+		Gui, MyWindow:Add, Text, vStrahdCosts x+2 w200 right, % StrahdCosts
 		
-		Gui, Tab, Modrons
-		Gui, Font, s16
-		Gui, MyWindow:Add, Text, x15 y33, Coming SOON!™
-		Gui, Font
+		Gui, Tab, Champions
+		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h150, % ChampDetails
 		
 		Gui, Tab, Settings
 		Gui, MyWindow:Add, CheckBox, vGetDetailsonStart, Get User Details on start?
 		Gui, MyWindow:Add, CheckBox, vLaunchGameonStart, Launch game client on start?
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveChests, Always save Chest Open Results to file?
+		Gui, MyWindow:Add, CheckBox, vAlwaysSaveContracts, Always save Blacksmith Results to file?
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveCodes, Always save Code Redeem Results to file?
 		Gui, MyWindow:Add, Button, gSave_Settings, Save Settings
 		
@@ -336,7 +361,11 @@ class MyGui {
 		GuiControl, MyWindow:, LastUpdated, % LastUpdated, w250 h210
 		;adventures
 		GuiControl, MyWindow:, CurrentAdventure, % CurrentAdventure, w250 h210
+		GuiControl, MyWindow:, CurrentArea, % CurrentArea, w250 h210
 		GuiControl, MyWindow:, CurrentPatron, % CurrentPatron, w250 h210
+		GuiControl, MyWindow:, BackgroundAdventure, % BackgroundAdventure, w250 h210
+		GuiControl, MyWindow:, BackgroundArea, % BackgroundArea, w250 h210
+		GuiControl, MyWindow:, BackgroundPatron, % BackgroundPatron, w250 h210
 		;inventory
 		GuiControl, MyWindow:, CurrentGems, % CurrentGems, w250 h210
 		GuiControl, MyWindow:, SpentGems, % SpentGems, w250 h210
@@ -360,16 +389,25 @@ class MyGui {
 		GuiControl, MyWindow:, MirtVariants, % MirtVariants, w250 h210
 		GuiControl, MyWindow:, MirtChallenges, % MirtChallenges, w250 h210
 		GuiControl, MyWindow:, MirtFPCurrency, % MirtFPCurrency, w250 h210
+		GuiControl, MyWindow:, MirtRequires, % MirtRequires, w250 h210
+		GuiControl, MyWindow:, MirtCosts, % MirtCosts, w250 h210
 		GuiControl, MyWindow:, VajraVariants, % VajraVariants, w250 h210
 		GuiControl, MyWindow:, VajraChallenges, % VajraChallenges, w250 h210
 		GuiControl, MyWindow:, VajraFPCurrency, % VajraFPCurrency, w250 h210
+		GuiControl, MyWindow:, VajraRequires, % VajraRequires, w250 h210
+		GuiControl, MyWindow:, VajraCosts, % VajraCosts, w250 h210
 		GuiControl, MyWindow:, StrahdVariants, % StrahdVariants, w250 h210
 		GuiControl, MyWindow:, StrahdChallenges, % StrahdChallenges, w250 h210
 		GuiControl, MyWindow:, StrahdFPCurrency, % StrahdFPCurrency, w250 h210
+		GuiControl, MyWindow:, StrahdRequires, % StrahdRequires, w250 h210
+		GuiControl, MyWindow:, StrahdCosts, % StrahdCosts, w250 h210
+		;champions
+		GuiControl, MyWindow:, ChampDetails, % ChampDetails, w250 h210
 		;settings
 		GuiControl, MyWindow:, GetDetailsonStart, % GetDetailsonStart, w250 h210
 		GuiControl, MyWindow:, LaunchGameonStart, % LaunchGameonStart, w250 h210
 		GuiControl, MyWindow:, AlwaysSaveChests, % AlwaysSaveChests, w250 h210
+		GuiControl, MyWindow:, AlwaysSaveContracts, % AlwaysSaveContracts, w250 h210
 		GuiControl, MyWindow:, AlwaysSaveCodes, % AlwaysSaveCodes, w250 h210
 		;this.Show() - removed
 	}
@@ -442,6 +480,7 @@ Save_Settings:
 	CurrentSettings.getdetailsonstart := GetDetailsonStart
 	CurrentSettings.launchgameonstart := LaunchGameonStart
 	CurrentSettings.alwayssavechests := AlwaysSaveChests
+	CurrentSettings.alwayssavecontracts := AlwaysSaveContracts
 	CurrentSettings.alwayssavecodes := AlwaysSaveCodes
 	newsettings := JSON.stringify(CurrentSettings)
 	FileDelete, %SettingsFile%
@@ -504,6 +543,8 @@ Redeem_Codes:
 	expiredcodes := ""
 	codegolds := 0
 	otherchests := ""
+	tempsavesetting := 0
+	tempnosavesetting := 0
 	for k, v in CodeList
 	{
 		v := StrReplace(v, "`r")
@@ -518,7 +559,10 @@ Redeem_Codes:
 		codeparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&code=" sCode
 		rawresults := ServerCall("redeemcoupon", codeparams)
 		coderesults := JSON.parse(rawresults)
-		codeactions := JSON.parse(coderesults.actions)
+		rawactions := JSON.stringify(coderesults.actions)
+		StringTrimLeft, rawactions, rawactions, 1
+		StringTrimRight, rawactions, rawactions, 1
+		codeactions := JSON.parse(rawactions)
 		if (coderesults.failure_reason == "Outdated instance id") {
 			MsgBox, 4, , % "Outdated instance id. Update from server?"
 			IfMsgBox, Yes
@@ -549,16 +593,21 @@ Redeem_Codes:
 			otherchests := otherchests codeactions.chest_type_id ", "
 		}			
 		CodeCount := % (CodeCount-1)
-		if (CurrentSettings.alwayssavecodes) {
+		if (CurrentSettings.alwayssavecodes || tempsavesetting) {
 			FileAppend, %sCode%`n, %RedeemCodeLogFile%
 			FileAppend, %rawresults%`n, %RedeemCodeLogFile%
 		}
-		else {
-			InputBox, dummyvar, Code Results, Save to File?, , 250, 150, , , , , % rawresults
-			dummyvar := ""
-			if !ErrorLevel {
+		else if !(tempnosavesetting) {
+			MsgBox, 4, , "Save to File?"
+			IfMsgBox, Yes
+			{
+				tempsavesetting := 1
 				FileAppend, %sCode%`n, %RedeemCodeLogFile%
 				FileAppend, %rawresults%`n, %RedeemCodeLogFile%
+			}
+			else IfMsgBox, No
+			{
+				tempnosavesetting := 1
 			}
 		}
 		sleep, 2000
@@ -818,12 +867,18 @@ Open_Chests(chestid) {
 		}
 		chestresults := JSON.parse(rawresults)
 		if ((chestresults.success == "0") || (chestresults.loot_details == "0")) {
-			MsgBox % "New Feats:`n" newfeats "New Shinies:`n" newshinies
-			MsgBox % "Error: " rawresults
-			switch chestid {
-			case "1": chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
-			case "2": chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
+			switch chestid
+		{
+			case "1": {
+				chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
+				MsgBox % "New Shinies:`n" newshinies
 			}
+			case "2": {
+				chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
+				MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
+			}
+		}
+			MsgBox % "Error: " rawresults
 			UpdateLogTime()
 			FileAppend, % "(" CurrentTime ") Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 			FileRead, OutputText, %OutputLogFile%
@@ -847,19 +902,180 @@ Open_Chests(chestid) {
 			}
 		}
 	}
-	MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
 	tempsavesetting := 0
 	tempnosavesetting := 0
-	switch chestid {
-	case "1": chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
-	case "2": chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
+	switch chestid
+{
+	case "1": {
+		chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
+		MsgBox % "New Shinies:`n" newshinies
 	}
+	case "2": {
+		chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
+		MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
+	}
+}
 	UpdateLogTime()
 	FileAppend, % "(" CurrentTime ") Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	FileRead, OutputText, %OutputLogFile%
 	oMyGUI.Update()
 	GetUserDetails()
 	SB_SetText("Chest opening completed.")
+	return
+}
+
+Tiny_Blacksmith:
+{
+	UseBlacksmith(31)
+	return
+}
+
+Sm_Blacksmith:
+{
+	UseBlacksmith(32)
+	return
+}
+
+Med_Blacksmith:
+{
+	UseBlacksmith(33)
+	return
+}
+
+Lg_Blacksmith:
+{
+	UseBlacksmith(34)
+	return
+}
+
+UseBlacksmith(buffid) {
+	if !UserID {
+		MsgBox % "Need User ID & Hash."
+		FirstRun()
+	}
+	switch buffid
+{
+	case 31: currentcontracts := CurrentTinyBS
+	case 32: currentcontracts := CurrentSmBS
+	case 33: currentcontracts := CurrentMdBS
+	case 34: currentcontracts := CurrentLgBS
+}	
+	if (!currentcontracts) {
+		MsgBox, 4, , No Blacksmith Contracts of that size detected.  Check server for user details?
+		IfMsgBox, Yes
+		{
+			GetUserDetails()
+		}
+	}
+	InputBox, count, Blacksmithing, % "How many Blacksmith Contracts?`n(Max: " currentcontracts ")", , 200, 180
+	if ErrorLevel
+		return
+	if (count > currentcontracts) {
+		MsgBox, 4, , Insufficient blacksmith contracts detected for use.`nContinue anyway?
+		IfMsgBox No
+			return
+	}
+	heroid := "error"
+	InputBox, heroid, Blacksmithing, % "Use contracts on which Champ? (Enter ID)", , 200, 180
+	if ErrorLevel
+		return
+	while !(heroid is number) {
+		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
+		if ErrorLevel
+			return
+	}
+	while !((heroid > 0) && (heroid < 100)) {
+		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
+		if ErrorLevel
+			return
+	}
+	MsgBox, 4, , % "Use " count " contracts on " ChampFromID(heroid) "?"
+	IfMsgBox No
+		return
+	bscontractparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&buff_id=" buffid "&hero_id=" heroid "&num_uses="
+	tempsavesetting := 0
+	tempnosavesetting := 0
+	while (count > 0) {
+		SB_SetText("Contracts remaining to use: " count)
+		if (count < 100) {
+			rawresults := ServerCall("useserverbuff", bscontractparams count)
+			count -= count
+		}
+		else {
+			rawresults := ServerCall("useserverbuff", bscontractparams "99")
+			count -= 99
+		}
+		if (CurrentSettings.alwayssavecontracts || tempsavesetting) {
+			FileAppend, %rawresults%`n, %BlacksmithLogFile%
+		}
+		else {
+			if !tempnosavesetting {
+				InputBox, dummyvar, Contracts Results, Save to File?, , 250, 150, , , , , % rawresults
+				dummyvar := ""
+				if !ErrorLevel {
+					FileAppend, %rawresults%`n, %ContractLogFile%
+					tempsavesetting := 1
+				}
+				if ErrorLevel {
+					tempnosavesetting := 1
+				}
+			}
+		}
+		blacksmithresults := JSON.parse(rawresults)
+		if ((blacksmithresults.success == "0") || (blacksmithresults.okay == "0")) {
+			MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
+			MsgBox % "Error: " rawresults
+			switch buffid
+		{
+			case 31: contractsused := (CurrentTinyBS - blacksmithresults.buffs_remaining)
+			case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
+			case 33: contractsused := (CurrentMdBS - blacksmithresults.buffs_remaining)
+			case 34: contractsused := (CurrentLgBS - blacksmithresults.buffs_remaining)
+		}
+			UpdateLogTime()
+			FileAppend, % "(" CurrentTime ") Contracts Used: " Floor(contractsused) "`n", %OutputLogFile%
+			FileRead, OutputText, %OutputLogFile%
+			oMyGUI.Update()
+			GetUserDetails()
+			SB_SetText("Contracts remaining: " count " (Error)")
+			return
+		}
+		rawactions := JSON.stringify(blacksmithresults.actions)
+		blacksmithactions := JSON.parse(rawactions)
+		slot1lvs := 0
+		slot2lvs := 0
+		slot3lvs := 0
+		slot4lvs := 0
+		slot5lvs := 0
+		slot6lvs := 0
+		for k, v in blacksmithactions
+		{
+			switch v.slot_id
+		{
+			case 1: slot1lvs += v.amount
+			case 2: slot2lvs += v.amount
+			case 3: slot3lvs += v.amount
+			case 4: slot4lvs += v.amount
+			case 5: slot5lvs += v.amount
+			case 6: slot6lvs += v.amount
+		}
+		}
+	}
+	MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
+	tempsavesetting := 0
+	tempnosavesetting := 0
+	switch buffid {
+		case 31: contractsused := (CurrentTinyBS - blacksmithresults.buffs_remaining)
+		case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
+		case 33: contractsused := (CurrentMdBS - blacksmithresults.buffs_remaining)
+		case 34: contractsused := (CurrentLgBS - blacksmithresults.buffs_remaining)
+	}
+	UpdateLogTime()
+	FileAppend, % "(" CurrentTime ") Contracts used on " ChampFromID(heroid) ": " Floor(contractsused) "`n", %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	GetUserDetails()
+	SB_SetText("Blacksmith use completed.")
 	return
 }
 
@@ -894,9 +1110,51 @@ LoadAdventure() {
 	return
 }
 
+LoadBGAdventure() {
+	if (ActiveInstance == "2") {
+		bginstance := 1
+	}
+	else {
+		bginstance := 2
+	}
+	while !(BackgroundAdventure == "-1") {
+		MsgBox, 5, , Please end your background adventure first.
+		IfMsgBox Cancel
+			return
+	}
+	advtoload := 31
+	patrontoload := 0
+	InputBox, advtoload, Adventure to Load, Please enter the adventure_id`nyou would like to load., , 250, 150, , , , , %advtoload%
+	if (ErrorLevel=1) {
+		return
+	}
+	if !((advtoload > 0) && (advtoload < 999)) {
+		MsgBox % "Invalid adventure_id: " advtoload
+		return
+	}
+	InputBox, patrontoload, Patron to Load, Please enter the patron_id`nyou would like to load., , 250, 150, , , , , %patrontoload%
+	if (ErrorLevel=1) {
+		return
+	}
+	if !((patrontoload > -1) && (patrontoload < 4)) {
+		MsgBox % "Invalid patron_id: " patrontoload
+		return
+	}
+	advparams := DummyData "&patron_tier=0&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" bginstance "&adventure_id=" advtoload "&patron_id=" patrontoload
+	sResult := ServerCall("setcurrentobjective", advparams)
+	GetUserDetails()
+	SB_SetText("Selected background adventure has been loaded.")
+	return
+}
+
 EndAdventure() {
 	while (CurrentAdventure == "-1") {
 		MsgBox, No current adventure active.
+		return
+	}
+	MsgBox, 4, , % "Are you sure you want to end your current adventure?`nParty: " ActiveInstance " AdvID: " CurrentAdventure " Patron: " CurrentPatron
+	IfMsgBox, No
+	{
 		return
 	}
 	advparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" ActiveInstance
@@ -904,11 +1162,29 @@ EndAdventure() {
 	GetUserDetails()
 	SB_SetText("Current adventure has been ended.")
 	return
-	;&include_free_play_objectives=true
-	;&abandon_objective=false
-	;&ad_buff_enabled=false
-	;&reset_number=4157
-	;&manual_reset=1
+}
+
+EndBGAdventure() {
+	if (ActiveInstance == "2") {
+		bginstance := 1
+	}
+	else {
+		bginstance := 2
+	}
+	while (BackgroundAdventure == "-1") {
+		MsgBox, No background adventure active.
+		return
+	}
+	MsgBox, 4, , % "Are you sure you want to end your background adventure?`nParty: " bginstance " AdvID: " BackgroundAdventure " Patron: " BackgroundPatron
+	IfMsgBox, No
+	{
+		return
+	}
+	advparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" bginstance
+	sResult := ServerCall("softreset", advparams)
+	GetUserDetails()
+	SB_SetText("Background adventure has been ended.")
+	return
 }
 
 FirstRun() {
@@ -995,6 +1271,7 @@ GetUserDetails() {
 	UserDetails := JSON.parse(rawdetails)
 	InstanceID := UserDetails.details.instance_id
 	ActiveInstance := UserDetails.details.active_game_instance_id
+	ParseChampData()
 	ParseAdventureData()
 	ParseTimestamps()
 	ParseInventoryData()
@@ -1012,7 +1289,13 @@ ParseAdventureData() {
 	for k, v in UserDetails.details.game_instances
 		if (v.game_instance_id == ActiveInstance) {
 			CurrentAdventure := v.current_adventure_id
+			CurrentArea := v.current_area
 			CurrentPatron := PatronFromID(v.current_patron_id)
+		}
+		else {
+			BackgroundAdventure := v.current_adventure_id
+			BackgroundArea := v.current_area
+			BackgroundPatron := PatronFromID(v.current_patron_id)
 		}
 	;
 }
@@ -1075,7 +1358,22 @@ ParsePatronData() {
 		switch v.patron_id
 	{
 		case 1: {
-			for kk, vv in v.progress_bars
+			if v.unlocked == False {
+				MirtVariants := "Locked"
+				MirtFPCurrency := "Requires:"
+				MirtChallenges := "Costs:"
+				MirtRequires := UserDetails.details.stats.total_hero_levels "/2000 Item Levels && " TotalChamps "/20 Champs"
+				if ((UserDetails.details.stats.total_hero_levels > 1999) && (TotalChamps > 19)) {
+					Gui, Font, cGreen
+					GuiControl, Font, MirtFPCurrency
+				}
+				MirtCosts := CurrentTGPs "/3 TGPs && " CurrentSilvers "/10 Silver Chests"
+				if ((CurrentTGPs > 2) && (CurrentSilvers > 9)) {
+					Gui, Font, cGreen
+					GuiControl, Font, MirtChallenges
+				}
+			}
+			else for kk, vv in v.progress_bars
 				switch vv.id
 			{
 				case "variants_completed":
@@ -1087,7 +1385,22 @@ ParsePatronData() {
 			}
 		}
 		case 2: {
-			for kk, vv in v.progress_bars
+			if v.unlocked == False {
+				VajraVariants := "Locked"
+				VajraFPCurrency := "Requires:"
+				VajraChallenges := "Costs:"
+				VajraRequires := UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c15 "/15 WD:DH Advs && " TotalChamps "/30 Champs"
+				if ((UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c15 > 14) && (TotalChamps > 29)) {
+					Gui, Font, cGreen
+					GuiControl, Font, VajraFPCurrency
+				}
+				VajraCosts := CurrentGems "/2500 Gems && " CurrentSilvers "/15 Silver Chests"
+				if ((CurrentGems > 2499) && (CurrentSilvers > 14)) {
+					Gui, Font, cGreen
+					GuiControl, Font, VajraChallenges
+				}
+			}
+			else for kk, vv in v.progress_bars
 				switch vv.id
 			{
 				case "variants_completed":
@@ -1099,7 +1412,22 @@ ParsePatronData() {
 			}
 		}
 		case 3: {
-			for kk, vv in v.progress_bars
+			if v.unlocked == False {
+				StrahdVariants := "Locked"
+				StrahdFPCurrency := "Requires:"
+				StrahdChallenges := "Costs:"
+				StrahdRequires := UserDetails.details.stats.highest_area_completed_ever_c413 "/250 in Adventure 413 && " TotalChamps "/40 Champs"
+				if ((UserDetails.details.stats.highest_area_completed_ever_c413 > 249) && (TotalChamps > 39)) {
+					Gui, Font, cGreen
+					GuiControl, Font, StrahdFPCurrency
+				}
+				StrahdCosts := CurrentLgBounties "/10 Lg Bounties && " CurrentSilvers "/20 Silver Chests"
+				if ((CurrentLgBounties > 9) && (CurrentSilvers > 19)) {
+					Gui, Font, cGreen
+					GuiControl, Font, StrahdChallenges
+				}
+			}
+			else for kk, vv in v.progress_bars
 				switch vv.id
 			{
 				case "variants_completed":
@@ -1140,88 +1468,113 @@ ParseLootData() {
 		}
 }
 
+ParseChampData() {
+	TotalChamps := 0
+	for k, v in UserDetails.details.heroes
+		if (v.owned == 1) {
+			TotalChamps += 1
+		}
+	;
+	ChampDetails := ""
+	if (UserDetails.details.stats.black_viper_total_gems) {
+		ChampDetails := ChampDetails "Black Viper Red Gems: " UserDetails.details.stats.black_viper_total_gems "`n`n"
+	}
+	if (UserDetails.details.stats.total_paid_up_front_gold) {
+		ChampDetails := ChampDetails "Môrgæn Gold Collected: " UserDetails.details.stats.total_paid_up_front_gold "`n`n"
+	}
+	if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
+		ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
+	}
+}
+
 CheckPatronProgress() {
-	if (MirtFPCurrency = "5000") {
-		Gui, Font, cGreen
-		GuiControl, Font, MirtFPCurrency
+	if !(MirtVariants == "Locked") {
+		if (MirtFPCurrency = "5000") {
+			Gui, Font, cGreen
+			GuiControl, Font, MirtFPCurrency
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, MirtFPCurrency
+		}
+		if (MirtChallenges = "10") {
+			Gui, Font, cGreen
+			GuiControl, Font, MirtChallenges
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, MirtChallenges
+		}
+		if (MirtCompleted = MirtVariantTotal) {
+			Gui, Font, cGreen
+			GuiControl, Font, MirtVariants
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, MirtVariants
+		}
 	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, MirtFPCurrency
+	if !(VajraVariants == "Locked") {
+		if (VajraFPCurrency = "5000") {
+			Gui, Font, cGreen
+			GuiControl, Font, VajraFPCurrency
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, VajraFPCurrency
+		}
+		if (VajraChallenges = "10") {
+			Gui, Font, cGreen
+			GuiControl, Font, VajraChallenges
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, VajraChallenges
+		}
+		if (VajraCompleted = VajraVariantTotal) {
+			Gui, Font, cGreen
+			GuiControl, Font, VajraVariants
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, VajraVariants
+		}
 	}
-	if (VajraFPCurrency = "5000") {
-		Gui, Font, cGreen
-		GuiControl, Font, VajraFPCurrency
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, VajraFPCurrency
-	}
-	if (StrahdFPCurrency = "5000") {
-		Gui, Font, cGreen
-		GuiControl, Font, StrahdFPCurrency
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, StrahdFPCurrency
-	}
-	if (MirtChallenges = "10") {
-		Gui, Font, cGreen
-		GuiControl, Font, MirtChallenges
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, MirtChallenges
-	}
-	if (VajraChallenges = "10") {
-		Gui, Font, cGreen
-		GuiControl, Font, VajraChallenges
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, VajraChallenges
-	}
-	if (StrahdChallenges = "10") {
-		Gui, Font, cGreen
-		GuiControl, Font, StrahdChallenges
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, StrahdChallenges
-	}
-	if (MirtCompleted = MirtVariantTotal) {
-		Gui, Font, cGreen
-		GuiControl, Font, MirtVariants
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, MirtVariants
-	}
-	if (VajraCompleted = VajraVariantTotal) {
-		Gui, Font, cGreen
-		GuiControl, Font, VajraVariants
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, VajraVariants
-	}
-	if (StrahdCompleted = StrahdVariantTotal) {
-		Gui, Font, cGreen
-		GuiControl, Font, StrahdVariants
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, StrahdVariants
+	if !(StrahdVariants == "Locked") {
+		if (StrahdChallenges = "10") {
+			Gui, Font, cGreen
+			GuiControl, Font, StrahdChallenges
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, StrahdChallenges
+		}
+		if (StrahdFPCurrency = "5000") {
+			Gui, Font, cGreen
+			GuiControl, Font, StrahdFPCurrency
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, StrahdFPCurrency
+		}
+		if (StrahdCompleted = StrahdVariantTotal) {
+			Gui, Font, cGreen
+			GuiControl, Font, StrahdVariants
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, StrahdVariants
+		}
 	}
 }
 
 CheckAchievements() {
 	if (UserDetails.details.stats.asharra_bonds < 3) {
-		if !(UserDetails.details.stats.asharra_bond.human)
+		if !(UserDetails.details.stats.asharra_bond_human)
 			ashexotic := " human"
-		if !(UserDetails.details.stats.asharra_bond.elf)
+		if !(UserDetails.details.stats.asharra_bond_elf)
 			ashelf := " elf"
-		if !(UserDetails.details.stats.asharra_bond.exotic)
+		if !(UserDetails.details.stats.asharra_bond_exotic)
 			ashhuman := " exotic"
 		todoasharra := "`nAsharra needs:" ashhuman ashelf ashexotic
 	}
@@ -1258,9 +1611,12 @@ CheckAchievements() {
 			regis6 := " ranged->"
 		todoregis := "`nRegis needs:" regis1 regis2 regis3 regis4 regis5 regis6
 	}
-	AchievementInfo := "Locked Achievement Details" todoasharra todogromma todokrond todoregis
-	if (AchievementInfo == "Locked Achievement Details") {
-		AchievementInfo := "Locked Achievement Details: N/A"
+	if !(UserDetails.details.stats.highest_level_gear > 4999) {
+		todogear := "`nHighest Gear Level:" UserDetails.details.stats.highest_level_gear
+	}
+	AchievementInfo := "Achievement Details`n" todogear todoasharra todogromma todokrond todoregis
+	if (AchievementInfo == "Achievement Details`n") {
+		AchievementInfo := "Achievement Details: N/A"
 	}
 }
 
@@ -1268,15 +1624,15 @@ CheckBlessings() {
 	epiccount := ""
 	epicvalue := Round((1.02 ** EpicGearCount), 2)
 	if (UserDetails.details.reset_upgrade_levels.44) { ;Helm-Slow and Steady (X Epics)
-		epiccount := "Slow and Steady:`nx" epicvalue " damage (" EpicGearCount " epics)`n"
+		epiccount := "Slow and Steady:`nx" epicvalue " damage (" EpicGearCount " epics)`n`n"
 	}
 	veterancount := ""
 	veteranvalue := Round(1 + (0.1 * UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22), 2)
 	if (UserDetails.details.reset_upgrade_levels.56) { ;Tiamat-Veterans of Avernus (X Adventures)
-		veterancount := "Veterans of Avernus:`nx" veteranvalue " damage (" UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22 " adventures)`n"
+		veterancount := "Veterans of Avernus:`nx" veteranvalue " damage (" UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22 " adventures)`n`n"
 	}
-	BlessingInfo := "Blessing Details`n" epiccount veterancount
-	if (BlessingInfo == "Blessing Details`n") {
+	BlessingInfo := "Blessing Details`n`n" epiccount veterancount
+	if (BlessingInfo == "Blessing Details`n`n") {
 		BlessingInfo := "Blessing Details: N/A"
 	}
 }
@@ -1471,7 +1827,7 @@ ChampFromID(id) {
 			case "61": namefromid := "Jaheira"
 			case "62": namefromid := "Nova"
 			case "63": namefromid := "Freely"
-			case "64": namefromid := "Beadle & Grimm"
+			case "64": namefromid := "B & G"
 			case "65": namefromid := "Omin"
 			case "66": namefromid := "Lazaapz"
 			case "67": namefromid := "Dragonbait"
@@ -1505,4 +1861,31 @@ ChampFromID(id) {
 		namefromid := "UNKNOWN"
 		return namefromid
 	}
+}
+
+List_ChampIDs:
+{
+	id := 1
+	champidlist := ""
+	while (id < 69) {
+		champidlist := champidlist id ": " ChampFromID(id) " `t"
+		if ((id = 9) or (id = 13) or (id = 37) or (id = 41) or (id = 45) or (id = 49) or (id = 53) or (id = 65)) {
+			champidlist := champidlist "`t"
+		}
+		id += 1
+		champidlist := champidlist id ": " ChampFromID(id) " `t"
+		if ((id = 2) or (id = 10) or (id = 14) or (id = 18) or (id = 30) or (id = 42) or (id = 58) or (id = 62)) {
+			champidlist := champidlist "`t"
+		}
+		id += 1
+		champidlist := champidlist id ": " ChampFromID(id) " `t"
+		if ((id = 3) or (id = 7) or (id = 23) or (id = 31) or (id = 30) or (id = 43) or (id = 51) or (id = 59) or (id = 63)) {
+			champidlist := champidlist "`t"
+		}
+		id += 1
+		champidlist := champidlist id ": " ChampFromID(id) "`n"
+		id += 1
+	}
+	MsgBox, , Champ ID List, % champidlist
+	return	
 }
