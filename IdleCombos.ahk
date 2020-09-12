@@ -1,5 +1,9 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
+;Fixed in 1.3.1
+;-Width issue causing tabs to overwrite first line
+;-Highest gear level shows beyond 5000 :)
+
 ;Added in 1.3:
 ;-Able to use Blacksmith Contracts
 ;-Highest Gear Level shown
@@ -8,14 +12,14 @@
 ;-Displays background Adventure/Patron
 ;-Displays current and background Area
 ;-Able to start/end background adventure
-;-Added list of Champ ID number in Help menu
+;-Added list of Champ ID numbers in Help menu
 
 ;Fixed in 1.3
 ;-Added warning when ending adventure
 ;-Removed "New Feats" from opening Silvers
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.3"
+global VersionNumber := "1.3.x"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -167,7 +171,7 @@ return
 
 ;BEGIN: GUI Defs
 class MyGui {
-	Width := "525"
+	Width := "550"
 	Height := "360"
 	
 	__New()
@@ -212,8 +216,8 @@ class MyGui {
 		Gui, Menu, IdleMenu
 		
 		col1_x := 5
-		col2_x := 400
-		col3_x := 460
+		col2_x := 420
+		col3_x := 480
 		row_y := 5
 		
 		Gui, Add, StatusBar,, %OutputStatus%
@@ -221,19 +225,19 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 		
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w380, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
 		Gui, Tab
 		
 		row_y := row_y + 25
 		;Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gUpdate_Clicked, Update
 		
 		row_y := row_y + 25
-		Gui, MyWindow:Add, Text, x390 y53 vCrashProtectStatus, % CrashProtectStatus
+		Gui, MyWindow:Add, Text, x410 y53 vCrashProtectStatus, % CrashProtectStatus
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gCrash_Toggle, Toggle
 		
-		Gui, MyWindow:Add, Text, x390 y100, Data Timestamp:
-		Gui, MyWindow:Add, Text, x390 y120 vLastUpdated w220, % LastUpdated
-		Gui, MyWindow:Add, Button, x390 y140 w60 gUpdate_Clicked, Update
+		Gui, MyWindow:Add, Text, x410 y100, Data Timestamp:
+		Gui, MyWindow:Add, Text, x410 y120 vLastUpdated w220, % LastUpdated
+		Gui, MyWindow:Add, Button, x410 y140 w60 gUpdate_Clicked, Update
 		
 		Gui, Tab, Summary
 		Gui, MyWindow:Add, Text, vAchievementInfo x15 y33 w300, % AchievementInfo
@@ -1611,13 +1615,8 @@ CheckAchievements() {
 			regis6 := " ranged->"
 		todoregis := "`nRegis needs:" regis1 regis2 regis3 regis4 regis5 regis6
 	}
-	if !(UserDetails.details.stats.highest_level_gear > 4999) {
-		todogear := "`nHighest Gear Level:" UserDetails.details.stats.highest_level_gear
-	}
+	todogear := "`nHighest Gear Level:" UserDetails.details.stats.highest_level_gear
 	AchievementInfo := "Achievement Details`n" todogear todoasharra todogromma todokrond todoregis
-	if (AchievementInfo == "Achievement Details`n") {
-		AchievementInfo := "Achievement Details: N/A"
-	}
 }
 
 CheckBlessings() {
