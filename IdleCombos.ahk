@@ -1,25 +1,18 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
-;Fixed in 1.3.1
-;-Width issue causing tabs to overwrite first line
-;-Highest gear level shows beyond 5000 :)
+;Added in 1.4
+;-Shows active cores, reset area, and XP
+;-Able to download Journal to file
+;-Able to load WRL file from other platforms
+;-(Tested: Android & iOS.)
+;-Highest gear level also shows Champ and Slot
 
-;Added in 1.3:
-;-Able to use Blacksmith Contracts
-;-Highest Gear Level shown
-;-Zorbu, BV, and Môrgæn lifetime stat tracking
-;-Patron Unlock progress shown when Locked
-;-Displays background Adventure/Patron
-;-Displays current and background Area
-;-Able to start/end background adventure
-;-Added list of Champ ID numbers in Help menu
-
-;Fixed in 1.3
-;-Added warning when ending adventure
-;-Removed "New Feats" from opening Silvers
+;Fixed in 1.4
+;-Settings file will correct itself when new settings are added
+;-Morgaen gold value is now a reasonable length
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.3.x"
+global VersionNumber := "1.4"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -28,6 +21,7 @@ global UserDetailsFile := "userdetails.json"
 global ChestOpenLogFile := "chestopenlog.json"
 global BlacksmithLogFile := "blacksmithlog.json"
 global RedeemCodeLogFile := "redeemcodelog.json"
+global JournalFile := "journal.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
@@ -40,6 +34,8 @@ global FirstRun := 1
 global AlwaysSaveChests := 0
 global AlwaysSaveContracts := 0
 global AlwaysSaveCodes := 0
+global SettingsCheckValue := 9 ;used to check for outdated settings file
+global NewSettings := JSON.stringify({"firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
 
 ;Server globals
 global DummyData := "&language_id=1&timestamp=0&request_id=0&network_id=11&mobile_client_version=999"
@@ -84,6 +80,9 @@ global AvailableBSLvs := ""
 global EpicGearCount := 0
 global BrivSlot4 := 0
 global BrivZone := 0
+;Modron globals
+global FGCore := "`n"
+global BGCore := "`n"
 ;Patron globals
 global MirtVariants := ""
 global MirtCompleted := ""
@@ -116,6 +115,7 @@ global CrashProtectStatus := "Crash Protect`nDisabled"
 global CrashCount := 0
 global LastUpdated := "No data loaded."
 global TrayIcon := systemroot "\system32\imageres.dll"
+global LastBSChamp := ""
 
 ;BEGIN:	default run commands
 If FileExist(TrayIcon) {
@@ -131,8 +131,7 @@ if (!oMyGUI) {
 }
 ;First run checks and setup
 if !FileExist(SettingsFile) {
-	newsettings := JSON.stringify({"firstrun":0,"user_id":0,"hash":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
-	FileAppend, %newsettings%, %SettingsFile%
+	FileAppend, %NewSettings%, %SettingsFile%
 	UpdateLogTime()
 	FileAppend, (%CurrentTime%) Settings file "idlecombosettings.json" created.`n, %OutputLogFile%
 	FileRead, OutputText, %OutputLogFile%
@@ -140,12 +139,32 @@ if !FileExist(SettingsFile) {
 }
 FileRead, rawsettings, %SettingsFile%
 CurrentSettings := JSON.parse(rawsettings)
+if !(CurrentSettings.Count() == SettingsCheckValue) {
+	FileDelete, %SettingsFile%
+	FileAppend, %NewSettings%, %SettingsFile%
+	UpdateLogTime()
+	FileAppend, (%CurrentTime%) Settings file "idlecombosettings.json" created.`n, %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	FileRead, rawsettings, %SettingsFile%
+	CurrentSettings := JSON.parse(rawsettings)
+	oMyGUI.Update()
+	MsgBox, Your settings file has been deleted due to an update to IdleCombos.  Please verify that your settings are set as preferred.
+}
+if FileExist(A_ScriptDir "\webRequestLog.txt") {
+	MsgBox, 4, , % "WRL File detected.  Use file?"
+	IfMsgBox, Yes
+	{
+		WRLFile := A_ScriptDir "\webRequestLog.txt"
+		FirstRun()
+	}
+}
 if !(CurrentSettings.firstrun) {
 	FirstRun()
 }
 if (CurrentSettings.user_id && CurrentSettings.hash) {
 	UserID := CurrentSettings.user_id
 	UserHash := CurrentSettings.hash
+	InstanceID := CurrentSettings.instance_id
 	SB_SetText("User ID & Hash ready.")
 }
 else {
@@ -162,7 +181,6 @@ if (GetDetailsonStart == "1") {
 }
 if (LaunchGameonStart == "1") {
 	LaunchGame()
-	FirstRun := 0
 }
 oMyGUI.Update()
 SendMessage, 0x115, 7, 0, Edit1, A
@@ -207,6 +225,7 @@ class MyGui {
 		
 		Menu, HelpSubmenu, Add, &Run Setup, FirstRun
 		Menu, HelpSubmenu, Add, Clear &Log, Clear_Log
+		Menu, HelpSubmenu, Add, Download &Journal, Get_Journal
 		Menu, HelpSubmenu, Add, CNE &Support Ticket, Open_Ticket
 		Menu, HelpSubmenu, Add
 		Menu, HelpSubmenu, Add, &List Champ IDs, List_ChampIDs
@@ -225,7 +244,7 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 		
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures||Inventory|Patrons|Champions|Settings|Log|
 		Gui, Tab
 		
 		row_y := row_y + 25
@@ -256,6 +275,9 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vBackgroundPatron x+2 w50, % BackgroundPatron
 		Gui, MyWindow:Add, Text, x15 y+p w120, Background Area:
 		Gui, MyWindow:Add, Text, vBackgroundArea x+2 w50, % BackgroundArea
+		
+		Gui, MyWindow:Add, Text, vFGCore x200 y33 w150, % FGCore
+		Gui, MyWindow:Add, Text, vBGCore x200 y76 w150, % BGCore
 		
 		Gui, Tab, Inventory
 		Gui, MyWindow:Add, Text, x15 y33 w70, Current Gems:
@@ -370,6 +392,8 @@ class MyGui {
 		GuiControl, MyWindow:, BackgroundAdventure, % BackgroundAdventure, w250 h210
 		GuiControl, MyWindow:, BackgroundArea, % BackgroundArea, w250 h210
 		GuiControl, MyWindow:, BackgroundPatron, % BackgroundPatron, w250 h210
+		GuiControl, MyWindow:, FGCore, % FGCore, w250 h210
+		GuiControl, MyWindow:, BGCore, % BGCore, w250 h210
 		;inventory
 		GuiControl, MyWindow:, CurrentGems, % CurrentGems, w250 h210
 		GuiControl, MyWindow:, SpentGems, % SpentGems, w250 h210
@@ -964,14 +988,14 @@ UseBlacksmith(buffid) {
 	case 33: currentcontracts := CurrentMdBS
 	case 34: currentcontracts := CurrentLgBS
 }	
-	if (!currentcontracts) {
+	if !(currentcontracts) {
 		MsgBox, 4, , No Blacksmith Contracts of that size detected.  Check server for user details?
 		IfMsgBox, Yes
 		{
 			GetUserDetails()
 		}
 	}
-	InputBox, count, Blacksmithing, % "How many Blacksmith Contracts?`n(Max: " currentcontracts ")", , 200, 180
+	InputBox, count, Blacksmithing, % "How many Blacksmith Contracts?`n(Max: " currentcontracts ")", , 200, 180, , , , , %currentcontracts%
 	if ErrorLevel
 		return
 	if (count > currentcontracts) {
@@ -980,22 +1004,23 @@ UseBlacksmith(buffid) {
 			return
 	}
 	heroid := "error"
-	InputBox, heroid, Blacksmithing, % "Use contracts on which Champ? (Enter ID)", , 200, 180
+	InputBox, heroid, Blacksmithing, % "Use contracts on which Champ? (Enter ID)", , 200, 180, , , , , %LastBSChamp%
 	if ErrorLevel
 		return
 	while !(heroid is number) {
-		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
+		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180, , , , , %LastBSChamp%
 		if ErrorLevel
 			return
 	}
 	while !((heroid > 0) && (heroid < 100)) {
-		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
+		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180, , , , , %LastBSChamp%
 		if ErrorLevel
 			return
 	}
 	MsgBox, 4, , % "Use " count " contracts on " ChampFromID(heroid) "?"
 	IfMsgBox No
 		return
+	LastBSChamp := heroid
 	bscontractparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&buff_id=" buffid "&hero_id=" heroid "&num_uses="
 	tempsavesetting := 0
 	tempnosavesetting := 0
@@ -1192,7 +1217,7 @@ EndBGAdventure() {
 }
 
 FirstRun() {
-	MsgBox, 4, , Get User ID and Hash from Steam webrequestlog.txt?
+	MsgBox, 4, , Get User ID and Hash from webrequestlog.txt?
 	IfMsgBox, Yes
 	{
 		GetIdFromWRL()
@@ -1274,7 +1299,11 @@ GetUserDetails() {
 	FileAppend, %rawdetails%, %UserDetailsFile%
 	UserDetails := JSON.parse(rawdetails)
 	InstanceID := UserDetails.details.instance_id
+	CurrentSettings.instance_id := InstanceID
 	ActiveInstance := UserDetails.details.active_game_instance_id
+	newsettings := JSON.stringify(CurrentSettings)
+	FileDelete, %SettingsFile%
+	FileAppend, %newsettings%, %SettingsFile%
 	ParseChampData()
 	ParseAdventureData()
 	ParseTimestamps()
@@ -1300,6 +1329,32 @@ ParseAdventureData() {
 			BackgroundAdventure := v.current_adventure_id
 			BackgroundArea := v.current_area
 			BackgroundPatron := PatronFromID(v.current_patron_id)
+		}
+	;
+	for k, v in UserDetails.details.modron_saves
+		if (v.instance_id == ActiveInstance) {
+			if (v.core_id == 1) {
+				FGCore := "Core: Modest"
+			}
+			else if (v.core_id == 2) {
+				FGCore := "Core: Strong"
+			}
+			if (v.properties.toggle_preferences.reset == true) {
+				FGCore := FGCore " (Reset at " v.area_goal ")"
+			}
+			FGCore := FGCore "`nXP: " v.exp_total
+		}
+		else if !(v.instance_id == ActiveInstance) {
+			if (v.core_id == 1) {
+				BGCore := "Core: Modest"
+			}
+			else if (v.core_id == 2) {
+				BGCore := "Core: Strong"
+			}
+			if (v.properties.toggle_preferences.reset == true) {
+				BGCore := BGCore " (Reset at " v.area_goal ")"
+			}
+			BGCore := BGCore "`nXP: " v.exp_total
 		}
 	;
 }
@@ -1447,16 +1502,21 @@ ParsePatronData() {
 
 ParseLootData() {
 	EpicGearCount := 0
-	for k, v in UserDetails.details.loot
+	todogear := "`nHighest Gear Level:" UserDetails.details.stats.highest_level_gear
+	for k, v in UserDetails.details.loot {
 		if (v.rarity == "4") {
 			EpicGearCount += 1
 		}
-	for k, v in UserDetails.details.loot
 		if ((v.hero_id == "58") && (v.slot_id == "4")) {
 			brivrarity := v.rarity
 			brivgild := v.gild
 			brivenchant := v.enchant
 		}
+		if ((v.enchant + 1) = UserDetails.details.stats.highest_level_gear) {
+			todogear := todogear "`n(" ChampFromID(v.hero_id) " Slot " v.slot_id ")"
+		}
+	}
+	AchievementInfo := "Achievement Details`n" todogear
 	switch brivrarity {
 		case "0": BrivSlot4 := 0
 		case "1": BrivSlot4 := 10
@@ -1484,7 +1544,10 @@ ParseChampData() {
 		ChampDetails := ChampDetails "Black Viper Red Gems: " UserDetails.details.stats.black_viper_total_gems "`n`n"
 	}
 	if (UserDetails.details.stats.total_paid_up_front_gold) {
-		ChampDetails := ChampDetails "Môrgæn Gold Collected: " UserDetails.details.stats.total_paid_up_front_gold "`n`n"
+		morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
+		epos := InStr(UserDetails.details.stats.total_paid_up_front_gold, "E")
+		morgaengold := morgaengold SubStr(UserDetails.details.stats.total_paid_up_front_gold, epos)
+		ChampDetails := ChampDetails "Môrgæn Gold Collected: " morgaengold "`n`n"
 	}
 	if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
 		ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
@@ -1615,8 +1678,7 @@ CheckAchievements() {
 			regis6 := " ranged->"
 		todoregis := "`nRegis needs:" regis1 regis2 regis3 regis4 regis5 regis6
 	}
-	todogear := "`nHighest Gear Level:" UserDetails.details.stats.highest_level_gear
-	AchievementInfo := "Achievement Details`n" todogear todoasharra todogromma todokrond todoregis
+	AchievementInfo := AchievementInfo todoasharra todogromma todokrond todoregis
 }
 
 CheckBlessings() {
@@ -1719,6 +1781,42 @@ LaunchGame() {
 			SB_SetText("Game client is already running!")
 		}
 	}
+	return
+}
+
+Get_Journal:
+{
+	if !UserID {
+		MsgBox % "Need User ID & Hash."
+		FirstRun()
+	}
+	if (InstanceID = 0) {
+		MsgBox, 4, , No Instance ID detected.  Check server for user details?
+		IfMsgBox, Yes
+		{
+			GetUserDetails()
+		}
+		else
+			return
+	}
+	journalparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&page="
+	InputBox, pagecount, Journal, % "How many pages of Journal to retreive?`n`n(This will overwrite any previous download.)", , 350, 180
+	if ErrorLevel
+		return
+	pagenum := 1
+	FileDelete, %JournalFile%
+	while !(pagenum > pagecount) {
+		SB_SetText("Journal pages remaining to download: " ((pagecount - pagenum) + 1))
+		rawresults := ServerCall("getPlayHistory", journalparams pagenum)
+		FileAppend, %rawresults%`n, %JournalFile%
+		pagenum += 1
+		sleep 1000
+	}
+	UpdateLogTime()
+	FileAppend, % "(" CurrentTime ") Journal pages downloaded: " (pagenum - 1) "`n", %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	SB_SetText("Journal download completed.")
 	return
 }
 
