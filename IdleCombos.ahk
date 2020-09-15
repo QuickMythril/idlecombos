@@ -1,5 +1,8 @@
-﻿#include %A_ScriptDir%
+#include %A_ScriptDir%
 #include JSON.ahk
+;Fixed in 1.4.1
+;-Clearing variables to prevent bad results when using only one core
+
 ;Added in 1.4
 ;-Shows active cores, reset area, and XP
 ;-Able to download Journal to file
@@ -12,7 +15,7 @@
 ;-Morgaen gold value is now a reasonable length
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.4"
+global VersionNumber := "1.4.1"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -1331,6 +1334,8 @@ ParseAdventureData() {
 			BackgroundPatron := PatronFromID(v.current_patron_id)
 		}
 	;
+	FGCore := "`n"
+	BGCore := "`n"
 	for k, v in UserDetails.details.modron_saves
 		if (v.instance_id == ActiveInstance) {
 			if (v.core_id == 1) {
