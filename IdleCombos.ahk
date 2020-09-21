@@ -1,21 +1,15 @@
-#include %A_ScriptDir%
+﻿#include %A_ScriptDir%
 #include JSON.ahk
-;Fixed in 1.4.1
-;-Clearing variables to prevent bad results when using only one core
+;Added in 1.4.2
+;-Tracks Torogar Zealot stacks
 
-;Added in 1.4
-;-Shows active cores, reset area, and XP
-;-Able to download Journal to file
-;-Able to load WRL file from other platforms
-;-(Tested: Android & iOS.)
-;-Highest gear level also shows Champ and Slot
-
-;Fixed in 1.4
-;-Settings file will correct itself when new settings are added
-;-Morgaen gold value is now a reasonable length
+;Fixed in 1.4.2
+;-Better Code results parsing
+;-Morgaen's name displaying incorrectly on some systems
+;-added application icon for WIN7/8/Vista
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.4.1"
+global VersionNumber := "1.4.2"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -121,10 +115,19 @@ global TrayIcon := systemroot "\system32\imageres.dll"
 global LastBSChamp := ""
 
 ;BEGIN:	default run commands
-If FileExist(TrayIcon) {
-	If (SubStr(A_OSVersion, 1, 2) == 10) {
+if FileExist(TrayIcon) {
+	if (SubStr(A_OSVersion, 1, 2) == 10) {
 		Menu, Tray, Icon, %TrayIcon%, 300
 	}
+	else if (A_OSVersion == "WIN_8") {
+		Menu, Tray, Icon, %TrayIcon%, 284
+	}
+	else if (A_OSVersion == "WIN_7") {
+		Menu, Tray, Icon, %TrayIcon%, 78
+	}
+	else if (A_OSVersion == "WIN_VISTA") {
+		Menu, Tray, Icon, %TrayIcon%, 77
+	} ; WIN_8.1, WIN_2003, WIN_XP, WIN_2000, WIN_NT4, WIN_95, WIN_98, WIN_ME
 }
 UpdateLogTime()
 FileAppend, (%CurrentTime%) IdleCombos v%VersionNumber% started.`n, %OutputLogFile%
@@ -247,7 +250,7 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 		
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures||Inventory|Patrons|Champions|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
 		Gui, Tab
 		
 		row_y := row_y + 25
@@ -574,6 +577,9 @@ Redeem_Codes:
 	expiredcodes := ""
 	codegolds := 0
 	otherchests := ""
+	codeepics := ""
+	codetgps := 0
+	codepolish := 0
 	tempsavesetting := 0
 	tempnosavesetting := 0
 	for k, v in CodeList
@@ -590,10 +596,10 @@ Redeem_Codes:
 		codeparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&code=" sCode
 		rawresults := ServerCall("redeemcoupon", codeparams)
 		coderesults := JSON.parse(rawresults)
-		rawactions := JSON.stringify(coderesults.actions)
-		StringTrimLeft, rawactions, rawactions, 1
-		StringTrimRight, rawactions, rawactions, 1
-		codeactions := JSON.parse(rawactions)
+		rawloot := JSON.stringify(coderesults.loot_details)
+		StringTrimLeft, rawloot, rawloot, 1
+		StringTrimRight, rawloot, rawloot, 1
+		codeloot := JSON.parse(rawloot)
 		if (coderesults.failure_reason == "Outdated instance id") {
 			MsgBox, 4, , % "Outdated instance id. Update from server?"
 			IfMsgBox, Yes
@@ -617,12 +623,30 @@ Redeem_Codes:
 		else if (coderesults.failure_reason == "This offer has expired") {
 			expiredcodes := expiredcodes sCode "`n"
 		}
-		else if (codeactions.chest_type_id == 2) {
-			codegolds += codeactions.count
+		else if (codeloot.chest_type_id == "2") {
+			codegolds += codeloot.count
 		}
-		else if (otherchests codeactions.chest_type_id) {
-			otherchests := otherchests codeactions.chest_type_id ", "
-		}			
+		else if (codeloot.chest_type_id) {
+			otherchests := otherchests codeloot.chest_type_id ", "
+		}
+		else if (codeloot.add_time_gate_key_piece) {
+			codetgps += codeloot.count
+		}
+		else if (codeloot.add_inventory_buff_id) {
+			switch codeloot.add_inventory_buff_id
+		{
+			case 4: codeepics := codeepics "STR (" codeloot.count "), "
+			case 8: codeepics := codeepics "GF (" codeloot.count "), "
+			case 16: codeepics := codeepics "HP (" codeloot.count "), "
+			case 20: codeepics := codeepics "Bounty (" codeloot.count "), "
+			case 34: codeepics := codeepics "BS (" codeloot.count "), "
+			case 35: codeepics := codeepics "Spec (" codeloot.count "), "
+			case 40: codeepics := codeepics "FB (" codeloot.count "), "
+			case 77: codeepics := codeepics "Spd (" codeloot.count "), "
+			case 36: codepolish += codeloot.count
+			default: codeepics := codeepics codeloot.add_inventory_buff_id " (" codeloot.count "), "
+		}
+		}
 		CodeCount := % (CodeCount-1)
 		if (CurrentSettings.alwayssavecodes || tempsavesetting) {
 			FileAppend, %sCode%`n, %RedeemCodeLogFile%
@@ -657,10 +681,21 @@ Redeem_Codes:
 		codemessage := codemessage "Gold Chests:`n" codegolds "`n"
 	}
 	if !(otherchests == "") {
+		StringTrimRight, otherchests, otherchests, 2
 		codemessage := codemessage "Other chests:`n" otherchests "`n"
 	}
+	if (codepolish > 0) {
+		codemessage := codemessage "Potions of Polish:`n" codepolish "`n"
+	}
+	if (codetgps > 0) {
+		codemessage := codemessage "Time Gate Pieces:`n" codetgps "`n"
+	}
+	if !(codeepics == "") {
+		StringTrimRight, codeepics, codeepics, 2
+		codemessage := codemessage "Epic consumables:`n" codeepics "`n"
+	}
 	if (codemessage == "") {
-		codemessage := "No Results."
+		codemessage := "Unknown or No Results."
 	}
 	GuiControl, , CodesPending, % CodesPending, w250 h210
 	GetUserDetails()
@@ -976,6 +1011,125 @@ Med_Blacksmith:
 Lg_Blacksmith:
 {
 	UseBlacksmith(34)
+	return
+}
+
+Use_All_Blacksmith:
+{
+	if !UserID {
+		MsgBox % "Need User ID & Hash."
+		FirstRun()
+	}
+	allcount := (CurrentTinyBS + CurrentSmBS + CurrentMdBS + CurrentLgBS)
+	tinycount := CurrentTinyBS
+	smcount := CurrentSmBS
+	mdcount := CurrentMdBS
+	lgcount := CurrentLgBS
+	usedcount := 0
+	if !(allcount) {
+		MsgBox, 4, , No Blacksmith Contracts detected.  Check server for user details?
+		IfMsgBox, Yes
+		{
+			GetUserDetails()
+		}
+	}
+	heroid := "error"
+	InputBox, heroid, Blacksmithing, % "Use ALL " allcount " contracts on which Champ? (Enter ID)", , 200, 180
+	if ErrorLevel
+		return
+	while !(heroid is number) {
+		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
+		if ErrorLevel
+			return
+	}
+	while !((heroid > 0) && (heroid < 100)) {
+		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
+		if ErrorLevel
+			return
+	}
+	MsgBox, 4, , % "Use ALL " allcount " contracts on " ChampFromID(heroid) "?"
+	IfMsgBox No
+		return
+	bscontractparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&hero_id=" heroid "&num_uses="
+	tempsavesetting := 0
+	tempnosavesetting := 0
+	currentcount := tinycount
+	currentbuff := 31
+	while (allcount > 0) {
+		SB_SetText("Contracts remaining to use: " allcount)
+		if (currentcount < 100) {
+			rawresults := ServerCall("useserverbuff", bscontractparams currentcount "&buff_id=" currentbuff)
+			currentcount -= currentcount
+		}
+		else {
+			rawresults := ServerCall("useserverbuff", bscontractparams "99")
+			currentcount -= 99
+		}
+		if (CurrentSettings.alwayssavecontracts || tempsavesetting) {
+			FileAppend, %rawresults%`n, %BlacksmithLogFile%
+		}
+		else {
+			if !tempnosavesetting {
+				InputBox, dummyvar, Contracts Results, Save to File?, , 250, 150, , , , , % rawresults
+				dummyvar := ""
+				if !ErrorLevel {
+					FileAppend, %rawresults%`n, %ContractLogFile%
+					tempsavesetting := 1
+				}
+				if ErrorLevel {
+					tempnosavesetting := 1
+				}
+			}
+		}
+		blacksmithresults := JSON.parse(rawresults)
+		if ((blacksmithresults.success == "0") || (blacksmithresults.okay == "0")) {
+			MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
+			MsgBox % "Error: " rawresults
+			contractsused := (allcount - blacksmithresults.buffs_remaining)
+			UpdateLogTime()
+			FileAppend, % "(" CurrentTime ") Contracts Used: " Floor(usedcount) "`n", %OutputLogFile%
+			FileRead, OutputText, %OutputLogFile%
+			oMyGUI.Update()
+			GetUserDetails()
+			SB_SetText("Contracts remaining: " count " (Error)")
+			return
+		}
+		rawactions := JSON.stringify(blacksmithresults.actions)
+		blacksmithactions := JSON.parse(rawactions)
+		slot1lvs := 0
+		slot2lvs := 0
+		slot3lvs := 0
+		slot4lvs := 0
+		slot5lvs := 0
+		slot6lvs := 0
+		for k, v in blacksmithactions
+		{
+			switch v.slot_id
+		{
+			case 1: slot1lvs += v.amount
+			case 2: slot2lvs += v.amount
+			case 3: slot3lvs += v.amount
+			case 4: slot4lvs += v.amount
+			case 5: slot5lvs += v.amount
+			case 6: slot6lvs += v.amount
+		}
+		}
+	}
+	MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
+	tempsavesetting := 0
+	tempnosavesetting := 0
+	switch buffid {
+		case 31: contractsused := (CurrentTinyBS - blacksmithresults.buffs_remaining)
+		case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
+		case 33: contractsused := (CurrentMdBS - blacksmithresults.buffs_remaining)
+		case 34: contractsused := (CurrentLgBS - blacksmithresults.buffs_remaining)
+	}
+	UpdateLogTime()
+	FileAppend, % "(" CurrentTime ") Contracts used on " ChampFromID(heroid) ": " Floor(contractsused) "`n", %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	GetUserDetails()
+	SB_SetText("All Blacksmith use completed.")
 	return
 }
 
@@ -1552,8 +1706,13 @@ ParseChampData() {
 		morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
 		epos := InStr(UserDetails.details.stats.total_paid_up_front_gold, "E")
 		morgaengold := morgaengold SubStr(UserDetails.details.stats.total_paid_up_front_gold, epos)
-		ChampDetails := ChampDetails "Môrgæn Gold Collected: " morgaengold "`n`n"
+		ChampDetails := ChampDetails "M" Chr(244) "rg" Chr(230) "n Gold Collected: " morgaengold "`n`n"
 	}
+	if (UserDetails.details.stats.torogar_lifetime_zealot_stacks) {
+		torostacks := UserDetails.details.stats.torogar_lifetime_zealot_stacks
+		ChampDetails := ChampDetails "Torogar Zealot Stacks: " torostacks "`n`n"
+	}
+	
 	if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
 		ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
 	}
@@ -1915,7 +2074,7 @@ ChampFromID(id) {
 			case "52": namefromid := "Sentry"
 			case "53": namefromid := "Krull"
 			case "54": namefromid := "Artemis"
-			case "55": namefromid := "Môrgæn"
+			case "55": namefromid := "M" Chr(244) "rg" Chr(230) "n"
 			case "56": namefromid := "Havilar"
 			case "57": namefromid := "Sisaspia"
 			case "58": namefromid := "Briv"
