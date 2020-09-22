@@ -1,15 +1,15 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
-;Added in 1.4.2
-;-Tracks Torogar Zealot stacks
+;Added in 1.5
+;-Custom UI Scale, Framerate, & Particles
+;-Modron Core levels
 
-;Fixed in 1.4.2
-;-Better Code results parsing
-;-Morgaen's name displaying incorrectly on some systems
-;-added application icon for WIN7/8/Vista
+;Fixed in 1.5
+;-More better Code results parsing
+;-Removed "load New BG Adv" as it was not working
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.4.2"
+global VersionNumber := "1.5"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -22,6 +22,10 @@ global JournalFile := "journal.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
+
+global ICSettingsFile := A_AppData
+StringTrimRight, ICSettingsFile, ICSettingsFile, 7
+ICSettingsFile := ICSettingsFile "LocalLow\Codename Entertainment\Idle Champions\localSettings.json"
 global GameClient := GameInstallDir "IdleDragons.exe"
 
 ;Settings globals
@@ -203,6 +207,11 @@ class MyGui {
 		Gui, MyWindow:New
 		Gui, MyWindow:+Resize -MaximizeBox 
 		
+		Menu, ICSettingsSubmenu, Add, &View Settings, ViewICSettings
+		Menu, ICSettingsSubmenu, Add, &Framerate, SetFramerate
+		Menu, ICSettingsSubmenu, Add, &Particles, SetParticles
+		Menu, ICSettingsSubmenu, Add, &UI Scale, SetUIScale
+		Menu, FileSubmenu, Add, &Idle Champions Settings, :ICSettingsSubmenu
 		Menu, FileSubmenu, Add, &Launch Game Client, LaunchGame
 		Menu, FileSubmenu, Add, &Update UserDetails, GetUserDetails
 		Menu, FileSubmenu, Add
@@ -223,8 +232,8 @@ class MyGui {
 		Menu, ToolsSubmenu, Add, &Redeem Codes, Open_Codes
 		Menu, AdvSubmenu, Add, &Load New Adv, LoadAdventure
 		Menu, AdvSubmenu, Add, &End Current Adv, EndAdventure
-		Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
-		Menu, AdvSubmenu, Add, End Current BG Adv, EndBGAdventure
+		;Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
+		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
 		Menu, ToolsSubmenu, Add, Briv &Stack Calculator, Briv_Calc
 		Menu, IdleMenu, Add, &Tools, :ToolsSubmenu
@@ -575,6 +584,8 @@ Redeem_Codes:
 	GuiControl, , CodesPending, % CodesPending, w250 h210
 	usedcodes := ""
 	expiredcodes := ""
+	earlycodes := ""
+	invalidcodes := ""
 	codegolds := 0
 	otherchests := ""
 	codeepics := ""
@@ -587,7 +598,7 @@ Redeem_Codes:
 		v := StrReplace(v, "`r")
 		v := StrReplace(v, "`n")
 		v := Trim(v)
-		CurrentCode := v	
+		CurrentCode := v
 		sCode := RegExReplace(CurrentCode, "&", Replacement := "%26")
 		if !UserID {
 			MsgBox % "Need User ID & Hash."
@@ -597,8 +608,6 @@ Redeem_Codes:
 		rawresults := ServerCall("redeemcoupon", codeparams)
 		coderesults := JSON.parse(rawresults)
 		rawloot := JSON.stringify(coderesults.loot_details)
-		StringTrimLeft, rawloot, rawloot, 1
-		StringTrimRight, rawloot, rawloot, 1
 		codeloot := JSON.parse(rawloot)
 		if (coderesults.failure_reason == "Outdated instance id") {
 			MsgBox, 4, , % "Outdated instance id. Update from server?"
@@ -623,29 +632,38 @@ Redeem_Codes:
 		else if (coderesults.failure_reason == "This offer has expired") {
 			expiredcodes := expiredcodes sCode "`n"
 		}
-		else if (codeloot.chest_type_id == "2") {
-			codegolds += codeloot.count
+		else if (coderesults.failure_reason == "You can not yet redeem this combination.") {
+			earlycodes := earlycodes sCode "`n"
 		}
-		else if (codeloot.chest_type_id) {
-			otherchests := otherchests codeloot.chest_type_id ", "
+		else if (coderesults.failure_reason == "This is not a valid combination.") {
+			invalidcodes := invalidcodes sCode "`n"
 		}
-		else if (codeloot.add_time_gate_key_piece) {
-			codetgps += codeloot.count
-		}
-		else if (codeloot.add_inventory_buff_id) {
-			switch codeloot.add_inventory_buff_id
+		else for kk, vv in codeloot
 		{
-			case 4: codeepics := codeepics "STR (" codeloot.count "), "
-			case 8: codeepics := codeepics "GF (" codeloot.count "), "
-			case 16: codeepics := codeepics "HP (" codeloot.count "), "
-			case 20: codeepics := codeepics "Bounty (" codeloot.count "), "
-			case 34: codeepics := codeepics "BS (" codeloot.count "), "
-			case 35: codeepics := codeepics "Spec (" codeloot.count "), "
-			case 40: codeepics := codeepics "FB (" codeloot.count "), "
-			case 77: codeepics := codeepics "Spd (" codeloot.count "), "
-			case 36: codepolish += codeloot.count
-			default: codeepics := codeepics codeloot.add_inventory_buff_id " (" codeloot.count "), "
-		}
+			if (vv.chest_type_id == "2") {
+				codegolds += vv.count
+			}
+			else if (vv.chest_type_id) {
+				otherchests := otherchests vv.chest_type_id ", "
+			}
+			else if (vv.add_time_gate_key_piece) {
+				codetgps += vv.count
+			}
+			else if (vv.add_inventory_buff_id) {
+				switch vv.add_inventory_buff_id
+			{
+				case 4: codeepics := codeepics "STR (" vv.count "), "
+				case 8: codeepics := codeepics "GF (" vv.count "), "
+				case 16: codeepics := codeepics "HP (" vv.count "), "
+				case 20: codeepics := codeepics "Bounty (" vv.count "), "
+				case 34: codeepics := codeepics "BS (" vv.count "), "
+				case 35: codeepics := codeepics "Spec (" vv.count "), "
+				case 40: codeepics := codeepics "FB (" vv.count "), "
+				case 77: codeepics := codeepics "Spd (" vv.count "), "
+				case 36: codepolish += vv.count
+				default: codeepics := codeepics vv.add_inventory_buff_id " (" vv.count "), "
+			}
+			}
 		}
 		CodeCount := % (CodeCount-1)
 		if (CurrentSettings.alwayssavecodes || tempsavesetting) {
@@ -677,6 +695,12 @@ Redeem_Codes:
 	if !(expiredcodes == "") {
 		codemessage := codemessage "Expired:`n" expiredcodes "`n"
 	}
+	if !(invalidcodes == "") {
+		codemessage := codemessage "Invalid:`n" invalidcodes "`n"
+	}
+	if !(earlycodes == "") {
+		codemessage := codemessage "Cannot Redeem Yet:`n" earlycodes "`n"
+	}
 	if (codegolds > 0) {
 		codemessage := codemessage "Gold Chests:`n" codegolds "`n"
 	}
@@ -700,7 +724,7 @@ Redeem_Codes:
 	GuiControl, , CodesPending, % CodesPending, w250 h210
 	GetUserDetails()
 	oMyGUI.Update()
-	MsgBox % codemessage
+	MsgBox, , Results, % codemessage
 	return
 }
 
@@ -1014,125 +1038,6 @@ Lg_Blacksmith:
 	return
 }
 
-Use_All_Blacksmith:
-{
-	if !UserID {
-		MsgBox % "Need User ID & Hash."
-		FirstRun()
-	}
-	allcount := (CurrentTinyBS + CurrentSmBS + CurrentMdBS + CurrentLgBS)
-	tinycount := CurrentTinyBS
-	smcount := CurrentSmBS
-	mdcount := CurrentMdBS
-	lgcount := CurrentLgBS
-	usedcount := 0
-	if !(allcount) {
-		MsgBox, 4, , No Blacksmith Contracts detected.  Check server for user details?
-		IfMsgBox, Yes
-		{
-			GetUserDetails()
-		}
-	}
-	heroid := "error"
-	InputBox, heroid, Blacksmithing, % "Use ALL " allcount " contracts on which Champ? (Enter ID)", , 200, 180
-	if ErrorLevel
-		return
-	while !(heroid is number) {
-		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
-		if ErrorLevel
-			return
-	}
-	while !((heroid > 0) && (heroid < 100)) {
-		InputBox, heroid, Blacksmithing, % "Please enter a valid Champ ID number.", , 200, 180
-		if ErrorLevel
-			return
-	}
-	MsgBox, 4, , % "Use ALL " allcount " contracts on " ChampFromID(heroid) "?"
-	IfMsgBox No
-		return
-	bscontractparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&hero_id=" heroid "&num_uses="
-	tempsavesetting := 0
-	tempnosavesetting := 0
-	currentcount := tinycount
-	currentbuff := 31
-	while (allcount > 0) {
-		SB_SetText("Contracts remaining to use: " allcount)
-		if (currentcount < 100) {
-			rawresults := ServerCall("useserverbuff", bscontractparams currentcount "&buff_id=" currentbuff)
-			currentcount -= currentcount
-		}
-		else {
-			rawresults := ServerCall("useserverbuff", bscontractparams "99")
-			currentcount -= 99
-		}
-		if (CurrentSettings.alwayssavecontracts || tempsavesetting) {
-			FileAppend, %rawresults%`n, %BlacksmithLogFile%
-		}
-		else {
-			if !tempnosavesetting {
-				InputBox, dummyvar, Contracts Results, Save to File?, , 250, 150, , , , , % rawresults
-				dummyvar := ""
-				if !ErrorLevel {
-					FileAppend, %rawresults%`n, %ContractLogFile%
-					tempsavesetting := 1
-				}
-				if ErrorLevel {
-					tempnosavesetting := 1
-				}
-			}
-		}
-		blacksmithresults := JSON.parse(rawresults)
-		if ((blacksmithresults.success == "0") || (blacksmithresults.okay == "0")) {
-			MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
-			MsgBox % "Error: " rawresults
-			contractsused := (allcount - blacksmithresults.buffs_remaining)
-			UpdateLogTime()
-			FileAppend, % "(" CurrentTime ") Contracts Used: " Floor(usedcount) "`n", %OutputLogFile%
-			FileRead, OutputText, %OutputLogFile%
-			oMyGUI.Update()
-			GetUserDetails()
-			SB_SetText("Contracts remaining: " count " (Error)")
-			return
-		}
-		rawactions := JSON.stringify(blacksmithresults.actions)
-		blacksmithactions := JSON.parse(rawactions)
-		slot1lvs := 0
-		slot2lvs := 0
-		slot3lvs := 0
-		slot4lvs := 0
-		slot5lvs := 0
-		slot6lvs := 0
-		for k, v in blacksmithactions
-		{
-			switch v.slot_id
-		{
-			case 1: slot1lvs += v.amount
-			case 2: slot2lvs += v.amount
-			case 3: slot3lvs += v.amount
-			case 4: slot4lvs += v.amount
-			case 5: slot5lvs += v.amount
-			case 6: slot6lvs += v.amount
-		}
-		}
-	}
-	MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
-	tempsavesetting := 0
-	tempnosavesetting := 0
-	switch buffid {
-		case 31: contractsused := (CurrentTinyBS - blacksmithresults.buffs_remaining)
-		case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
-		case 33: contractsused := (CurrentMdBS - blacksmithresults.buffs_remaining)
-		case 34: contractsused := (CurrentLgBS - blacksmithresults.buffs_remaining)
-	}
-	UpdateLogTime()
-	FileAppend, % "(" CurrentTime ") Contracts used on " ChampFromID(heroid) ": " Floor(contractsused) "`n", %OutputLogFile%
-	FileRead, OutputText, %OutputLogFile%
-	oMyGUI.Update()
-	GetUserDetails()
-	SB_SetText("All Blacksmith use completed.")
-	return
-}
-
 UseBlacksmith(buffid) {
 	if !UserID {
 		MsgBox % "Need User ID & Hash."
@@ -1293,43 +1198,6 @@ LoadAdventure() {
 	sResult := ServerCall("setcurrentobjective", advparams)
 	GetUserDetails()
 	SB_SetText("Selected adventure has been loaded.")
-	return
-}
-
-LoadBGAdventure() {
-	if (ActiveInstance == "2") {
-		bginstance := 1
-	}
-	else {
-		bginstance := 2
-	}
-	while !(BackgroundAdventure == "-1") {
-		MsgBox, 5, , Please end your background adventure first.
-		IfMsgBox Cancel
-			return
-	}
-	advtoload := 31
-	patrontoload := 0
-	InputBox, advtoload, Adventure to Load, Please enter the adventure_id`nyou would like to load., , 250, 150, , , , , %advtoload%
-	if (ErrorLevel=1) {
-		return
-	}
-	if !((advtoload > 0) && (advtoload < 999)) {
-		MsgBox % "Invalid adventure_id: " advtoload
-		return
-	}
-	InputBox, patrontoload, Patron to Load, Please enter the patron_id`nyou would like to load., , 250, 150, , , , , %patrontoload%
-	if (ErrorLevel=1) {
-		return
-	}
-	if !((patrontoload > -1) && (patrontoload < 4)) {
-		MsgBox % "Invalid patron_id: " patrontoload
-		return
-	}
-	advparams := DummyData "&patron_tier=0&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" bginstance "&adventure_id=" advtoload "&patron_id=" patrontoload
-	sResult := ServerCall("setcurrentobjective", advparams)
-	GetUserDetails()
-	SB_SetText("Selected background adventure has been loaded.")
 	return
 }
 
@@ -1501,7 +1369,18 @@ ParseAdventureData() {
 			if (v.properties.toggle_preferences.reset == true) {
 				FGCore := FGCore " (Reset at " v.area_goal ")"
 			}
-			FGCore := FGCore "`nXP: " v.exp_total
+			xptolevel := v.exp_total
+			corelevel := 0
+			levelxp := 8000
+			while (xptolevel > 7999) {
+				corelevel += 1
+				xptolevel -= levelxp
+				levelxp += 4000
+			}
+			if (corelevel > 15) {
+				corelevel := corelevel " - Max 15"
+			}
+			FGCore := FGCore "`nXP: " v.exp_total " (Lv " corelevel ")"
 		}
 		else if !(v.instance_id == ActiveInstance) {
 			if (v.core_id == 1) {
@@ -1513,7 +1392,18 @@ ParseAdventureData() {
 			if (v.properties.toggle_preferences.reset == true) {
 				BGCore := BGCore " (Reset at " v.area_goal ")"
 			}
-			BGCore := BGCore "`nXP: " v.exp_total
+			xptolevel := v.exp_total
+			corelevel := 0
+			levelxp := 8000
+			while (xptolevel > 7999) {
+				corelevel += 1
+				xptolevel -= levelxp
+				levelxp += 4000
+			}
+			if (corelevel > 15) {
+				corelevel := corelevel " - Max 15"
+			}
+			BGCore := BGCore "`nXP: " v.exp_total " (Lv " corelevel ")"
 		}
 	;
 }
@@ -2149,4 +2039,113 @@ List_ChampIDs:
 	}
 	MsgBox, , Champ ID List, % champidlist
 	return	
+}
+
+ViewICSettings() {
+	rawicsettings := ""
+	FileRead, rawicsettings, %ICSettingsFile%
+	CurrentICSettings := JSON.parse(rawicsettings)
+	MsgBox, , localSettings.json file, % rawicsettings
+}
+
+SetUIScale() {
+	FileRead, rawicsettings, %ICSettingsFile%
+	CurrentICSettings := JSON.parse(rawicsettings)
+	newuiscale := 1
+	InputBox, newuiscale, UI Scale, Please enter the desired UI Scale.`n(0.5 - 1.25), , 250, 150, , , , , % CurrentICSettings.UIScale
+	if ErrorLevel
+		return
+	while ((newuiscale < 0.5) || (newuiscale > 1.25)) {
+		InputBox, newuiscale, UI Scale, Please enter a valid UI Scale.`n(0.5 - 1.25), , 250, 150, , , , , % CurrentICSettings.UIScale
+		if ErrorLevel
+		return
+	}
+	if (InStr(newuiscale, ".") == 1) {
+	newuiscale := "0" newuiscale
+	}
+	newicsettings := ""
+	for k, v in CurrentICSettings {
+		if (k == "UIScale") {
+			newicsettings := newicsettings """" k """:" newuiscale ","
+		}
+		else {
+			newicsettings := newicsettings """" k """:" v ","
+		}
+	}
+	StringTrimRight, newicsettings, newicsettings, 1
+	newicsettings := "{" newicsettings "}"
+	MsgBox % newicsettings
+	FileDelete, %ICSettingsFile%
+	FileAppend, %newicsettings%, %ICSettingsFile%
+	UpdateLogTime()
+	FileAppend, % "(" CurrentTime ") UI Scale changed to " newuiscale "`n", %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	SB_SetText("UI Scale changed to " newuiscale)
+}
+
+SetFramerate() {
+	FileRead, rawicsettings, %ICSettingsFile%
+	CurrentICSettings := JSON.parse(rawicsettings)
+	newframerate := 60
+	InputBox, newframerate, Framerate, Please enter the desired Framerate.`n(1 - 240), , 250, 150, , , , , % CurrentICSettings.TargetFramerate
+	if ErrorLevel
+		return
+	while ((newframerate < 1) || (newframerate > 240)) {
+		InputBox, newframerate, Framerate, Please enter a valid Framerate.`n(1 - 240), , 250, 150, , , , , % CurrentICSettings.TargetFramerate
+		if ErrorLevel
+		return
+	}
+	newicsettings := ""
+	for k, v in CurrentICSettings {
+		if (k == "TargetFramerate") {
+			newicsettings := newicsettings """" k """:" newframerate ","
+		}
+		else {
+			newicsettings := newicsettings """" k """:" v ","
+		}
+	}
+	StringTrimRight, newicsettings, newicsettings, 1
+	newicsettings := "{" newicsettings "}"
+	MsgBox % newicsettings
+	FileDelete, %ICSettingsFile%
+	FileAppend, %newicsettings%, %ICSettingsFile%
+	UpdateLogTime()
+	FileAppend, % "(" CurrentTime ") Framerate changed to " newframerate "`n", %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	SB_SetText("Framerate changed to " newframerate)
+}
+
+SetParticles() {
+	FileRead, rawicsettings, %ICSettingsFile%
+	CurrentICSettings := JSON.parse(rawicsettings)
+	newparticles := 100
+	InputBox, newparticles, Particles, Please enter the desired Percentage.`n(0 - 100), , 250, 150, , , , , % CurrentICSettings.PercentOfParticlesSpawned
+	if ErrorLevel
+		return
+	while ((newparticles < 0) || (newparticles > 100)) {
+		InputBox, newparticles, Particles, Please enter a valid Percentage.`n(0 - 100), , 250, 150, , , , , % CurrentICSettings.PercentOfParticlesSpawned
+		if ErrorLevel
+		return
+	}
+	newicsettings := ""
+	for k, v in CurrentICSettings {
+		if (k == "PercentOfParticlesSpawned") {
+			newicsettings := newicsettings """" k """:" newparticles ","
+		}
+		else {
+			newicsettings := newicsettings """" k """:" v ","
+		}
+	}
+	StringTrimRight, newicsettings, newicsettings, 1
+	newicsettings := "{" newicsettings "}"
+	MsgBox % newicsettings
+	FileDelete, %ICSettingsFile%
+	FileAppend, %newicsettings%, %ICSettingsFile%
+	UpdateLogTime()
+	FileAppend, % "(" CurrentTime ") Paticles changed to " newparticles "`n", %OutputLogFile%
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	SB_SetText("Particles changed to " newparticles)
 }
