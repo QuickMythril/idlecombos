@@ -245,11 +245,7 @@ class MyGui {
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
 		
-		Menu, CalcSubmenu, Add, &Briv Stacking, Briv_Calc
-		Menu, CalcSubmenu, Add, &Gold Chest Opening, GoldChestCalc
-		Menu, CalcSubmenu, Add, &Silver Chest Opening, SilverChestCalc
-		Menu, CalcSubmenu, Add, &Modron Chest Opening, ModronChestCalc
-		Menu, ToolsSubmenu, Add, Ca&lculators, :CalcSubmenu
+		Menu, ToolsSubmenu, Add, &Briv Stacking, Briv_Calc
 		Menu, IdleMenu, Add, &Tools, :ToolsSubmenu
 		
 		Menu, HelpSubmenu, Add, &Run Setup, FirstRun
