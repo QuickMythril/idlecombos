@@ -1,15 +1,20 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
-;Added in 1.5
-;-Custom UI Scale, Framerate, & Particles
-;-Modron Core levels
+#include idledict.ahk
 
-;Fixed in 1.5
-;-More better Code results parsing
-;-Removed "load New BG Adv" as it was not working
+;Added in 1.5.1
+;-Modron Core XP and % to next level
+;-Displays champ/effect for Feats from chests
+;-Buying chests increased from 99 to 100
+;-(moved id lookups to idledict.ahk file)
+
+;Fixed in 1.5.1
+;-Modron Core level math issue
+;-Supply chest parsing from Codes
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.5"
+
+global VersionNumber := "1.5.1"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -82,8 +87,8 @@ global EpicGearCount := 0
 global BrivSlot4 := 0
 global BrivZone := 0
 ;Modron globals
-global FGCore := "`n"
-global BGCore := "`n"
+global FGCore := "`n`n"
+global BGCore := "`n`n"
 ;Patron globals
 global MirtVariants := ""
 global MirtCompleted := ""
@@ -212,6 +217,7 @@ class MyGui {
 		Menu, ICSettingsSubmenu, Add, &Particles, SetParticles
 		Menu, ICSettingsSubmenu, Add, &UI Scale, SetUIScale
 		Menu, FileSubmenu, Add, &Idle Champions Settings, :ICSettingsSubmenu
+		
 		Menu, FileSubmenu, Add, &Launch Game Client, LaunchGame
 		Menu, FileSubmenu, Add, &Update UserDetails, GetUserDetails
 		Menu, FileSubmenu, Add
@@ -224,18 +230,26 @@ class MyGui {
 		Menu, ChestsSubmenu, Add, Open Gold, Open_Gold
 		Menu, ChestsSubmenu, Add, Open Silver, Open_Silver
 		Menu, ToolsSubmenu, Add, &Chests, :ChestsSubmenu
+		
 		Menu, BlacksmithSubmenu, Add, Use Tiny Contracts, Tiny_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Small Contracts, Sm_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Medium Contracts, Med_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Large Contracts, Lg_Blacksmith
 		Menu, ToolsSubmenu, Add, &Blacksmith, :BlacksmithSubmenu
+		
 		Menu, ToolsSubmenu, Add, &Redeem Codes, Open_Codes
+		
 		Menu, AdvSubmenu, Add, &Load New Adv, LoadAdventure
 		Menu, AdvSubmenu, Add, &End Current Adv, EndAdventure
 		;Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
-		Menu, ToolsSubmenu, Add, Briv &Stack Calculator, Briv_Calc
+		
+		Menu, CalcSubmenu, Add, &Briv Stacking, Briv_Calc
+		Menu, CalcSubmenu, Add, &Gold Chest Opening, GoldChestCalc
+		Menu, CalcSubmenu, Add, &Silver Chest Opening, SilverChestCalc
+		Menu, CalcSubmenu, Add, &Modron Chest Opening, ModronChestCalc
+		Menu, ToolsSubmenu, Add, Ca&lculators, :CalcSubmenu
 		Menu, IdleMenu, Add, &Tools, :ToolsSubmenu
 		
 		Menu, HelpSubmenu, Add, &Run Setup, FirstRun
@@ -305,8 +319,8 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vCurrentGolds x+2 w35 right, % CurrentGolds
 		Gui, MyWindow:Add, Text, x15 y+p w110, Silver Chests:
 		Gui, MyWindow:Add, Text, vCurrentSilvers x+2 w35 right, % CurrentSilvers
-		Gui, MyWindow:Add, Text, x+105 w185, Next TGP:
-		Gui, MyWindow:Add, Text, x15 y+p w110, Time Gate Pieces:
+		Gui, MyWindow:Add, Text, x+105 y+1 w185, Next TGP:
+		Gui, MyWindow:Add, Text, x15 y+0 w110, Time Gate Pieces:
 		Gui, MyWindow:Add, Text, vCurrentTGPs x+2 w35 right, % CurrentTGPs
 		Gui, MyWindow:Add, Text, vAvailableTGs x+10 w85, % AvailableTGs
 		Gui, MyWindow:Add, Text, vNextTGPDrop x+10 w220, % NextTGPDrop
@@ -587,6 +601,8 @@ Redeem_Codes:
 	earlycodes := ""
 	invalidcodes := ""
 	codegolds := 0
+	codesilvers := 0
+	codesupplys := 0
 	otherchests := ""
 	codeepics := ""
 	codetgps := 0
@@ -642,6 +658,12 @@ Redeem_Codes:
 		{
 			if (vv.chest_type_id == "2") {
 				codegolds += vv.count
+			}
+			else if (vv.chest_type_id == "37") {
+				codesupplys += vv.count
+			}
+			else if (vv.chest_type_id == "1") {
+				codesilvers += vv.count
 			}
 			else if (vv.chest_type_id) {
 				otherchests := otherchests vv.chest_type_id ", "
@@ -703,6 +725,12 @@ Redeem_Codes:
 	}
 	if (codegolds > 0) {
 		codemessage := codemessage "Gold Chests:`n" codegolds "`n"
+	}
+	if (codesilvers > 0) {
+		codemessage := codemessage "Silver Chests:`n" codesilvers "`n"
+	}
+	if (codesupplys > 0) {
+		codemessage := codemessage "Supply Chests:`n" codesupplys "`n"
 	}
 	if !(otherchests == "") {
 		StringTrimRight, otherchests, otherchests, 2
@@ -766,13 +794,13 @@ Buy_Extra_Chests(chestid,extracount) {
 	gemsspent := 0
 	while (extracount > 0) {
 		SB_SetText("Chests remaining to purchase: " extracount)
-		if (extracount < 100) {
+		if (extracount < 101) {
 			rawresults := ServerCall("buysoftcurrencychest", chestparams extracount)
 			extracount -= extracount
 		}
 		else {
-			rawresults := ServerCall("buysoftcurrencychest", chestparams "99")
-			extracount -= 99
+			rawresults := ServerCall("buysoftcurrencychest", chestparams "100")
+			extracount -= 100
 		}
 		chestresults := JSON.parse(rawresults)
 		if (chestresults.success == "0") {
@@ -848,13 +876,13 @@ Buy_Chests(chestid) {
 	gemsspent := 0
 	while (count > 0) {
 		SB_SetText("Chests remaining to purchase: " count)
-		if (count < 100) {
+		if (count < 101) {
 			rawresults := ServerCall("buysoftcurrencychest", chestparams count)
 			count -= count
 		}
 		else {
-			rawresults := ServerCall("buysoftcurrencychest", chestparams "99")
-			count -= 99
+			rawresults := ServerCall("buysoftcurrencychest", chestparams "100")
+			count -= 100
 		}
 		chestresults := JSON.parse(rawresults)
 		if (chestresults.success == "0") {
@@ -983,7 +1011,7 @@ Open_Chests(chestid) {
 		newshinies := ""
 		for k, v in chestresults.loot_details {
 			if (v.unlock_hero_feat) {
-				lastfeat := (v.unlock_hero_feat "`n")
+				lastfeat := (FeatFromID(v.unlock_hero_feat) "`n")
 				newfeats := newfeats lastfeat
 			}
 			if (v.gilded) {
@@ -1370,9 +1398,9 @@ ParseAdventureData() {
 				FGCore := FGCore " (Reset at " v.area_goal ")"
 			}
 			xptolevel := v.exp_total
-			corelevel := 0
+			corelevel := 1
 			levelxp := 8000
-			while (xptolevel > 7999) {
+			while (xptolevel > (levelxp - 1)) {
 				corelevel += 1
 				xptolevel -= levelxp
 				levelxp += 4000
@@ -1380,7 +1408,8 @@ ParseAdventureData() {
 			if (corelevel > 15) {
 				corelevel := corelevel " - Max 15"
 			}
-			FGCore := FGCore "`nXP: " v.exp_total " (Lv " corelevel ")"
+			percenttolevel := Floor((xptolevel / levelxp) * 100)
+			FGCore := FGCore "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
 		else if !(v.instance_id == ActiveInstance) {
 			if (v.core_id == 1) {
@@ -1393,9 +1422,9 @@ ParseAdventureData() {
 				BGCore := BGCore " (Reset at " v.area_goal ")"
 			}
 			xptolevel := v.exp_total
-			corelevel := 0
+			corelevel := 1
 			levelxp := 8000
-			while (xptolevel > 7999) {
+			while (xptolevel > (levelxp - 1)) {
 				corelevel += 1
 				xptolevel -= levelxp
 				levelxp += 4000
@@ -1403,7 +1432,8 @@ ParseAdventureData() {
 			if (corelevel > 15) {
 				corelevel := corelevel " - Max 15"
 			}
-			BGCore := BGCore "`nXP: " v.exp_total " (Lv " corelevel ")"
+			percenttolevel := Floor((xptolevel / levelxp) * 100)
+			BGCore := BGCore "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
 	;
 }
@@ -1770,59 +1800,6 @@ ServerCall(callname, parameters) {
 	return data
 }
 
-SimulateBriv(i) {
-	SB_SetText("Calculating...")
-	;Original version by Gladio Stricto - pastebin.com/Rd8wWSVC
-	;Copied from updated version - github.com/Deatho0ne
-	chance := ((BrivSlot4 / 100) + 1) * 0.25
-	trueChance := chance
-	skipLevels := 1
-	if (chance > 2) {
-		while chance >= 1 {
-			skipLevels++
-			chance /= 2
-		}
-		;trueChance := ((chance - Floor(chance)) / 2)
-	} else {
-		skipLevels := Floor(chance + 1)
-		If (skipLevels > 1) {
-			trueChance := 0.5 + ((chance - Floor(chance)) / 2)
-		}
-	}
-	totalLevels := 0
-	totalSkips := 0
-	Loop % i {
-		level := 0.0
-		skips := 0.0
-		Loop {
-			Random, x, 0.0, 1.0
-			If (x < trueChance) {
-				level += skipLevels
-				skips++
-			}
-			level++
-		}
-		Until level > BrivZone
-		totalLevels += level
-		totalSkips += skips
-	}
-	;chance := Round(chance, 2)
-	if skipLevels < 3
-		trueChance := Round(trueChance * 100, 2)
-	else
-		trueChance := Round(chance * 100, 2)
-	avgSkips := Round(totalSkips / i, 2)
-	avgSkipped := Round(avgSkips * skipLevels, 2)
-	avgZones := Round(totalLevels / i, 2)
-	avgSkipRate := Round((avgSkipped / avgZones) * 100, 2)
-	avgStacks := Round((1.032**avgSkips) * 48, 2)
-	multiplier := 0.1346894362, additve := 41.86396406
-	roughTime := Round(((multiplier * avgStacks) + additve), 2)
-	message = With Briv skip %skipLevels% until zone %BrivZone%`n(%trueChance%`% chance to skip %skipLevels% zones)`n`n%i% simulations produced an average:`n%avgSkips% skips (%avgSkipped% zones skipped)`n%avgZones% end zone`n%avgSkipRate%`% true skip rate`n%avgStacks% required stacks with`n%roughTime% time in secs to build said stacks very rough guess
-	SB_SetText("Calculation has completed.")
-	Return message
-}
-
 LaunchGame() {
 	if (Not WinExist("ahk_exe IdleDragons.exe")) {
 		Run, %GameClient%
@@ -1884,134 +1861,6 @@ Discord_Clicked:
 {
 	Run, % "https://discord.com/invite/N3U8xtB"
 	return
-}
-
-PatronFromID(patronid) {
-	switch patronid {
-		case "0": namefromid := "None"
-		case "1": namefromid := "Mirt"
-		case "2": namefromid := "Vajra"
-		case "3": namefromid := "Strahd"
-		case "4": namefromid := "Zariel"
-	}
-	return namefromid
-}
-
-ChampFromID(id) {
-	if (id < 21) {
-		switch id {
-			case "1": namefromid := "Bruenor"
-			case "2": namefromid := "Celeste"
-			case "3": namefromid := "Nayeli"
-			case "4": namefromid := "Jarlaxle"
-			case "5": namefromid := "Calliope"
-			case "6": namefromid := "Asharra"
-			case "7": namefromid := "Minsc"
-			case "8": namefromid := "Delina"
-			case "9": namefromid := "Makos"
-			case "10": namefromid := "Tyril"
-			case "11": namefromid := "Jamilah"
-			case "12": namefromid := "Arkhan"
-			case "13": namefromid := "Hitch"
-			case "14": namefromid := "Stoki"
-			case "15": namefromid := "Krond"
-			case "16": namefromid := "Gromma"
-			case "17": namefromid := "Dhadius"
-			case "18": namefromid := "Drizzt"
-			case "19": namefromid := "Barrowin"
-			case "20": namefromid := "Regis"
-		}
-	return namefromid
-	}
-	else if (id < 41) {
-		switch id {
-			case "21": namefromid := "Birdsong"
-			case "22": namefromid := "Zorbu"
-			case "23": namefromid := "Strix"
-			case "24": namefromid := "Nrakk"
-			case "25": namefromid := "Catti-brie"
-			case "26": namefromid := "Evelyn"
-			case "27": namefromid := "Binwin"
-			case "28": namefromid := "Deekin"
-			case "29": namefromid := "Xander"
-			case "30": namefromid := "Azaka"
-			case "31": namefromid := "Ishi"
-			case "32": namefromid := "Wulfgar"
-			case "33": namefromid := "Farideh"
-			case "34": namefromid := "Donaar"
-			case "35": namefromid := "Vlahnya"
-			case "36": namefromid := "Warden"
-			case "37": namefromid := "Nerys"
-			case "38": namefromid := "K'thriss"
-			case "39": namefromid := "Paultin"
-			case "40": namefromid := "Black Viper"
-		}
-	return namefromid
-	}
-	else if (id < 61) {
-		switch id {
-			case "41": namefromid := "Rosie"
-			case "42": namefromid := "Aila"
-			case "43": namefromid := "Spurt"
-			case "44": namefromid := "Qillek"
-			case "45": namefromid := "Korth"
-			case "46": namefromid := "Walnut"
-			case "47": namefromid := "Shandie"
-			case "48": namefromid := "Jim"
-			case "49": namefromid := "Turiel"
-			case "50": namefromid := "Pwent"
-			case "51": namefromid := "Avren"
-			case "52": namefromid := "Sentry"
-			case "53": namefromid := "Krull"
-			case "54": namefromid := "Artemis"
-			case "55": namefromid := "M" Chr(244) "rg" Chr(230) "n"
-			case "56": namefromid := "Havilar"
-			case "57": namefromid := "Sisaspia"
-			case "58": namefromid := "Briv"
-			case "59": namefromid := "Melf"
-			case "60": namefromid := "Krydle"
-			}
-	return namefromid
-	}
-	else if (id < 81) {
-		switch id {
-			case "61": namefromid := "Jaheira"
-			case "62": namefromid := "Nova"
-			case "63": namefromid := "Freely"
-			case "64": namefromid := "B & G"
-			case "65": namefromid := "Omin"
-			case "66": namefromid := "Lazaapz"
-			case "67": namefromid := "Dragonbait"
-			case "68": namefromid := "Ulkoria"
-			case "69": namefromid := "Torogar"
-			case "70": namefromid := "Ezmerelda"
-			case "71": namefromid := "Y4E3"
-			case "72": namefromid := "Y4E4"
-			case "73": namefromid := "Y4E5"
-			case "74": namefromid := "Y4E6"
-			case "75": namefromid := "Y4E7"
-			case "76": namefromid := "Y4E8"
-			case "77": namefromid := "Y4E9"
-			case "78": namefromid := "Y4E10"
-			case "79": namefromid := "Y4E11"
-			case "80": namefromid := "Y4E12"
-		}
-	return namefromid
-	}
-	else if (id < 86) {
-		switch id {
-			case "81": namefromid := "Y4E13"
-			case "82": namefromid := "Y4E14"
-			case "83": namefromid := "Y4E15"
-			case "84": namefromid := "Y4E16"
-			case "85": namefromid := "Y4E17"
-		}
-	return namefromid
-	}
-	else {
-		namefromid := "UNKNOWN"
-		return namefromid
-	}
 }
 
 List_ChampIDs:
@@ -2148,4 +1997,57 @@ SetParticles() {
 	FileRead, OutputText, %OutputLogFile%
 	oMyGUI.Update()
 	SB_SetText("Particles changed to " newparticles)
+}
+
+SimulateBriv(i) {
+	SB_SetText("Calculating...")
+	;Original version by Gladio Stricto - pastebin.com/Rd8wWSVC
+	;Copied from updated version - github.com/Deatho0ne
+	chance := ((BrivSlot4 / 100) + 1) * 0.25
+	trueChance := chance
+	skipLevels := 1
+	if (chance > 2) {
+		while chance >= 1 {
+			skipLevels++
+			chance /= 2
+		}
+		;trueChance := ((chance - Floor(chance)) / 2)
+	} else {
+		skipLevels := Floor(chance + 1)
+		If (skipLevels > 1) {
+			trueChance := 0.5 + ((chance - Floor(chance)) / 2)
+		}
+	}
+	totalLevels := 0
+	totalSkips := 0
+	Loop % i {
+		level := 0.0
+		skips := 0.0
+		Loop {
+			Random, x, 0.0, 1.0
+			If (x < trueChance) {
+				level += skipLevels
+				skips++
+			}
+			level++
+		}
+		Until level > BrivZone
+		totalLevels += level
+		totalSkips += skips
+	}
+	;chance := Round(chance, 2)
+	if skipLevels < 3
+		trueChance := Round(trueChance * 100, 2)
+	else
+		trueChance := Round(chance * 100, 2)
+	avgSkips := Round(totalSkips / i, 2)
+	avgSkipped := Round(avgSkips * skipLevels, 2)
+	avgZones := Round(totalLevels / i, 2)
+	avgSkipRate := Round((avgSkipped / avgZones) * 100, 2)
+	avgStacks := Round((1.032**avgSkips) * 48, 2)
+	multiplier := 0.1346894362, additve := 41.86396406
+	roughTime := Round(((multiplier * avgStacks) + additve), 2)
+	message = With Briv skip %skipLevels% until zone %BrivZone%`n(%trueChance%`% chance to skip %skipLevels% zones)`n`n%i% simulations produced an average:`n%avgSkips% skips (%avgSkipped% zones skipped)`n%avgZones% end zone`n%avgSkipRate%`% true skip rate`n%avgStacks% required stacks with`n%roughTime% time in secs to build said stacks very rough guess
+	SB_SetText("Calculation has completed.")
+	Return message
 }
