@@ -1,6 +1,7 @@
 # idlecombos
 IdleCombos.exe (current standalone exe)</br>
 IdleCombos.ahk (current AHK version)</br>
+idledict.ahk (id definitions file)</br>
 json.ahk (json parsing, included in exe)</br>
 README.md (this file)</br>
 </br>
