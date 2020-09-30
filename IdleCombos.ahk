@@ -1103,6 +1103,12 @@ UseBlacksmith(buffid) {
 	bscontractparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&buff_id=" buffid "&hero_id=" heroid "&num_uses="
 	tempsavesetting := 0
 	tempnosavesetting := 0
+	slot1lvs := 0
+	slot2lvs := 0
+	slot3lvs := 0
+	slot4lvs := 0
+	slot5lvs := 0
+	slot6lvs := 0
 	while (count > 0) {
 		SB_SetText("Contracts remaining to use: " count)
 		if (count < 50) {
@@ -1150,12 +1156,6 @@ UseBlacksmith(buffid) {
 		}
 		rawactions := JSON.stringify(blacksmithresults.actions)
 		blacksmithactions := JSON.parse(rawactions)
-		slot1lvs := 0
-		slot2lvs := 0
-		slot3lvs := 0
-		slot4lvs := 0
-		slot5lvs := 0
-		slot6lvs := 0
 		for k, v in blacksmithactions
 		{
 			switch v.slot_id
