@@ -2,19 +2,12 @@
 #include JSON.ahk
 #include idledict.ahk
 
-;Added in 1.5.1
-;-Modron Core XP and % to next level
-;-Displays champ/effect for Feats from chests
-;-Buying chests increased from 99 to 100
-;-(moved id lookups to idledict.ahk file)
-
-;Fixed in 1.5.1
-;-Modron Core level math issue
-;-Supply chest parsing from Codes
+;Fixed in 1.5.3
+;-Using mass Blacksmith contracts
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
 
-global VersionNumber := "1.5.1"
+global VersionNumber := "1.5.3"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -1112,13 +1105,13 @@ UseBlacksmith(buffid) {
 	tempnosavesetting := 0
 	while (count > 0) {
 		SB_SetText("Contracts remaining to use: " count)
-		if (count < 100) {
+		if (count < 50) {
 			rawresults := ServerCall("useserverbuff", bscontractparams count)
 			count -= count
 		}
 		else {
-			rawresults := ServerCall("useserverbuff", bscontractparams "99")
-			count -= 99
+			rawresults := ServerCall("useserverbuff", bscontractparams "50")
+			count -= 50
 		}
 		if (CurrentSettings.alwayssavecontracts || tempsavesetting) {
 			FileAppend, %rawresults%`n, %BlacksmithLogFile%
