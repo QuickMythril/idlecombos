@@ -1,4 +1,4 @@
-global CurrentDictionary := "1.6"
+global DictionaryVersion := "1.6"
 
 PatronFromID(patronid) {
 	switch patronid {
