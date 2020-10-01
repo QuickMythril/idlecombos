@@ -2,12 +2,14 @@
 #include JSON.ahk
 #include idledict.ahk
 
-;Fixed in 1.5.3
-;-Using mass Blacksmith contracts
+;Added in 1.6
+;-Fix for month-rollover display bug
+;-Chest names display when redeeming codes
+;-Can update dictionary file from menu
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-
-global VersionNumber := "1.5.3"
+global VersionNumber := "1.6"
+global CurrentDictionary := "1.6"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -20,6 +22,8 @@ global JournalFile := "journal.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
+global DictionaryFile := "https://raw.githubusercontent.com/QuickMythril/idlecombos/master/idledict.ahk"
+global LocalDictionary := "idledict.ahk"
 
 global ICSettingsFile := A_AppData
 StringTrimRight, ICSettingsFile, ICSettingsFile, 7
@@ -238,7 +242,7 @@ class MyGui {
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
 		
-		Menu, ToolsSubmenu, Add, &Briv Stacking, Briv_Calc
+		Menu, ToolsSubmenu, Add, &Briv Stack Calculator, Briv_Calc
 		Menu, IdleMenu, Add, &Tools, :ToolsSubmenu
 		
 		Menu, HelpSubmenu, Add, &Run Setup, FirstRun
@@ -248,6 +252,7 @@ class MyGui {
 		Menu, HelpSubmenu, Add
 		Menu, HelpSubmenu, Add, &List Champ IDs, List_ChampIDs
 		Menu, HelpSubmenu, Add, &About IdleCombos, About_Clicked
+		Menu, HelpSubmenu, Add, &Update Dictionary, Update_Dictionary
 		Menu, HelpSubmenu, Add, &Discord Support Server, Discord_Clicked
 		Menu, IdleMenu, Add, &Help, :HelpSubmenu
 		Gui, Menu, IdleMenu
@@ -655,7 +660,7 @@ Redeem_Codes:
 				codesilvers += vv.count
 			}
 			else if (vv.chest_type_id) {
-				otherchests := otherchests vv.chest_type_id ", "
+				otherchests := otherchests ChestFromID(vv.chest_type_id) "`n"
 			}
 			else if (vv.add_time_gate_key_piece) {
 				codetgps += vv.count
@@ -722,7 +727,7 @@ Redeem_Codes:
 		codemessage := codemessage "Supply Chests:`n" codesupplys "`n"
 	}
 	if !(otherchests == "") {
-		StringTrimRight, otherchests, otherchests, 2
+		;StringTrimRight, otherchests, otherchests, 2
 		codemessage := codemessage "Other chests:`n" otherchests "`n"
 	}
 	if (codepolish > 0) {
@@ -1429,12 +1434,18 @@ ParseAdventureData() {
 
 ParseTimestamps() {
 	localdiff := (A_Now - A_NowUTC)
+	if (localdiff < -28000000) {
+		localdiff += 70000000
+	}
 	if (localdiff < -250000) {
 		localdiff += 760000
 	}
 	StringTrimRight, localdiffh, localdiff, 4
 	localdiffm := SubStr(localdiff, -3)
 	StringTrimRight, localdiffm, localdiffm, 2
+	if (localdiffm > 59) {
+		localdiffm -= 40
+	}
 	timestampvalue := "19700101000000"
 	timestampvalue += UserDetails.current_time, s
 	EnvAdd, timestampvalue, localdiffh, h
@@ -1849,6 +1860,19 @@ Open_Ticket:
 Discord_Clicked:
 {
 	Run, % "https://discord.com/invite/N3U8xtB"
+	return
+}
+
+Update_Dictionary() {
+	if !(DictionaryVersion == CurrentDictionary) {
+		FileDelete, %LocalDictionary%
+		UrlDownloadToFile, %DictionaryFile%, %LocalDictionary%
+		Reload
+		return
+	}
+	else {
+	MsgBox % "Dictionary file up to date."
+	}
 	return
 }
 
