@@ -1,14 +1,14 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
-
-;Added in 1.6
-;-Fix for month-rollover display bug
-;-Chest names display when redeeming codes
-;-Can update dictionary file from menu
+;Added in 1.7
+;-Lists incomplete Patron Variants
+;-Kleho image link generator
+;-Krydle achievement info
+;-Fixed Shiny results display
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.6"
+global VersionNumber := "1.7"
 global CurrentDictionary := "1.6"
 
 ;Local File globals
@@ -56,7 +56,7 @@ global CurrentPatron := ""
 global BackgroundAdventure := ""
 global BackgroundArea := ""
 global BackgroundPatron := ""
-global AchievementInfo := "This page intentionally left blank.`n`n`n`n`n`n"
+global AchievementInfo := "This page intentionally left blank.`n`n`n`n`n`n`n"
 global BlessingInfo := "`n`n`n`n`n`n"
 global ChampDetails := ""
 global TotalChamps := 0
@@ -240,6 +240,8 @@ class MyGui {
 		Menu, AdvSubmenu, Add, &End Current Adv, EndAdventure
 		;Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
+		Menu, AdvSubmenu, Add, &Kleho Image, KlehoImage
+		Menu, AdvSubmenu, Add, &Incomplete Variants, IncompleteVariants
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
 		
 		Menu, ToolsSubmenu, Add, &Briv Stack Calculator, Briv_Calc
@@ -951,6 +953,10 @@ Open_Chests(chestid) {
 	chestparams := "&gold_per_second=0&checksum=4c5f019b6fc6eefa4d47d21cfaf1bc68&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&chest_type_id=" chestid "&game_instance_id=" ActiveInstance "&count="
 	tempsavesetting := 0
 	tempnosavesetting := 0
+	lastfeat := ""
+	newfeats := ""
+	lastshiny := ""
+	newshinies := ""
 	while (count > 0) {
 		SB_SetText("Chests remaining to open: " count)
 		if (count < 100) {
@@ -999,10 +1005,6 @@ Open_Chests(chestid) {
 			SB_SetText("Chests remaining: " count " (Error)")
 			return
 		}
-		lastfeat := ""
-		newfeats := ""
-		lastshiny := ""
-		newshinies := ""
 		for k, v in chestresults.loot_details {
 			if (v.unlock_hero_feat) {
 				lastfeat := (FeatFromID(v.unlock_hero_feat) "`n")
@@ -1592,7 +1594,7 @@ ParseLootData() {
 			brivenchant := v.enchant
 		}
 		if ((v.enchant + 1) = UserDetails.details.stats.highest_level_gear) {
-			todogear := todogear "`n(" ChampFromID(v.hero_id) " Slot " v.slot_id ")"
+			todogear := todogear "`n(" ChampFromID(v.hero_id) " Slot " v.slot_id ")`n"
 		}
 	}
 	AchievementInfo := "Achievement Details`n" todogear
@@ -1762,7 +1764,16 @@ CheckAchievements() {
 			regis6 := " ranged->"
 		todoregis := "`nRegis needs:" regis1 regis2 regis3 regis4 regis5 regis6
 	}
-	AchievementInfo := AchievementInfo todoasharra todogromma todokrond todoregis
+	if (UserDetails.details.stats.krydle_return_to_baldurs_gate < 3) {
+		if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_delina == 1)
+			krydle1 := " delina"
+		if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_krydle == 1)
+			krydle2 := " krydle"
+		if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_minsc == 1)
+			krydle3 := " minsc"
+		todokrydle := "`nKrydle needs:" krydle1 krydle2 krydle3
+	}
+	AchievementInfo := AchievementInfo todoasharra todogromma todokrond todoregis todokrydle
 }
 
 CheckBlessings() {
@@ -2063,4 +2074,88 @@ SimulateBriv(i) {
 	message = With Briv skip %skipLevels% until zone %BrivZone%`n(%trueChance%`% chance to skip %skipLevels% zones)`n`n%i% simulations produced an average:`n%avgSkips% skips (%avgSkipped% zones skipped)`n%avgZones% end zone`n%avgSkipRate%`% true skip rate`n%avgStacks% required stacks with`n%roughTime% time in secs to build said stacks very rough guess
 	SB_SetText("Calculation has completed.")
 	Return message
+}
+
+KlehoImage()
+{
+	kleholink := "https://idle.kleho.ru/assets/fb/"
+	for k, v in UserDetails.defines.campaign_defines {
+		kleholink := kleholink v.id
+	}
+	kleholink := kleholink "/"
+	for k, v in UserDetails.details.game_instances {
+		if (v.game_instance_id == ActiveInstance) {
+			for kk, vv in v.formation {
+				if (vv > 0) {
+					kleholink := kleholink vv "_"
+				}
+				else {
+					kleholink := kleholink "_"
+				}
+			}
+		}
+	}
+	StringTrimRight, kleholink, kleholink, 1
+	kleholink := kleholink ".png"
+	InputBox, dummyvar, Kleho Link, Image link from Kleho's site:, , 250, 150, , , , , % kleholink
+	dummyvar := ""
+	return
+}
+
+IncompleteVariants()
+{
+	patronid := 1
+	InputBox, patronid, Incomplete Adventures, Please enter the Patron to check.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 150, , , , , % patronid
+	if ErrorLevel
+		return
+	while ((patronid < 1) or (patronid > 3)) {
+		InputBox, patronid, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 150, , , , , % patronid
+		if ErrorLevel
+			return
+	}
+	missingvariants := PatronFromID(patronid) ": "
+	availablelist := {}
+	completelist := {}
+	freeplaylist := {}
+	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
+	sResult := ServerCall("getcampaigndetails", getparams)
+	campaignresults := JSON.parse(sResult)
+	for k, v in campaignresults.defines.adventure_defines {
+		if (v.repeatable) {
+			freeplaylist.push(v.id)
+		}
+	}
+	for k, v in campaignresults.campaigns {
+		for k2, v2 in v.available_patron_adventure_ids {
+			for k3, v3 in v2 {
+				if ((k3 == patronid) && (v3[1] == 1))
+				availablelist.push(k2)
+			}
+		}
+		for k2, v2 in v.completed_patron_adventure_ids {
+			for k3, v3 in v2 {
+				if ((k3 == patronid) && (v3[1] == 1))
+				completelist.push(k2)
+			}
+		}
+		if (availablelist[1]) {
+			missingvariants := missingvariants "`nCampaign ID " v.campaign_id ": "
+		}
+		for k2, v2 in availablelist {
+			missingvariants := missingvariants v2 ", "
+		}
+		for k2, v2 in completelist {
+			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+		}
+		for k2, v2 in freeplaylist {
+			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+		}
+		if (availablelist[1]) {
+			StringTrimRight, missingvariants, missingvariants, 2
+		}
+		availablelist := {}
+		completelist := {}
+	}
+	MsgBox % missingvariants
+	return
 }
