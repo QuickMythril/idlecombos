@@ -1,15 +1,18 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
-;Added in 1.7
-;-Lists incomplete Patron Variants
-;-Kleho image link generator
-;-Krydle achievement info
-;-Fixed Shiny results display
+;Added in 1.7.1
+;-Lists incomplete Base Variants (no patron)
+;-Duplicate shinies indicate when giving +125 item levels
+;-Fixed running game client if install dir is chosen manually
+;-Redeemed codes indicate if someone else used it, but not you
+;-Providing a link & saving formation image to file from Kleho's site
+;--(Known issue: Does not work with event/timegate formations)
+;-Dictionary file updated to 1.7
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.7"
-global CurrentDictionary := "1.6"
+global VersionNumber := "1.7.1"
+global CurrentDictionary := "1.7"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -242,6 +245,7 @@ class MyGui {
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
 		Menu, AdvSubmenu, Add, &Kleho Image, KlehoImage
 		Menu, AdvSubmenu, Add, &Incomplete Variants, IncompleteVariants
+		Menu, AdvSubmenu, Add, Adventure List, AdventureList
 		Menu, ToolsSubmenu, Add, &Adventure Manager, :AdvSubmenu
 		
 		Menu, ToolsSubmenu, Add, &Briv Stack Calculator, Briv_Calc
@@ -593,6 +597,7 @@ Redeem_Codes:
 	CodesPending := "Codes pending: " CodeCount
 	GuiControl, , CodesPending, % CodesPending, w250 h210
 	usedcodes := ""
+	someonescodes := ""
 	expiredcodes := ""
 	earlycodes := ""
 	invalidcodes := ""
@@ -640,6 +645,9 @@ Redeem_Codes:
 		}
 		if (coderesults.failure_reason == "You have already redeemed this combination.") {
 			usedcodes := usedcodes sCode "`n"
+		}
+		else if (coderesults.failure_reason == "Someone has already redeemed this combination.") {
+			someonescodes := someonescodes sCode "`n"
 		}
 		else if (coderesults.failure_reason == "This offer has expired") {
 			expiredcodes := expiredcodes sCode "`n"
@@ -708,7 +716,10 @@ Redeem_Codes:
 	CodesPending := "Codes submitted!"
 	codemessage := ""
 	if !(usedcodes == "") {
-		codemessage := codemessage "Already used:`n" usedcodes "`n"
+		codemessage := codemessage "You already used:`n" usedcodes "`n"
+	}
+	if !(someonescodes == "") {
+		codemessage := codemessage "Someone else used:`n" someonescodes "`n"
 	}
 	if !(expiredcodes == "") {
 		codemessage := codemessage "Expired:`n" expiredcodes "`n"
@@ -1011,8 +1022,11 @@ Open_Chests(chestid) {
 				newfeats := newfeats lastfeat
 			}
 			if (v.gilded) {
-				lastshiny := (ChampFromID(v.hero_id) " (Slot " v.slot_id ")`n")
-				newshinies := newshinies lastshiny
+				lastshiny := (ChampFromID(v.hero_id) " (Slot " v.slot_id ")")
+				if (v.disenchant_amount == 125) {
+					lastshiny := lastshiny " +125"
+				}
+				newshinies := newshinies lastshiny "`n"
 			}
 		}
 	}
@@ -1282,6 +1296,8 @@ FirstRun() {
 			if ErrorLevel
 				return
 			GetIdFromWRL()
+			GameInstallDir := SubStr(WRLFile, 1, -67)
+			GameClient := GameInstallDir "IdleDragons.exe"
 		}	
 		else {
 			InputBox, UserID, user_id, Please enter your "user_id" value., , 250, 125
@@ -2078,11 +2094,12 @@ SimulateBriv(i) {
 
 KlehoImage()
 {
+	campaignid := 0
 	kleholink := "https://idle.kleho.ru/assets/fb/"
 	for k, v in UserDetails.defines.campaign_defines {
-		kleholink := kleholink v.id
+		campaignid := v.id
 	}
-	kleholink := kleholink "/"
+	kleholink := kleholink campaignid "/"
 	for k, v in UserDetails.details.game_instances {
 		if (v.game_instance_id == ActiveInstance) {
 			for kk, vv in v.formation {
@@ -2097,28 +2114,114 @@ KlehoImage()
 	}
 	StringTrimRight, kleholink, kleholink, 1
 	kleholink := kleholink ".png"
-	InputBox, dummyvar, Kleho Link, Image link from Kleho's site:, , 250, 150, , , , , % kleholink
+	if !(FileExist("\formationimages\")) {
+		FileCreateDir, formationimages
+	}
+	if !(FileExist("\formationimages\Patron-" CurrentPatron)) {
+		FileCreateDir, % "formationimages\Patron-" CurrentPatron
+	}
+	if !(FileExist("\formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure)) {
+		FileCreateDir, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure
+	}
+	UrlDownloadToFile, %kleholink%, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png"
+	InputBox, dummyvar, Kleho Image, % "Saved as: formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png", , , , , , , , % kleholink
 	dummyvar := ""
 	return
 }
 
 IncompleteVariants()
 {
-	patronid := 1
-	InputBox, patronid, Incomplete Adventures, Please enter the Patron to check.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 150, , , , , % patronid
+	if !FileExist("advdefs.json") {
+		MsgBox % "Downloading adventure defines."
+		AdventureList()
+	}
+	idtocheck := 0
+	InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3), , 250, 200, , , , , % idtocheck
 	if ErrorLevel
 		return
-	while ((patronid < 1) or (patronid > 3)) {
-		InputBox, patronid, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 150, , , , , % patronid
+	while ((idtocheck < 0) or (idtocheck > 3)) {
+		InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 200, , , , , % idtocheck
 		if ErrorLevel
 			return
 	}
-	missingvariants := PatronFromID(patronid) ": "
+	if (idtocheck == 0) {
+		IncompleteBase()
+	}
+	else {
+		IncompletePatron(idtocheck)
+	}
+}
+
+IncompleteBase()
+{
+	FileRead, AdventureFile, advdefs.json
+	AdventureNames := JSON.parse(AdventureFile)
+	
+	missingvariants := "No Patron:"
 	availablelist := {}
 	completelist := {}
 	freeplaylist := {}
 	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
 	sResult := ServerCall("getcampaigndetails", getparams)
+	FileDelete, campaign.json
+	FileAppend, %sResult%, campaign.json
+	campaignresults := JSON.parse(sResult)
+	for k, v in campaignresults.defines.adventure_defines {
+		if (v.repeatable) {
+			freeplaylist.push(v.id)
+		}
+	}
+	for k, v in campaignresults.campaigns {
+		for k2, v2 in v.available_adventure_ids {
+			availablelist.push(v2)
+		}
+		for k2, v2 in v.completed_adventure_ids {
+			completelist.push(v2)
+		}
+		if (availablelist[1]) {
+			missingvariants := missingvariants "`nCampaign ID " v.campaign_id ": "
+		}
+		for k2, v2 in availablelist {
+			missingvariants := missingvariants v2 ", "
+		}
+		for k2, v2 in completelist {
+			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+		}
+		for k2, v2 in freeplaylist {
+			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+		}
+		; missinglist := StrSplit(missingvariants, ", ")
+		if (availablelist[1]) {
+			StringTrimRight, missingvariants, missingvariants, 2
+		; }
+		; missingnames := missingnames "`nCampaign ID " v.campaign_id ": "
+		; count := 1
+		; while (count < missinglist.Count()) {
+			; missingnames := missingnames JSON.stringify(AdventureNames.missinglist[count]) ", "
+			; count += 1
+		}
+		availablelist := {}
+		completelist := {}
+	}
+	; StrSplit(x, " ,")
+	MsgBox % missingvariants
+	return
+}
+
+IncompletePatron(patronid)
+{
+	FileRead, AdventureFile, advdefs.json
+	AdventureNames := JSON.parse(AdventureFile)
+	
+	missingvariants := PatronFromID(patronid) ":"
+	; missingnames := PatronFromID(patronid) ":"
+	availablelist := {}
+	completelist := {}
+	freeplaylist := {}
+	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
+	sResult := ServerCall("getcampaigndetails", getparams)
+	FileDelete, campaign.json
+	FileAppend, %sResult%, campaign.json
 	campaignresults := JSON.parse(sResult)
 	for k, v in campaignresults.defines.adventure_defines {
 		if (v.repeatable) {
@@ -2129,12 +2232,14 @@ IncompleteVariants()
 		for k2, v2 in v.available_patron_adventure_ids {
 			for k3, v3 in v2 {
 				if ((k3 == patronid) && (v3[1] == 1))
+				; MsgBox % JSON.stringify(k2)
 				availablelist.push(k2)
 			}
 		}
 		for k2, v2 in v.completed_patron_adventure_ids {
 			for k3, v3 in v2 {
 				if ((k3 == patronid) && (v3[1] == 1))
+				; MsgBox % JSON.stringify(k2)
 				completelist.push(k2)
 			}
 		}
@@ -2150,12 +2255,50 @@ IncompleteVariants()
 		for k2, v2 in freeplaylist {
 			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
 		}
+		; missinglist := StrSplit(missingvariants, ", ")
 		if (availablelist[1]) {
 			StringTrimRight, missingvariants, missingvariants, 2
+		; }
+		; missingnames := missingnames "`nCampaign ID " v.campaign_id ": "
+		; count := 1
+		; while (count < missinglist.Count()) {
+			; missingnames := missingnames JSON.stringify(AdventureNames.missinglist[count]) ", "
+			; count += 1
 		}
 		availablelist := {}
 		completelist := {}
 	}
+	; StrSplit(x, " ,")
 	MsgBox % missingvariants
+	return
+}
+
+AdventureList() {
+	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
+	sResult := ServerCall("getcampaigndetails", getparams)
+	campaignresults := JSON.parse(sResult)
+	freeplayids := {}
+	freeplaynames := {}
+	for k, v in campaignresults.defines.adventure_defines {
+		freeplayids.push(v.id)
+		freeplaynames.push(v.name)
+	}
+	count := 1
+	testvar := "{"
+	while (count < freeplayids.Count()) {
+		testvar := testvar """" JSON.stringify(freeplayids[count]) """:"
+		tempname := JSON.stringify(freeplaynames[count])
+		; StringTrimRight, tempname, tempname, 1
+		; StringTrimLeft, tempname, tempname, 1
+		testvar := testvar tempname ","
+		count += 1
+	}
+	StringTrimRight, testvar, testvar, 1
+	testvar := testvar "}"
+	; testvar := JSON.stringify(freeplaylist)
+	; InputBox, testvar, TEST, TEST, , 250, 150, , , , , % testvar
+	FileDelete, advdefs.json
+	FileAppend, %testvar%, advdefs.json
+	MsgBox % "advdefs.json saved to file."
 	return
 }
