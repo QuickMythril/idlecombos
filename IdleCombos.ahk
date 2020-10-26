@@ -1,18 +1,19 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
-;Added in 1.7.1
-;-Lists incomplete Base Variants (no patron)
-;-Duplicate shinies indicate when giving +125 item levels
-;-Fixed running game client if install dir is chosen manually
-;-Redeemed codes indicate if someone else used it, but not you
-;-Providing a link & saving formation image to file from Kleho's site
-;--(Known issue: Does not work with event/timegate formations)
-;-Dictionary file updated to 1.7
+;Added in 1.7.2
+;-Incomplete variants show Campaign name
+;--(Completed campaigns are no longer listed)
+;-Log indicates Gold or Silver when opening
+;-Warning when opening chests with the game running
+;-Item Level Report in Blacksmith menu
+;-Check for Active Patron Feats
+;-Kleho image disabled for Events & TGs
+;-Dictionary file updated to 1.7.1
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.7.1"
-global CurrentDictionary := "1.7"
+global VersionNumber := "1.7.2"
+global CurrentDictionary := "1.7.1"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -235,6 +236,8 @@ class MyGui {
 		Menu, BlacksmithSubmenu, Add, Use Small Contracts, Sm_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Medium Contracts, Med_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Large Contracts, Lg_Blacksmith
+		Menu, BlacksmithSubmenu, Add, Item Level Report, GearReport
+		Menu, BlacksmithSubmenu, Add, Active Patron Feats, PatronFeats
 		Menu, ToolsSubmenu, Add, &Blacksmith, :BlacksmithSubmenu
 		
 		Menu, ToolsSubmenu, Add, &Redeem Codes, Open_Codes
@@ -566,14 +569,42 @@ Buy_Gold:
 
 Open_Silver:
 {
-	Open_Chests(1)
-	return
+	if (Not WinExist("ahk_exe IdleDragons.exe")) {
+		Open_Chests(1)
+		return
+	}
+	else {
+		MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?"
+		IfMsgBox, Yes
+		{
+			Open_Chests(1)
+			return
+		}
+		else IfMsgBox, No
+		{
+			return
+		}
+	}
 }
 
 Open_Gold:
 {
-	Open_Chests(2)
-	return
+	if (Not WinExist("ahk_exe IdleDragons.exe")) {
+		Open_Chests(2)
+		return
+	}
+	else {
+		MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?`n`n(Feats earned using this app do not count towards the related achievement.)"
+		IfMsgBox, Yes
+		{
+			Open_Chests(2)
+			return
+		}
+		else IfMsgBox, No
+		{
+			return
+		}
+	}
 }
 
 Open_Codes:
@@ -943,7 +974,7 @@ Open_Chests(chestid) {
 			}
 		}
 		case 2: {
-			InputBox, count, Opening Chests, % "How many Gold Chests?`n(Owned: " CurrentGolds ")`n(Max: " (CurrentGolds + Floor(CurrentGems/500)) ")", , 200, 180
+			InputBox, count, Opening Chests, % "How many Gold Chests?`n(Owned: " CurrentGolds ")`n(Max: " (CurrentGolds + Floor(CurrentGems/500)) ")`n`n(Feats earned using this app do not`ncount towards the related achievement.)", , 360, 240
 			if ErrorLevel
 				return
 			if (count > CurrentGolds) {
@@ -1037,14 +1068,16 @@ Open_Chests(chestid) {
 	case "1": {
 		chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
 		MsgBox % "New Shinies:`n" newshinies
+		UpdateLogTime()
+		FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	}
 	case "2": {
 		chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
 		MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
+		UpdateLogTime()
+		FileAppend, % "(" CurrentTime ") Gold Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	}
 }
-	UpdateLogTime()
-	FileAppend, % "(" CurrentTime ") Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	FileRead, OutputText, %OutputLogFile%
 	oMyGUI.Update()
 	GetUserDetails()
@@ -2099,6 +2132,10 @@ KlehoImage()
 	for k, v in UserDetails.defines.campaign_defines {
 		campaignid := v.id
 	}
+	if !((campaignid < 3) or (campaignid == 15) or (campaignid > 21)) {
+		MsgBox % "Currently unavailable for Events & Timegates."
+		return
+	}
 	kleholink := kleholink campaignid "/"
 	for k, v in UserDetails.details.game_instances {
 		if (v.game_instance_id == ActiveInstance) {
@@ -2114,6 +2151,11 @@ KlehoImage()
 	}
 	StringTrimRight, kleholink, kleholink, 1
 	kleholink := kleholink ".png"
+	InputBox, dummyvar, Kleho Image, % "Copy link for formation sharing.`n`nSave image to the following file?`nformationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png", , , , , , , , % kleholink
+	if ErrorLevel {
+		dummyvar := ""
+		return
+	}
 	if !(FileExist("\formationimages\")) {
 		FileCreateDir, formationimages
 	}
@@ -2124,7 +2166,6 @@ KlehoImage()
 		FileCreateDir, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure
 	}
 	UrlDownloadToFile, %kleholink%, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png"
-	InputBox, dummyvar, Kleho Image, % "Saved as: formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png", , , , , , , , % kleholink
 	dummyvar := ""
 	return
 }
@@ -2150,6 +2191,7 @@ IncompleteVariants()
 	else {
 		IncompletePatron(idtocheck)
 	}
+	return
 }
 
 IncompleteBase()
@@ -2158,6 +2200,7 @@ IncompleteBase()
 	AdventureNames := JSON.parse(AdventureFile)
 	
 	missingvariants := "No Patron:"
+	campaignvariants := ""
 	availablelist := {}
 	completelist := {}
 	freeplaylist := {}
@@ -2179,20 +2222,20 @@ IncompleteBase()
 			completelist.push(v2)
 		}
 		if (availablelist[1]) {
-			missingvariants := missingvariants "`nCampaign ID " v.campaign_id ": "
+			campaignvariants := campaignvariants "`n" CampaignFromID(v.campaign_id) "- "
 		}
 		for k2, v2 in availablelist {
-			missingvariants := missingvariants v2 ", "
+			campaignvariants := campaignvariants v2 ", "
 		}
 		for k2, v2 in completelist {
-			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
 		}
 		for k2, v2 in freeplaylist {
-			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
 		}
-		; missinglist := StrSplit(missingvariants, ", ")
+		; missinglist := StrSplit(campaignvariants, ", ")
 		if (availablelist[1]) {
-			StringTrimRight, missingvariants, missingvariants, 2
+			StringTrimRight, campaignvariants, campaignvariants, 2
 		; }
 		; missingnames := missingnames "`nCampaign ID " v.campaign_id ": "
 		; count := 1
@@ -2202,8 +2245,15 @@ IncompleteBase()
 		}
 		availablelist := {}
 		completelist := {}
+		; Msgbox % campaignvariants
+		; Msgbox % "`n" CampaignFromID(v.campaign_id)
+		if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
+			missingvariants := missingvariants campaignvariants
+		}
+		campaignvariants := ""
 	}
 	; StrSplit(x, " ,")
+	missingvariants := StrReplace(missingvariants, "-", ":`n")
 	MsgBox % missingvariants
 	return
 }
@@ -2214,6 +2264,7 @@ IncompletePatron(patronid)
 	AdventureNames := JSON.parse(AdventureFile)
 	
 	missingvariants := PatronFromID(patronid) ":"
+	campaignvariants := ""
 	; missingnames := PatronFromID(patronid) ":"
 	availablelist := {}
 	completelist := {}
@@ -2244,20 +2295,20 @@ IncompletePatron(patronid)
 			}
 		}
 		if (availablelist[1]) {
-			missingvariants := missingvariants "`nCampaign ID " v.campaign_id ": "
+			campaignvariants := campaignvariants "`n" CampaignFromID(v.campaign_id) "- "
 		}
 		for k2, v2 in availablelist {
-			missingvariants := missingvariants v2 ", "
+			campaignvariants := campaignvariants v2 ", "
 		}
 		for k2, v2 in completelist {
-			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
 		}
 		for k2, v2 in freeplaylist {
-			missingvariants := StrReplace(missingvariants, " " v2 ", ", " ")
+			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
 		}
-		; missinglist := StrSplit(missingvariants, ", ")
+		; missinglist := StrSplit(campaignvariants, ", ")
 		if (availablelist[1]) {
-			StringTrimRight, missingvariants, missingvariants, 2
+			StringTrimRight, campaignvariants, campaignvariants, 2
 		; }
 		; missingnames := missingnames "`nCampaign ID " v.campaign_id ": "
 		; count := 1
@@ -2267,8 +2318,13 @@ IncompletePatron(patronid)
 		}
 		availablelist := {}
 		completelist := {}
+		if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
+			missingvariants := missingvariants campaignvariants
+		}
+		campaignvariants := ""
 	}
 	; StrSplit(x, " ,")
+	missingvariants := StrReplace(missingvariants, "-", ":`n")
 	MsgBox % missingvariants
 	return
 }
@@ -2300,5 +2356,161 @@ AdventureList() {
 	FileDelete, advdefs.json
 	FileAppend, %testvar%, advdefs.json
 	MsgBox % "advdefs.json saved to file."
+	return
+}
+
+GearReport() {
+	totalgearlevels := -1
+	totalgearitems := -1
+	totalcorelevels := -1
+	totalcoreitems := -1
+	totaleventlevels := 0
+	totaleventitems := 0
+	;totalshinygear := 0
+	totalshinycore := 0
+	totalshinyevent := 0
+	;highestgearlevel := 0
+	highestcorelevel := 0
+	highesteventlevel := 0
+	;highestchampid := 0
+	highestcoreid := 0
+	highesteventid := 0
+	;lowestgearlevel := 10000000000
+	lowestcorelevel := 10000000000
+	lowesteventlevel := 10000000000
+	;lowestchampid := 0
+	lowestcoreid := 0
+	lowesteventid := 0
+	currentchamplevel := 0
+	currentcount := 0
+	lastchamp := 0
+	lastshiny := 0
+	currentloot := UserDetails.details.loot
+	dummyitem := {}
+	currentloot.push(dummyitem)
+
+	for k, v in currentloot {
+		totalgearlevels += (v.enchant + 1)
+		totalgearitems += 1
+		
+		if (lastchamp < 13) {
+			totalcorelevels += (v.enchant + 1)
+			totalcoreitems += 1
+			if (lastshiny) {
+				totalshinycore += 1
+			}
+			if ((v.hero_id != lastchamp) and (lastchamp != 0)) {
+				if (currentchamplevel > highestcorelevel) {
+					highestcorelevel := currentchamplevel
+					highestcoreid := lastchamp
+				}
+				if (currentchamplevel < lowestcorelevel) {
+					lowestcorelevel := currentchamplevel
+					lowestcoreid := lastchamp
+				}
+				currentchamplevel := 0
+				currentcount := 0
+				currentchamplevel := (v.enchant + 1)
+				currentcount += 1
+			}
+			else {
+				currentchamplevel += (v.enchant + 1)
+				currentcount += 1
+			}
+		}
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68)){
+			totalcorelevels += (v.enchant + 1)
+			totalcoreitems += 1
+			if (lastshiny) {
+				totalshinycore += 1
+			}
+			if (v.hero_id != lastchamp) {
+				if (currentchamplevel > highestcorelevel) {
+					highestcorelevel := currentchamplevel
+					highestcoreid := lastchamp
+				}
+				if (currentchamplevel < lowestcorelevel) {
+					lowestcorelevel := currentchamplevel
+					lowestcoreid := lastchamp
+				}
+				currentchamplevel := 0
+				currentcount := 0
+				currentchamplevel := (v.enchant + 1)
+				currentcount += 1
+			}
+			else {
+				currentchamplevel += (v.enchant + 1)
+				currentcount += 1
+			}
+		}
+		else {
+			totaleventlevels += (v.enchant + 1)
+			totaleventitems += 1
+			if (lastshiny) {
+				totalshinyevent += 1
+			}
+			if (v.hero_id != lastchamp) {
+				if (currentchamplevel > highesteventlevel) {
+					highesteventlevel := currentchamplevel
+					highesteventid := lastchamp
+				}
+				if (currentchamplevel < lowesteventlevel) {
+					lowesteventlevel := currentchamplevel
+					lowesteventid := lastchamp
+				}
+				currentchamplevel := 0
+				currentcount := 0
+				currentchamplevel := (v.enchant + 1)
+				currentcount += 1
+			}
+			else {
+				currentchamplevel += (v.enchant + 1)
+				currentcount += 1
+			}
+		}
+
+		lastchamp := v.hero_id
+		lastshiny := v.gild
+	}
+	dummyitem := currentloot.pop()
+	shortreport := ""
+	
+	shortreport := shortreport "Avg item level:`t" Round(totalgearlevels/totalgearitems)
+		
+	shortreport := shortreport "`n`nAvg core level:`t" Round(totalcorelevels/totalcoreitems)
+	shortreport := shortreport "`nHighest avg core:`t" Round(highestcorelevel/6) " (" ChampFromID(highestcoreid) ")"
+	shortreport := shortreport "`nLowest avg core:`t" Round(lowestcorelevel/6) " (" ChampFromID(lowestcoreid) ")"
+	shortreport := shortreport "`nCore Shinies:`t" totalshinycore "/" totalcoreitems
+	
+	shortreport := shortreport "`n`nAvg event level:`t" Round(totaleventlevels/totaleventitems)
+	shortreport := shortreport "`nHighest avg event:`t" Round(highesteventlevel/6) " (" ChampFromID(highesteventid) ")"
+	shortreport := shortreport "`nLowest avg event:`t" Round(lowesteventlevel/6) " (" ChampFromID(lowesteventid) ")"
+	shortreport := shortreport "`nEvent Shinies:`t" totalshinyevent "/" totaleventitems
+	
+	MsgBox % shortreport
+	return
+}
+
+PatronFeats() {
+	assignedfeats := ""
+	for k, v in UserDetails.details.heroes {
+		for k2, v2 in v.active_feats {
+			switch JSON.stringify(v2) {
+			case "272": assignedfeats := assignedfeats "Celeste CON+1`n"
+			case "13": assignedfeats := assignedfeats "Celeste INT+1`n"
+			case "107": assignedfeats := assignedfeats "Drizzt INT+1`n"
+			case "138": assignedfeats := assignedfeats "Nrakk INT+1`n"
+			case "193": assignedfeats := assignedfeats "Zorbu INT+1`n"
+			case "208": assignedfeats := assignedfeats "Nerys INT+1`n"
+			case "229": assignedfeats := assignedfeats "Rosie INT+1`n"
+			case "361": assignedfeats := assignedfeats "Gromma INT+1`n"
+			default: assignedfeats := assignedfeats
+			}
+		}
+	}
+	if (assignedfeats = "") {
+		assignedfeats := "None"
+	}
+	MsgBox % assignedfeats
 	return
 }

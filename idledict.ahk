@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.7"
+global DictionaryVersion := "1.7.1"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -7,6 +7,37 @@ PatronFromID(patronid) {
 		case "2": namefromid := "Vajra"
 		case "3": namefromid := "Strahd"
 		case "4": namefromid := "Zariel"
+	}
+	return namefromid
+}
+
+campaignFromID(campaignid) {
+	switch campaignid {
+		case "1": namefromid := "Grand Tour of the Sword Coast"
+		case "2": namefromid := "Tomb of Annihilation"
+		case "15": namefromid := "Waterdeep: Dragon Heist"
+		case "22": namefromid := "Baldur's Gate: Descent into Avernus"
+		case "24": namefromid := "Icewind Dale: Rime of the Frostmaiden"
+		case "23": namefromid := "Special"
+		case "17": namefromid := "Time Gates"
+		case "3": namefromid := "Highharvestide"
+		case "4": namefromid := "Liars' Night"
+		case "5": namefromid := "Feast of the Moon"
+		case "6": namefromid := "Simril"
+		case "7": namefromid := "Wintershield"
+		case "8": namefromid := "Midwinter"
+		case "9": namefromid := "Grand Revel"
+		case "10": namefromid := "Fleetswake"
+		case "11": namefromid := "Festival of Fools"
+		case "12": namefromid := "Greengrass"
+		case "13": namefromid := "The Running"
+		case "14": namefromid := "The Great Modron March"
+		case "16": namefromid := "Dragondown"
+		case "18": namefromid := "Founders' Day"
+		case "19": namefromid := "Midsummer"
+		case "20": namefromid := "Ahghairon's Day"
+		case "21": namefromid := "Brightswords"
+		default: namefromid := "Error: " campaignid
 	}
 	return namefromid
 }
