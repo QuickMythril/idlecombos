@@ -1,19 +1,18 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
-;Added in 1.7.2
-;-Incomplete variants show Campaign name
-;--(Completed campaigns are no longer listed)
-;-Log indicates Gold or Silver when opening
-;-Warning when opening chests with the game running
-;-Item Level Report in Blacksmith menu
-;-Check for Active Patron Feats
-;-Kleho image disabled for Events & TGs
-;-Dictionary file updated to 1.7.1
+;Added in 1.8
+;-Pity Timer for Golds on Inventory Tab
+;-Event Pity Timers in the Chests menu
+;-More info on number of tokens/FPs available
+;-Kleho image now works for Events & TGs
+;-Fix for "Chests Opened: 0" in log output
+;-Dictionary file updated to 1.8
+;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.7.2"
-global CurrentDictionary := "1.7.1"
+global VersionNumber := "1.8"
+global CurrentDictionary := "1.8"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -69,10 +68,12 @@ global CurrentGems := ""
 global AvailableChests := ""
 global SpentGems := ""
 global CurrentGolds := ""
+global GoldPity := ""
 global CurrentSilvers := ""
 global CurrentTGPs := ""
 global AvailableTGs := ""
 global NextTGPDrop := ""
+global CurrentTokens := ""
 global CurrentSmBounties := ""
 global CurrentMdBounties := ""
 global CurrentLgBounties := ""
@@ -206,7 +207,7 @@ return
 ;BEGIN: GUI Defs
 class MyGui {
 	Width := "550"
-	Height := "360"
+	Height := "250"
 	
 	__New()
 	{
@@ -230,6 +231,7 @@ class MyGui {
 		Menu, ChestsSubmenu, Add, Buy Silver, Buy_Silver
 		Menu, ChestsSubmenu, Add, Open Gold, Open_Gold
 		Menu, ChestsSubmenu, Add, Open Silver, Open_Silver
+		Menu, ChestsSubmenu, Add, Pity Timers, ShowPityTimers
 		Menu, ToolsSubmenu, Add, &Chests, :ChestsSubmenu
 		
 		Menu, BlacksmithSubmenu, Add, Use Tiny Contracts, Tiny_Blacksmith
@@ -320,6 +322,7 @@ class MyGui {
 		
 		Gui, MyWindow:Add, Text, x15 y+5+p w110, Gold Chests:
 		Gui, MyWindow:Add, Text, vCurrentGolds x+2 w35 right, % CurrentGolds
+		Gui, MyWindow:Add, Text, vGoldPity x+10 w190, % GoldPity
 		Gui, MyWindow:Add, Text, x15 y+p w110, Silver Chests:
 		Gui, MyWindow:Add, Text, vCurrentSilvers x+2 w35 right, % CurrentSilvers
 		Gui, MyWindow:Add, Text, x+105 y+1 w185, Next TGP:
@@ -333,9 +336,10 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vAvailableTokens x+10 w185, % AvailableTokens
 		Gui, MyWindow:Add, Text, x15 y+p w110, Medium Bounties:
 		Gui, MyWindow:Add, Text, vCurrentMdBounties x+2 w35 right, % CurrentMdBounties
-		Gui, MyWindow:Add, Text, vAvailableFPs x+10 w185, % AvailableFPs
+		Gui, MyWindow:Add, Text, vCurrentTokens x+10 w185, % CurrentTokens
 		Gui, MyWindow:Add, Text, x15 y+p w110, Large Bounties:
 		Gui, MyWindow:Add, Text, vCurrentLgBounties x+2 w35 right, % CurrentLgBounties
+		Gui, MyWindow:Add, Text, vAvailableFPs x+10 w185, % AvailableFPs
 		
 		Gui, MyWindow:Add, Text, x15 y+5+p w110, Tiny Blacksmiths:
 		Gui, MyWindow:Add, Text, vCurrentTinyBS x+2 w35 right, % CurrentTinyBS
@@ -430,6 +434,7 @@ class MyGui {
 		GuiControl, MyWindow:, CurrentGems, % CurrentGems, w250 h210
 		GuiControl, MyWindow:, SpentGems, % SpentGems, w250 h210
 		GuiControl, MyWindow:, CurrentGolds, % CurrentGolds, w250 h210
+		GuiControl, MyWindow:, GoldPity, % GoldPity, w250 h210
 		GuiControl, MyWindow:, CurrentSilvers, % CurrentSilvers, w250 h210
 		GuiControl, MyWindow:, CurrentTGPs, % CurrentTGPs, w250 h210
 		GuiControl, MyWindow:, NextTGPDrop, % NextTGPDrop, w250 h210
@@ -439,6 +444,7 @@ class MyGui {
 		GuiControl, MyWindow:, CurrentMdBounties, % CurrentMdBounties, w250 h210
 		GuiControl, MyWindow:, CurrentLgBounties, % CurrentLgBounties, w250 h210
 		GuiControl, MyWindow:, AvailableTokens, % AvailableTokens, w250 h210
+		GuiControl, MyWindow:, CurrentTokens, % CurrentTokens, w250 h210
 		GuiControl, MyWindow:, AvailableFPs, % AvailableFPs, w250 h210
 		GuiControl, MyWindow:, CurrentTinyBS, % CurrentTinyBS, w250 h210
 		GuiControl, MyWindow:, CurrentSmBS, % CurrentSmBS, w250 h210
@@ -1030,11 +1036,17 @@ Open_Chests(chestid) {
 			switch chestid
 		{
 			case "1": {
-				chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
+				chestsopened := (CurrentSilvers - chestresults.chests_remaining)
+				if (extraspent) {
+					chestsopened += (extraspent/50)
+				}
 				MsgBox % "New Shinies:`n" newshinies
 			}
 			case "2": {
-				chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
+				chestsopened := (CurrentGolds - chestresults.chests_remaining)
+				if (extraspent) {
+					chestsopened += (extraspent/500)
+				}
 				MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
 			}
 		}
@@ -1066,13 +1078,18 @@ Open_Chests(chestid) {
 	switch chestid
 {
 	case "1": {
-		chestsopened := ((CurrentSilvers - chestresults.chests_remaining) + (extraspent/50))
-		MsgBox % "New Shinies:`n" newshinies
+		chestsopened := (CurrentSilvers - chestresults.chests_remaining)
+		if (extraspent) {
+			chestsopened += (extraspent/50)
+		}
 		UpdateLogTime()
 		FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	}
 	case "2": {
-		chestsopened := ((CurrentGolds - chestresults.chests_remaining) + (extraspent/500))
+		chestsopened := (CurrentGolds - chestresults.chests_remaining)
+		if (extraspent) {
+			chestsopened += (extraspent/500)
+		}
 		MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
 		UpdateLogTime()
 		FileAppend, % "(" CurrentTime ") Gold Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
@@ -1391,7 +1408,7 @@ GetIDFromWRL() {
 GetUserDetails() {
 	Gui, MyWindow:Default
 	SB_SetText("Please wait a moment...")
-	getuserparams := "&instance_key=1&user_id=" UserID "&hash=" UserHash
+	getuserparams := DummyData "&include_free_play_objectives=true&instance_key=1&user_id=" UserID "&hash=" UserHash
 	rawdetails := ServerCall("getuserdetails", getuserparams)
 	FileDelete, %UserDetailsFile%
 	FileAppend, %rawdetails%, %UserDetailsFile%
@@ -1521,6 +1538,7 @@ ParseInventoryData() {
 	CurrentGems := UserDetails.details.red_rubies
 	SpentGems := UserDetails.details.red_rubies_spent
 	CurrentGolds := UserDetails.details.chests.2
+	GoldPity := "(Epic in Next " UserDetails.details.stats.forced_win_counter_2 ")"
 	CurrentSilvers := UserDetails.details.chests.1
 	CurrentTGPs := UserDetails.details.stats.time_gate_key_pieces
 	AvailableTGs := "= " Floor(CurrentTGPs/6) " Time Gates"
@@ -1537,8 +1555,16 @@ ParseInventoryData() {
 	}
 	AvailableChests := "= " Floor(CurrentGems/50) " Silver Chests"
 	tokencount := (CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
-	AvailableTokens := "= " tokencount " Tokens"
-	AvailableFPs := "(" Floor(tokencount/2500) " Free Plays)"
+	if (UserDetails.details.event_details[1].user_data.event_tokens) {
+		tokentotal := UserDetails.details.event_details[1].user_data.event_tokens
+		AvailableTokens := "= " tokencount " Tokens`t(" Round(tokencount/2500, 2) " FPs)"
+		CurrentTokens := "+ " tokentotal " Current`t(" Round(tokentotal/2500, 2) " FPs)"
+		AvailableFPs := "(Total: " (tokentotal+tokencount) " = " Round((tokentotal + tokencount)/2500, 2) " Free Plays)"
+	}
+	else {
+		AvailableTokens := "= " tokencount " Tokens"
+		CurrentTokens := "(" Round(tokencount/2500, 2) " Free Plays)"
+	}
 	AvailableBSLvs := "= " CurrentTinyBS+(CurrentSmBS*2)+(CurrentMdBS*6)+(CurrentLgBS*24) " Item Levels"
 }
 
@@ -1632,7 +1658,7 @@ ParsePatronData() {
 
 ParseLootData() {
 	EpicGearCount := 0
-	todogear := "`nHighest Gear Level:" UserDetails.details.stats.highest_level_gear
+	todogear := "`nHighest Gear Level: " UserDetails.details.stats.highest_level_gear
 	for k, v in UserDetails.details.loot {
 		if (v.rarity == "4") {
 			EpicGearCount += 1
@@ -2128,13 +2154,25 @@ SimulateBriv(i) {
 KlehoImage()
 {
 	campaignid := 0
+	currenttimegate := ""
 	kleholink := "https://idle.kleho.ru/assets/fb/"
 	for k, v in UserDetails.defines.campaign_defines {
 		campaignid := v.id
 	}
-	if !((campaignid < 3) or (campaignid == 15) or (campaignid > 21)) {
-		MsgBox % "Currently unavailable for Events & Timegates."
-		return
+	if (campaignid == 17) {
+		for k, v in UserDetails.details.game_instances {
+			if (v.game_instance_id == ActiveInstance) {
+				currenttimegate := JSON.stringify(v.defines.adventure_defines[1].requirements[1].champion_id)
+			}
+		}
+		campaignid := KlehoFromID(currenttimegate)
+	}
+	else if !((campaignid < 3) or (campaignid == 15) or (campaignid > 21)) {
+		for k, v in UserDetails.details.game_instances {
+			if (v.game_instance_id == ActiveInstance) {
+				campaignid := campaignid "a" JSON.stringify(v.defines.adventure_defines[1].requirements[1].adventure_id)
+			}
+		}
 	}
 	kleholink := kleholink campaignid "/"
 	for k, v in UserDetails.details.game_instances {
@@ -2233,26 +2271,16 @@ IncompleteBase()
 		for k2, v2 in freeplaylist {
 			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
 		}
-		; missinglist := StrSplit(campaignvariants, ", ")
 		if (availablelist[1]) {
 			StringTrimRight, campaignvariants, campaignvariants, 2
-		; }
-		; missingnames := missingnames "`nCampaign ID " v.campaign_id ": "
-		; count := 1
-		; while (count < missinglist.Count()) {
-			; missingnames := missingnames JSON.stringify(AdventureNames.missinglist[count]) ", "
-			; count += 1
 		}
 		availablelist := {}
 		completelist := {}
-		; Msgbox % campaignvariants
-		; Msgbox % "`n" CampaignFromID(v.campaign_id)
 		if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
 			missingvariants := missingvariants campaignvariants
 		}
 		campaignvariants := ""
 	}
-	; StrSplit(x, " ,")
 	missingvariants := StrReplace(missingvariants, "-", ":`n")
 	MsgBox % missingvariants
 	return
@@ -2265,7 +2293,6 @@ IncompletePatron(patronid)
 	
 	missingvariants := PatronFromID(patronid) ":"
 	campaignvariants := ""
-	; missingnames := PatronFromID(patronid) ":"
 	availablelist := {}
 	completelist := {}
 	freeplaylist := {}
@@ -2283,14 +2310,12 @@ IncompletePatron(patronid)
 		for k2, v2 in v.available_patron_adventure_ids {
 			for k3, v3 in v2 {
 				if ((k3 == patronid) && (v3[1] == 1))
-				; MsgBox % JSON.stringify(k2)
 				availablelist.push(k2)
 			}
 		}
 		for k2, v2 in v.completed_patron_adventure_ids {
 			for k3, v3 in v2 {
 				if ((k3 == patronid) && (v3[1] == 1))
-				; MsgBox % JSON.stringify(k2)
 				completelist.push(k2)
 			}
 		}
@@ -2306,15 +2331,8 @@ IncompletePatron(patronid)
 		for k2, v2 in freeplaylist {
 			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
 		}
-		; missinglist := StrSplit(campaignvariants, ", ")
 		if (availablelist[1]) {
 			StringTrimRight, campaignvariants, campaignvariants, 2
-		; }
-		; missingnames := missingnames "`nCampaign ID " v.campaign_id ": "
-		; count := 1
-		; while (count < missinglist.Count()) {
-			; missingnames := missingnames JSON.stringify(AdventureNames.missinglist[count]) ", "
-			; count += 1
 		}
 		availablelist := {}
 		completelist := {}
@@ -2323,7 +2341,6 @@ IncompletePatron(patronid)
 		}
 		campaignvariants := ""
 	}
-	; StrSplit(x, " ,")
 	missingvariants := StrReplace(missingvariants, "-", ":`n")
 	MsgBox % missingvariants
 	return
@@ -2344,15 +2361,11 @@ AdventureList() {
 	while (count < freeplayids.Count()) {
 		testvar := testvar """" JSON.stringify(freeplayids[count]) """:"
 		tempname := JSON.stringify(freeplaynames[count])
-		; StringTrimRight, tempname, tempname, 1
-		; StringTrimLeft, tempname, tempname, 1
 		testvar := testvar tempname ","
 		count += 1
 	}
 	StringTrimRight, testvar, testvar, 1
 	testvar := testvar "}"
-	; testvar := JSON.stringify(freeplaylist)
-	; InputBox, testvar, TEST, TEST, , 250, 150, , , , , % testvar
 	FileDelete, advdefs.json
 	FileAppend, %testvar%, advdefs.json
 	MsgBox % "advdefs.json saved to file."
@@ -2366,19 +2379,14 @@ GearReport() {
 	totalcoreitems := -1
 	totaleventlevels := 0
 	totaleventitems := 0
-	;totalshinygear := 0
 	totalshinycore := 0
 	totalshinyevent := 0
-	;highestgearlevel := 0
 	highestcorelevel := 0
 	highesteventlevel := 0
-	;highestchampid := 0
 	highestcoreid := 0
 	highesteventid := 0
-	;lowestgearlevel := 10000000000
 	lowestcorelevel := 10000000000
 	lowesteventlevel := 10000000000
-	;lowestchampid := 0
 	lowestcoreid := 0
 	lowesteventid := 0
 	currentchamplevel := 0
@@ -2512,5 +2520,57 @@ PatronFeats() {
 		assignedfeats := "None"
 	}
 	MsgBox % assignedfeats
+	return
+}
+
+ShowPityTimers() {
+	pitylist := ""
+	pityjson := JSON.stringify(UserDetails.details.stats)
+	pityjson := StrReplace(pityjson, """forced_tutorial_done"":""0"",""", """forced_win"":{""")
+	pityjson := StrReplace(pityjson, "forced_win_counter_", "")
+	pityjson := StrReplace(pityjson, ",""free_plays_completed""", "},""free_plays_completed""")
+	pityjson := JSON.parse(pityjson)
+	newestchamp := JSON.stringify(UserDetails.details.heroes[UserDetails.details.heroes.MaxIndex()].hero_id)
+	newestchamp := StrReplace(newestchamp, """")
+	chestsforepic := 1
+	while (chestsforepic < 11) {
+		if (chestsforepic == 1) {
+			pitylist := pitylist "Epic in Next Chest for:`n "
+		}
+		else {
+			pitylist := pitylist "Epic in next " chestsforepic " Chests for:`n "
+		}
+		currentchamp := 14
+		currentcount := 0
+		currentchest := 0
+		currentpity := ""
+		while (currentchamp < newestchamp) {
+			currentchest := ChestIDFromChampID(currentchamp)
+			for k, v in (pityjson.forced_win) {
+				if (k = currentchest) {
+					currentpity := v
+				}
+			}
+			if (currentpity = chestsforepic) {
+				pitylist := pitylist ChampFromID(currentchamp) ", "
+				currentcount += 1
+			}
+			switch currentchamp {
+				case "17": currentchamp += 2
+				case "29": currentchamp += 2
+				case "66": currentchamp += 3
+				default: currentchamp += 1
+			}
+		}
+		if !(currentcount) {
+			pitylist := pitylist "(None)`n"
+		}
+		else {
+			StringTrimRight, pitylist, pitylist, 2
+			pitylist := pitylist "`n"
+		}
+		chestsforepic += 1
+	}
+	MsgBox % pitylist
 	return
 }

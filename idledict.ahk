@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.7.1"
+global DictionaryVersion := "1.8"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -652,4 +652,194 @@ ChestFromID(id) {
 		namefromid := "UNKNOWN (" id ")"
 	}
 	return namefromid
+}
+
+KlehoFromID(id) {
+	if (id < 21) {
+		switch id {
+			case "14": namefromid := "3a23"
+			case "15": namefromid := "4a44"
+			case "16": namefromid := "5a49"
+			case "17": namefromid := "6a64"
+			case "19": namefromid := "7a84"
+			case "20": namefromid := "8a89"
+		}
+	}
+	else if (id < 41) {
+		switch id {
+			case "21": namefromid := "9a104"
+			case "22": namefromid := "10a119"
+			case "23": namefromid := "11a134"
+			case "24": namefromid := "12a139"
+			case "25": namefromid := "13a144"
+			case "26": namefromid := "14a159"
+			case "27": namefromid := "16a174"
+			case "28": namefromid := "18a202"
+			case "29": namefromid := "19a218"
+			case "31": namefromid := "20a224"
+			case "32": namefromid := "21a240"
+			case "33": namefromid := "3a256"
+			case "34": namefromid := "4a272"
+			case "35": namefromid := "5a288"
+			case "36": namefromid := "6a293"
+			case "37": namefromid := "7a298"
+			case "38": namefromid := "8a303"
+			case "39": namefromid := "9a308"
+			case "40": namefromid := "10a313"
+		}
+	}
+	else if (id < 61) {
+		switch id {
+			case "41": namefromid := "11a318"
+			case "42": namefromid := "12a323"
+			case "43": namefromid := "13a328"
+			case "44": namefromid := "14a333"
+			case "45": namefromid := "16a338"
+			case "46": namefromid := "18a343"
+			case "47": namefromid := "19a348"
+			case "48": namefromid := "20a353"
+			case "49": namefromid := "21a358"
+			case "50": namefromid := "3a438"
+			case "51": namefromid := "4a443"
+			case "52": namefromid := "5a448"
+			case "53": namefromid := "6a453"
+			case "54": namefromid := "7a458"
+			case "55": namefromid := "8a463"
+			case "56": namefromid := "9a468"
+			case "57": namefromid := "10a473"
+			case "58": namefromid := "11a478"
+			case "59": namefromid := "12a483"
+			case "60": namefromid := "13a488"
+			}
+	}
+	else if (id < 81) {
+		switch id {
+			case "61": namefromid := "14a493"
+			case "62": namefromid := "16a498"
+			case "63": namefromid := "18a503"
+			case "64": namefromid := "19a508"
+			case "65": namefromid := "20a513"
+			case "66": namefromid := "21a518"
+			case "69": namefromid := "3a700"
+			case "70": namefromid := "4a705"
+			case "71": namefromid := "5a710"
+			case "72": namefromid := "6a715"
+			case "73": namefromid := "7a720"
+			case "74": namefromid := "8a725"
+			case "75": namefromid := "9a730"
+			case "76": namefromid := "10a735"
+			case "77": namefromid := "11a740"
+			case "78": namefromid := "12a745"
+			case "79": namefromid := "13a750"
+			case "80": namefromid := "14a755"
+		}
+	}
+	else if (id < 86) {
+		switch id {
+			case "81": namefromid := "16a760"
+			case "82": namefromid := "18a765"
+			case "83": namefromid := "19a770"
+			case "84": namefromid := "20a775"
+			case "85": namefromid := "21a780"
+		}
+	}
+	else {
+		namefromid := "UNKNOWN (" id ")"
+	}
+	return namefromid
+}
+
+ChestIDFromChampID(id) {
+	if (id < 21) {
+		switch id {
+			case "14": chestfromchamp := "4"
+			case "15": chestfromchamp := "6"
+			case "16": chestfromchamp := "8"
+			case "17": chestfromchamp := "10"
+			case "19": chestfromchamp := "12"
+			case "20": chestfromchamp := "17"
+		}
+	}
+	else if (id < 41) {
+		switch id {
+			case "21": chestfromchamp := "19"
+			case "22": chestfromchamp := "22"
+			case "23": chestfromchamp := "27"
+			case "24": chestfromchamp := "30"
+			case "25": chestfromchamp := "36"
+			case "26": chestfromchamp := "41"
+			case "27": chestfromchamp := "46"
+			case "28": chestfromchamp := "54"
+			case "29": chestfromchamp := "56"
+			case "31": chestfromchamp := "58"
+			case "32": chestfromchamp := "68"
+			case "33": chestfromchamp := "72"
+			case "34": chestfromchamp := "74"
+			case "35": chestfromchamp := "76"
+			case "36": chestfromchamp := "82"
+			case "37": chestfromchamp := "84"
+			case "38": chestfromchamp := "86"
+			case "39": chestfromchamp := "88"
+			case "40": chestfromchamp := "90"
+		}
+	}
+	else if (id < 61) {
+		switch id {
+			case "41": chestfromchamp := "92"
+			case "42": chestfromchamp := "94"
+			case "43": chestfromchamp := "96"
+			case "44": chestfromchamp := "98"
+			case "45": chestfromchamp := "100"
+			case "46": chestfromchamp := "102"
+			case "47": chestfromchamp := "104"
+			case "48": chestfromchamp := "106"
+			case "49": chestfromchamp := "108"
+			case "50": chestfromchamp := "159"
+			case "51": chestfromchamp := "161"
+			case "52": chestfromchamp := "163"
+			case "53": chestfromchamp := "165"
+			case "54": chestfromchamp := "167"
+			case "55": chestfromchamp := "169"
+			case "56": chestfromchamp := "171"
+			case "57": chestfromchamp := "173"
+			case "58": chestfromchamp := "175"
+			case "59": chestfromchamp := "177"
+			case "60": chestfromchamp := "179"
+			}
+	}
+	else if (id < 81) {
+		switch id {
+			case "61": chestfromchamp := "181"
+			case "62": chestfromchamp := "183"
+			case "63": chestfromchamp := "185"
+			case "64": chestfromchamp := "187"
+			case "65": chestfromchamp := "189"
+			case "66": chestfromchamp := "191"
+			case "69": chestfromchamp := "245"
+			case "70": chestfromchamp := "247"
+			case "71": chestfromchamp := "249"
+			case "72": chestfromchamp := "251"
+			case "73": chestfromchamp := "253"
+			case "74": chestfromchamp := "255"
+			case "75": chestfromchamp := "257"
+			case "76": chestfromchamp := "259"
+			case "77": chestfromchamp := "261"
+			case "78": chestfromchamp := "263"
+			case "79": chestfromchamp := "265"
+			case "80": chestfromchamp := "267"
+		}
+	}
+	else if (id < 86) {
+		switch id {
+			case "81": chestfromchamp := "269"
+			case "82": chestfromchamp := "271"
+			case "93": chestfromchamp := "273"
+			case "84": chestfromchamp := "275"
+			case "85": chestfromchamp := "277"
+		}
+	}
+	else {
+		chestfromchamp := "UNKNOWN (" id ")"
+	}
+	return chestfromchamp
 }
