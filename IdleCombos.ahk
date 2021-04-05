@@ -1,6 +1,9 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;Added in 1.9
+;-Patron Zariel
+;
 ;Added in 1.8
 ;-Pity Timer for Golds on Inventory Tab
 ;-Event Pity Timers in the Chests menu
@@ -11,7 +14,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.8"
+global VersionNumber := "1.9"
 global CurrentDictionary := "1.8"
 
 ;Local File globals
