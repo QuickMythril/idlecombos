@@ -618,10 +618,10 @@ ChestFromID(id) {
 			case "261": namefromid := "Gold Alyndra Chest"
 			case "262": namefromid := "Silver Orkira Chest"
 			case "263": namefromid := "Gold Orkira Chest"
-			case "264": namefromid := "Silver Y4E11 Chest"
-			case "265": namefromid := "Gold Y4E11 Chest"
-			case "266": namefromid := "Silver Y4E12 Chest"
-			case "267": namefromid := "Gold Y4E12 Chest"
+			case "264": namefromid := "Silver Shaka Chest"
+			case "265": namefromid := "Gold Shaka Chest"
+			case "266": namefromid := "Silver Mehan Chest"
+			case "267": namefromid := "Gold Mehan Chest"
 			case "268": namefromid := "Silver Y4E13 Chest"
 			case "269": namefromid := "Gold Y4E13 Chest"
 			case "270": namefromid := "Silver Y4E14 Chest"
@@ -637,7 +637,7 @@ ChestFromID(id) {
 			case "280": namefromid := "Gold Feathered Hat Chest"
 		}
 	}
-	else if (id < 283) {
+	else if (id < 290) {
 		switch id {
 			case "281": namefromid := "Gold Experimental Chest"
 			case "282": namefromid := "Electrum Chest"
