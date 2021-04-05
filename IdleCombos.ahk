@@ -124,6 +124,7 @@ global ZarielChallenges := ""
 global ZarielRequires := ""
 global ZarielCosts := ""
 
+
 ;GUI globals
 global oMyGUI := ""
 global OutputText := "Test"
@@ -486,11 +487,11 @@ class MyGui {
 		GuiControl, MyWindow:, StrahdFPCurrency, % StrahdFPCurrency, w250 h210
 		GuiControl, MyWindow:, StrahdRequires, % StrahdRequires, w250 h210
 		GuiControl, MyWindow:, StrahdCosts, % StrahdCosts, w250 h210
-        GuiControl, MyWindow:, ZarielVariants, % ZarielVariants, w250 h210
-        GuiControl, MyWindow:, ZarielChallenges, % ZarielChallenges, w250 h210
-        GuiControl, MyWindow:, ZarielFPCurrency, % ZarielFPCurrency, w250 h210
-        GuiControl, MyWindow:, ZarielRequires, % ZarielRequires, w250 h210
-        GuiControl, MyWindow:, ZarielCosts, % ZarielCosts, w250 h210
+		GuiControl, MyWindow:, ZarielVariants, % ZarielVariants, w250 h210
+		GuiControl, MyWindow:, ZarielChallenges, % ZarielChallenges, w250 h210
+		GuiControl, MyWindow:, ZarielFPCurrency, % ZarielFPCurrency, w250 h210
+		GuiControl, MyWindow:, ZarielRequires, % ZarielRequires, w250 h210
+		GuiControl, MyWindow:, ZarielCosts, % ZarielCosts, w250 h210		
 		;champions
 		GuiControl, MyWindow:, ChampDetails, % ChampDetails, w250 h210
 		;settings
@@ -1682,15 +1683,15 @@ ParsePatronData() {
 				ZarielVariants := "Locked"
 				ZarielFPCurrency := "Requires:"
 				ZarielChallenges := "Costs:"
-				ZarielRequires := UserDetails.details.stats.highest_area_completed_ever_c873 "/250 in Adventure 413 && " TotalChamps "/40 Champs"
-				if ((UserDetails.details.stats.highest_area_completed_ever_c413 > 249) && (TotalChamps > 39)) {
+				ZarielRequires := UserDetails.details.stats.highest_area_completed_ever_c873 "/575 in Adventure 873 && " TotalChamps "/50 Champs"
+				if ((UserDetails.details.stats.highest_area_completed_ever_c873 > 574) && (TotalChamps > 49)) {
 					Gui, Font, cGreen
 					GuiControl, Font, ZarielFPCurrency
 				}
-				ZarielCosts := CurrentLgBounties "/10 Lg Bounties && " CurrentSilvers "/20 Silver Chests"
-				if ((CurrentLgBounties > 9) && (CurrentSilvers > 19)) {
+				ZarielCosts := CurrentSilvers "/50 Silver Chests"
+				if (CurrentSilvers > 49) {
 					Gui, Font, cGreen
-					GuiControl, Font, StrahdChallenges
+					GuiControl, Font, ZarielChallenges
 				}
 			}
 			else for kk, vv in v.progress_bars
@@ -1704,7 +1705,6 @@ ParsePatronData() {
 				case "weekly_challenge_porgress": ZarielChallenges := vv.count
 			}
 		}
-
 	}
 }
 
@@ -1845,34 +1845,32 @@ CheckPatronProgress() {
 			Gui, Font, cRed
 			GuiControl, Font, StrahdVariants
 		}
-
 	}
 	if !(ZarielVariants == "Locked") {
-	if (ZarielChallenges = "10") {
-		Gui, Font, cGreen
-		GuiControl, Font, ZarielChallenges
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, ZarielChallenges
-	}
-	if (ZarielFPCurrency = "5000") {
-		Gui, Font, cGreen
-		GuiControl, Font, ZarielFPCurrency
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, ZarielFPCurrency
-	}
-	if (ZarielCompleted = ZarielVariantTotal) {
-		Gui, Font, cGreen
-		GuiControl, Font, ZarielVariants
-	}
-	else {
-		Gui, Font, cRed
-		GuiControl, Font, ZarielVariants
-	}
-	
+		if (ZarielChallenges = "10") {
+			Gui, Font, cGreen
+			GuiControl, Font, ZarielChallenges
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, ZarielChallenges
+		}
+		if (ZarielFPCurrency = "5000") {
+			Gui, Font, cGreen
+			GuiControl, Font, ZarielFPCurrency
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, ZarielFPCurrency
+		}
+		if (ZarielCompleted = ZarielVariantTotal) {
+			Gui, Font, cGreen
+			GuiControl, Font, ZarielVariants
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, ZarielVariants
+		}
 	}
 }
 
@@ -2044,29 +2042,73 @@ Update_Dictionary() {
 
 List_ChampIDs:
 {
+	champnamelen := 0
+	champname := ""
 	id := 1
 	champidlist := ""
-	while (id < 69) {
-		champidlist := champidlist id ": " ChampFromID(id) " `t"
-		if ((id = 9) or (id = 13) or (id = 37) or (id = 41) or (id = 45) or (id = 49) or (id = 53) or (id = 65)) {
-			champidlist := champidlist "`t"
+	while (id < 87) {
+;		champidlist := champidlist id ": " ChampFromID(id) " `t"
+;		if ((id = 9) or (id = 13) or (id = 37) or (id = 41) or (id = 45) or (id = 49) or (id = 53) or (id = 65)) {
+;			champidlist := champidlist "`t"
+;		}
+;		id += 1
+;		champidlist := champidlist id ": " ChampFromID(id) " `t"
+;		if ((id = 2) or (id = 10) or (id = 14) or (id = 18) or (id = 30) or (id = 42) or (id = 58) or (id = 62)) {
+;			champidlist := champidlist "`t"
+;		}
+;		id += 1
+;		champidlist := champidlist id ": " ChampFromID(id) " `t"
+;		if ((id = 3) or (id = 7) or (id = 23) or (id = 31) or (id = 30) or (id = 43) or (id = 51) or (id = 59) or (id = 63)) {
+;			champidlist := champidlist "`t"
+;		}
+;		id += 1
+;		champidlist := champidlist id ": " ChampFromID(id) "`n"
+;		id += 1
+		champname := ChampFromID(id)
+		StringLen, champnamelen, champname
+		while (champnamelen < 16)
+		{
+			champname := champname " "
+			champnamelen += 1
 		}
-		id += 1
-		champidlist := champidlist id ": " ChampFromID(id) " `t"
-		if ((id = 2) or (id = 10) or (id = 14) or (id = 18) or (id = 30) or (id = 42) or (id = 58) or (id = 62)) {
-			champidlist := champidlist "`t"
-		}
-		id += 1
-		champidlist := champidlist id ": " ChampFromID(id) " `t"
-		if ((id = 3) or (id = 7) or (id = 23) or (id = 31) or (id = 30) or (id = 43) or (id = 51) or (id = 59) or (id = 63)) {
-			champidlist := champidlist "`t"
-		}
-		id += 1
-		champidlist := champidlist id ": " ChampFromID(id) "`n"
+		if (!mod(id, 4))
+			champidlist := champidlist id ": " champname "`n"
+		else
+			champidlist := champidlist id ": " champname "`t"
 		id += 1
 	}
-	MsgBox, , Champ ID List, % champidlist
+	;MsgBox, , Champ ID List, % champidlist
+	CustomMsgBox("Champion IDs and Names",champidlist,"Courier New","Blue")
 	return	
+}
+
+CustomMsgBox(Title,Message,Font="",FontOptions="",WindowColor="")
+{
+	Gui,66:Destroy
+	Gui,66:Color,%WindowColor%
+	
+	Gui,66:Font,%FontOptions%,%Font%
+	Gui,66:Add,Text,,%Message%
+	Gui,66:Font
+	
+	GuiControlGet,Text,66:Pos,Static1
+	
+	Gui,66:Add,Button,% "Default y+10 w75 g66OK xp+" (TextW / 2) - 38 ,OK
+	
+	Gui,66:-MinimizeBox
+	Gui,66:-MaximizeBox
+	
+	SoundPlay,*-1
+	Gui,66:Show,,%Title%
+	
+	Gui,66:+LastFound
+	WinWaitClose
+	Gui,66:Destroy
+	return
+	
+	66OK:
+	Gui,66:Destroy
+	return
 }
 
 ViewICSettings() {
@@ -2295,11 +2337,11 @@ IncompleteVariants()
 		AdventureList()
 	}
 	idtocheck := 0
-	InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3), , 250, 200, , , , , % idtocheck
+	InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
 	if ErrorLevel
 		return
-	while ((idtocheck < 0) or (idtocheck > 3)) {
-		InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 200, , , , , % idtocheck
+	while ((idtocheck < 0) or (idtocheck > 4)) {
+		InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
 		if ErrorLevel
 			return
 	}
