@@ -13,3 +13,5 @@
 (2021-04-04 21:44:53) IdleCombos v1.9 started.
 (2021-04-04 21:45:01) Server request: "getuserdetails"
 (2021-04-04 23:37:06) Server request: "getuserdetails"
+(2021-04-05 00:36:52) IdleCombos v1.9 started.
+(2021-04-05 00:37:03) Server request: "getuserdetails"

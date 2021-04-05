@@ -15,7 +15,7 @@
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
 global VersionNumber := "1.9"
-global CurrentDictionary := "1.8"
+global CurrentDictionary := "1.9"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -77,6 +77,7 @@ global CurrentTGPs := ""
 global AvailableTGs := ""
 global NextTGPDrop := ""
 global CurrentTokens := ""
+global CurrentTinyBounties := ""
 global CurrentSmBounties := ""
 global CurrentMdBounties := ""
 global CurrentLgBounties := ""
@@ -217,8 +218,8 @@ return
 
 ;BEGIN: GUI Defs
 class MyGui {
-	Width := "575"
-	Height := "275"
+	Width := "550"
+	Height := "275" ;"250"
 	
 	__New()
 	{
@@ -289,13 +290,13 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 		
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400 h230, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
 		Gui, Tab
 		
 		row_y := row_y + 25
 		;Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gUpdate_Clicked, Update
-		
 		row_y := row_y + 25
+	
 		Gui, MyWindow:Add, Text, x410 y53 vCrashProtectStatus, % CrashProtectStatus
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gCrash_Toggle, Toggle
 		
@@ -342,15 +343,17 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vAvailableTGs x+10 w85, % AvailableTGs
 		Gui, MyWindow:Add, Text, vNextTGPDrop x+10 w220, % NextTGPDrop
 		
-		Gui, MyWindow:Add, Text, x15 y+5+p w110, Small Bounties:
+		Gui, MyWindow:Add, Text, x15 y+5+p w110, Tiny Bounties:
+		Gui, MyWindow:Add, Text, vCurrentTinyBounties x+2 w35 right, % CurrentTinyBounties
+		Gui, MyWindow:Add, Text, x15 y+p w110, Small Bounties:
 		Gui, MyWindow:Add, Text, vCurrentSmBounties x+2 w35 right, % CurrentSmBounties
-		Gui, MyWindow:Add, Text, vAvailableTokens x+10 w185, % AvailableTokens
+		Gui, MyWindow:Add, Text, vAvailableTokens x+10 w220, % AvailableTokens
 		Gui, MyWindow:Add, Text, x15 y+p w110, Medium Bounties:
 		Gui, MyWindow:Add, Text, vCurrentMdBounties x+2 w35 right, % CurrentMdBounties
 		Gui, MyWindow:Add, Text, vCurrentTokens x+10 w185, % CurrentTokens
 		Gui, MyWindow:Add, Text, x15 y+p w110, Large Bounties:
 		Gui, MyWindow:Add, Text, vCurrentLgBounties x+2 w35 right, % CurrentLgBounties
-		Gui, MyWindow:Add, Text, vAvailableFPs x+10 w185, % AvailableFPs
+		Gui, MyWindow:Add, Text, vAvailableFPs x+10 w220, % AvailableFPs
 		
 		Gui, MyWindow:Add, Text, x15 y+5+p w110, Tiny Blacksmiths:
 		Gui, MyWindow:Add, Text, vCurrentTinyBS x+2 w35 right, % CurrentTinyBS
@@ -460,6 +463,7 @@ class MyGui {
 		GuiControl, MyWindow:, NextTGPDrop, % NextTGPDrop, w250 h210
 		GuiControl, MyWindow:, AvailableTGs, % AvailableTGs, w250 h210
 		GuiControl, MyWindow:, AvailableChests, % AvailableChests, w250 h210
+		GuiControl, MyWindow:, CurrentTinyBounties, % CurrentTinyBounties, w250 h210
 		GuiControl, MyWindow:, CurrentSmBounties, % CurrentSmBounties, w250 h210
 		GuiControl, MyWindow:, CurrentMdBounties, % CurrentMdBounties, w250 h210
 		GuiControl, MyWindow:, CurrentLgBounties, % CurrentLgBounties, w250 h210
@@ -1570,6 +1574,7 @@ ParseInventoryData() {
 	for k, v in UserDetails.details.buffs
 		switch v.buff_id
 	{
+		case 17: CurrentTinyBounties := v.inventory_amount
 		case 18: CurrentSmBounties := v.inventory_amount
 		case 19: CurrentMdBounties := v.inventory_amount
 		case 20: CurrentLgBounties := v.inventory_amount
@@ -1579,7 +1584,7 @@ ParseInventoryData() {
 		case 34: CurrentLgBS := v.inventory_amount
 	}
 	AvailableChests := "= " Floor(CurrentGems/50) " Silver Chests"
-	tokencount := (CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
+	tokencount :=  (CurrentTinyBounties*12)+(CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
 	if (UserDetails.details.event_details[1].user_data.event_tokens) {
 		tokentotal := UserDetails.details.event_details[1].user_data.event_tokens
 		AvailableTokens := "= " tokencount " Tokens`t(" Round(tokencount/2500, 2) " FPs)"
@@ -2047,23 +2052,6 @@ List_ChampIDs:
 	id := 1
 	champidlist := ""
 	while (id < 87) {
-;		champidlist := champidlist id ": " ChampFromID(id) " `t"
-;		if ((id = 9) or (id = 13) or (id = 37) or (id = 41) or (id = 45) or (id = 49) or (id = 53) or (id = 65)) {
-;			champidlist := champidlist "`t"
-;		}
-;		id += 1
-;		champidlist := champidlist id ": " ChampFromID(id) " `t"
-;		if ((id = 2) or (id = 10) or (id = 14) or (id = 18) or (id = 30) or (id = 42) or (id = 58) or (id = 62)) {
-;			champidlist := champidlist "`t"
-;		}
-;		id += 1
-;		champidlist := champidlist id ": " ChampFromID(id) " `t"
-;		if ((id = 3) or (id = 7) or (id = 23) or (id = 31) or (id = 30) or (id = 43) or (id = 51) or (id = 59) or (id = 63)) {
-;			champidlist := champidlist "`t"
-;		}
-;		id += 1
-;		champidlist := champidlist id ": " ChampFromID(id) "`n"
-;		id += 1
 		champname := ChampFromID(id)
 		StringLen, champnamelen, champname
 		while (champnamelen < 16)
