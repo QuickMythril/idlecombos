@@ -113,6 +113,13 @@ global StrahdFPCurrency := ""
 global StrahdChallenges := ""
 global StrahdRequires := ""
 global StrahdCosts := ""
+global ZarielVariants := ""
+global ZarielCompleted := ""
+global ZarielVariantTotal := ""
+global ZarielFPCurrency := ""
+global ZarielChallenges := ""
+global ZarielRequires := ""
+global ZarielCosts := ""
 
 ;GUI globals
 global oMyGUI := ""
@@ -379,6 +386,15 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vStrahdChallenges x+p w55 right cRed, % StrahdChallenges
 		Gui, MyWindow:Add, Text, vStrahdCosts x+2 w200 right, % StrahdCosts
 		
+		Gui, MyWindow:Add, Text, x15 y+5+p w75, Zariel Variants:
+		Gui, MyWindow:Add, Text, vZarielVariants x+p w75 right cRed, % ZarielVariants
+		Gui, MyWindow:Add, Text, x15 y+p w95, Zariel FP Currency:
+		Gui, MyWindow:Add, Text, vZarielFPCurrency x+p w55 right cRed, % ZarielFPCurrency
+		Gui, MyWindow:Add, Text, vZarielRequires x+2 w200 right, % ZarielRequires
+		Gui, MyWindow:Add, Text, x15 y+p w95, Zariel Challenges:
+		Gui, MyWindow:Add, Text, vZarielChallenges x+p w55 right cRed, % ZarielChallenges
+		Gui, MyWindow:Add, Text, vZarielCosts x+2 w200 right, % ZarielCosts
+		
 		Gui, Tab, Champions
 		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h150, % ChampDetails
 		
@@ -467,6 +483,11 @@ class MyGui {
 		GuiControl, MyWindow:, StrahdFPCurrency, % StrahdFPCurrency, w250 h210
 		GuiControl, MyWindow:, StrahdRequires, % StrahdRequires, w250 h210
 		GuiControl, MyWindow:, StrahdCosts, % StrahdCosts, w250 h210
+        GuiControl, MyWindow:, ZarielVariants, % ZarielVariants, w250 h210
+        GuiControl, MyWindow:, ZarielChallenges, % ZarielChallenges, w250 h210
+        GuiControl, MyWindow:, ZarielFPCurrency, % ZarielFPCurrency, w250 h210
+        GuiControl, MyWindow:, ZarielRequires, % ZarielRequires, w250 h210
+        GuiControl, MyWindow:, ZarielCosts, % ZarielCosts, w250 h210
 		;champions
 		GuiControl, MyWindow:, ChampDetails, % ChampDetails, w250 h210
 		;settings
@@ -1653,6 +1674,34 @@ ParsePatronData() {
 				case "weekly_challenge_porgress": StrahdChallenges := vv.count
 			}
 		}
+		case 4: {
+			if v.unlocked == False {
+				ZarielVariants := "Locked"
+				ZarielFPCurrency := "Requires:"
+				ZarielChallenges := "Costs:"
+				ZarielRequires := UserDetails.details.stats.highest_area_completed_ever_c873 "/250 in Adventure 413 && " TotalChamps "/40 Champs"
+				if ((UserDetails.details.stats.highest_area_completed_ever_c413 > 249) && (TotalChamps > 39)) {
+					Gui, Font, cGreen
+					GuiControl, Font, ZarielFPCurrency
+				}
+				ZarielCosts := CurrentLgBounties "/10 Lg Bounties && " CurrentSilvers "/20 Silver Chests"
+				if ((CurrentLgBounties > 9) && (CurrentSilvers > 19)) {
+					Gui, Font, cGreen
+					GuiControl, Font, StrahdChallenges
+				}
+			}
+			else for kk, vv in v.progress_bars
+				switch vv.id
+			{
+				case "variants_completed":
+				ZarielVariantTotal := vv.goal
+				ZarielCompleted := vv.count
+				ZarielVariants := ZarielCompleted " / " ZarielVariantTotal
+				case "free_play_limit": ZarielFPCurrency := vv.count
+				case "weekly_challenge_porgress": ZarielChallenges := vv.count
+			}
+		}
+
 	}
 }
 
@@ -1793,6 +1842,34 @@ CheckPatronProgress() {
 			Gui, Font, cRed
 			GuiControl, Font, StrahdVariants
 		}
+
+	}
+	if !(ZarielVariants == "Locked") {
+	if (ZarielChallenges = "10") {
+		Gui, Font, cGreen
+		GuiControl, Font, ZarielChallenges
+	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, ZarielChallenges
+	}
+	if (ZarielFPCurrency = "5000") {
+		Gui, Font, cGreen
+		GuiControl, Font, ZarielFPCurrency
+	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, ZarielFPCurrency
+	}
+	if (ZarielCompleted = ZarielVariantTotal) {
+		Gui, Font, cGreen
+		GuiControl, Font, ZarielVariants
+	}
+	else {
+		Gui, Font, cRed
+		GuiControl, Font, ZarielVariants
+	}
+	
 	}
 }
 
@@ -1869,7 +1946,7 @@ CheckBlessings() {
 }
 
 ServerCall(callname, parameters) {
-	URLtoCall := "http://ps2.idlechampions.com/~idledragons/post.php?call=" callname parameters
+	URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
 	WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 	WR.SetTimeouts("10000", "10000", "10000", "10000")
 	Try {
