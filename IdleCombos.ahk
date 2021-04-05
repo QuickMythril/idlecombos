@@ -217,8 +217,8 @@ return
 
 ;BEGIN: GUI Defs
 class MyGui {
-	Width := "550"
-	Height := "250"
+	Width := "575"
+	Height := "275"
 	
 	__New()
 	{
