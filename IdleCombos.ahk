@@ -3,6 +3,7 @@
 #include idledict.ahk
 ;Added in 1.9
 ;-Patron Zariel
+;-Dictionary file updated to 1.9
 ;
 ;Added in 1.8
 ;-Pity Timer for Golds on Inventory Tab
@@ -2536,7 +2537,7 @@ GearReport() {
 				currentcount += 1
 			}
 		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68)){
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86)){
 			totalcorelevels += (v.enchant + 1)
 			totalcoreitems += 1
 			if (lastshiny) {

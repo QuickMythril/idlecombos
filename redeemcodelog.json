@@ -1,8 +1,0 @@
-BLABFATEOBIA
- {"success":true,"loot_details":[{"loot_item":"generic_chest","loot_action":"generic_chest","count":1,"chest_type_id":282,"before":59,"after":60}],"okay":true,"actions":[{"action":"update_chest_count","chest_type_id":282,"count":60}],"processing_time":"0.05391","memory_usage":"20 mb","apc_stats":{"gets":5,"gets_time":"0.00000","sets":0,"sets_time":"0.00000"},"db_stats":{"10":false,"1":false}}
-
- {"success":true,"failure_reason":"This offer has expired","okay":false,"fail_message":"This offer has expired","actions":[],"processing_time":"0.00718","memory_usage":"2 mb","apc_stats":{"gets":2,"gets_time":"0.00000","sets":1,"sets_time":"0.00000"},"db_stats":{"10":false,"1":false}}
-YUAN-SOOM-OLMS
- {"success":true,"loot_details":[{"loot_item":"generic_chest","loot_action":"generic_chest","count":1,"chest_type_id":282,"before":60,"after":61}],"okay":true,"actions":[{"action":"update_chest_count","chest_type_id":282,"count":61}],"processing_time":"0.05111","memory_usage":"26 mb","apc_stats":{"gets":5,"gets_time":"0.00000","sets":0,"sets_time":"0.00000"},"db_stats":{"10":false,"1":false}}
-
- {"success":true,"failure_reason":"This offer has expired","okay":false,"fail_message":"This offer has expired","actions":[],"processing_time":"0.00631","memory_usage":"2 mb","apc_stats":{"gets":3,"gets_time":"0.00000","sets":0,"sets_time":"0.00000"},"db_stats":{"10":false,"1":false}}
