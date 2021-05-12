@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.8"
+global DictionaryVersion := "1.9"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -120,7 +120,7 @@ ChampFromID(id) {
 			case "61": namefromid := "Jaheira"
 			case "62": namefromid := "Nova"
 			case "63": namefromid := "Freely"
-			case "64": namefromid := "B & G"
+			case "64": namefromid := "B && G"
 			case "65": namefromid := "Omin"
 			case "66": namefromid := "Lazaapz"
 			case "67": namefromid := "Dragonbait"
@@ -130,22 +130,23 @@ ChampFromID(id) {
 			case "71": namefromid := "Penelope"
 			case "72": namefromid := "Lucius"
 			case "73": namefromid := "Baeloth"
-			case "74": namefromid := "Y4E6"
-			case "75": namefromid := "Y4E7"
-			case "76": namefromid := "Y4E8"
-			case "77": namefromid := "Y4E9"
-			case "78": namefromid := "Y4E10"
-			case "79": namefromid := "Y4E11"
-			case "80": namefromid := "Y4E12"
+			case "74": namefromid := "Talin"
+			case "75": namefromid := "Hew Maan"
+			case "76": namefromid := "Orisha"
+			case "77": namefromid := "Alyndra"
+			case "78": namefromid := "Orkira"
+			case "79": namefromid := "Shaka"
+			case "80": namefromid := "Mehen"
 		}
 	}
-	else if (id < 86) {
+	else if (id < 87) {
 		switch id {
 			case "81": namefromid := "Y4E13"
 			case "82": namefromid := "Y4E14"
 			case "83": namefromid := "Y4E15"
 			case "84": namefromid := "Y4E16"
 			case "85": namefromid := "Y4E17"
+			case "86": namefromid := "Reya"
 		}
 	}
 	else {
@@ -599,28 +600,28 @@ ChestFromID(id) {
 			case "247": namefromid := "Gold Ezmerelda Chest"
 			case "248": namefromid := "Silver Penelope Chest"
 			case "249": namefromid := "Gold Penelope Chest"
-			case "250": namefromid := "Silver Y4E4 Chest"
-			case "251": namefromid := "Gold Y4E4 Chest"
-			case "252": namefromid := "Silver Y4E5 Chest"
-			case "253": namefromid := "Gold Y4E5 Chest"
-			case "254": namefromid := "Silver Y4E6 Chest"
-			case "255": namefromid := "Gold Y4E6 Chest"
-			case "256": namefromid := "Silver Y4E7 Chest"
-			case "257": namefromid := "Gold Y4E7 Chest"
-			case "258": namefromid := "Silver Y4E8 Chest"
-			case "259": namefromid := "Gold Y4E8 Chest"
-			case "260": namefromid := "Silver Y4E9 Chest"
+			case "250": namefromid := "Silver Lucius Chest"
+			case "251": namefromid := "Gold Lucius Chest"
+			case "252": namefromid := "Silver Baeloth Chest"
+			case "253": namefromid := "Gold Baeloth Chest"
+			case "254": namefromid := "Silver Talin Chest"
+			case "255": namefromid := "Gold Talin Chest"
+			case "256": namefromid := "Silver Hew Mann Chest"
+			case "257": namefromid := "Gold Hew Mann Chest"
+			case "258": namefromid := "Silver Orisha Chest"
+			case "259": namefromid := "Gold Orisha Chest"
+			case "260": namefromid := "Silver Alyndra Chest"
 		}
 	}
 	else if (id < 281) {
 		switch id {
-			case "261": namefromid := "Gold Y4E9 Chest"
-			case "262": namefromid := "Silver Y4E10 Chest"
-			case "263": namefromid := "Gold Y4E10 Chest"
-			case "264": namefromid := "Silver Y4E11 Chest"
-			case "265": namefromid := "Gold Y4E11 Chest"
-			case "266": namefromid := "Silver Y4E12 Chest"
-			case "267": namefromid := "Gold Y4E12 Chest"
+			case "261": namefromid := "Gold Alyndra Chest"
+			case "262": namefromid := "Silver Orkira Chest"
+			case "263": namefromid := "Gold Orkira Chest"
+			case "264": namefromid := "Silver Shaka Chest"
+			case "265": namefromid := "Gold Shaka Chest"
+			case "266": namefromid := "Silver Mehan Chest"
+			case "267": namefromid := "Gold Mehan Chest"
 			case "268": namefromid := "Silver Y4E13 Chest"
 			case "269": namefromid := "Gold Y4E13 Chest"
 			case "270": namefromid := "Silver Y4E14 Chest"
@@ -636,7 +637,7 @@ ChestFromID(id) {
 			case "280": namefromid := "Gold Feathered Hat Chest"
 		}
 	}
-	else if (id < 282) {
+	else if (id < 290) {
 		switch id {
 			case "281": namefromid := "Gold Experimental Chest"
 			case "282": namefromid := "Electrum Chest"

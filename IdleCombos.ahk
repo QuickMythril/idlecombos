@@ -1,6 +1,10 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;Added in 1.9
+;-Patron Zariel
+;-Dictionary file updated to 1.9
+;
 ;Added in 1.8
 ;-Pity Timer for Golds on Inventory Tab
 ;-Event Pity Timers in the Chests menu
@@ -11,8 +15,8 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.8"
-global CurrentDictionary := "1.8"
+global VersionNumber := "1.9"
+global CurrentDictionary := "1.9"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -74,6 +78,7 @@ global CurrentTGPs := ""
 global AvailableTGs := ""
 global NextTGPDrop := ""
 global CurrentTokens := ""
+global CurrentTinyBounties := ""
 global CurrentSmBounties := ""
 global CurrentMdBounties := ""
 global CurrentLgBounties := ""
@@ -113,6 +118,14 @@ global StrahdFPCurrency := ""
 global StrahdChallenges := ""
 global StrahdRequires := ""
 global StrahdCosts := ""
+global ZarielVariants := ""
+global ZarielCompleted := ""
+global ZarielVariantTotal := ""
+global ZarielFPCurrency := ""
+global ZarielChallenges := ""
+global ZarielRequires := ""
+global ZarielCosts := ""
+
 
 ;GUI globals
 global oMyGUI := ""
@@ -207,7 +220,7 @@ return
 ;BEGIN: GUI Defs
 class MyGui {
 	Width := "550"
-	Height := "250"
+	Height := "275" ;"250"
 	
 	__New()
 	{
@@ -278,13 +291,13 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 		
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400 h230, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
 		Gui, Tab
 		
 		row_y := row_y + 25
 		;Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gUpdate_Clicked, Update
-		
 		row_y := row_y + 25
+	
 		Gui, MyWindow:Add, Text, x410 y53 vCrashProtectStatus, % CrashProtectStatus
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gCrash_Toggle, Toggle
 		
@@ -331,15 +344,17 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vAvailableTGs x+10 w85, % AvailableTGs
 		Gui, MyWindow:Add, Text, vNextTGPDrop x+10 w220, % NextTGPDrop
 		
-		Gui, MyWindow:Add, Text, x15 y+5+p w110, Small Bounties:
+		Gui, MyWindow:Add, Text, x15 y+5+p w110, Tiny Bounties:
+		Gui, MyWindow:Add, Text, vCurrentTinyBounties x+2 w35 right, % CurrentTinyBounties
+		Gui, MyWindow:Add, Text, x15 y+p w110, Small Bounties:
 		Gui, MyWindow:Add, Text, vCurrentSmBounties x+2 w35 right, % CurrentSmBounties
-		Gui, MyWindow:Add, Text, vAvailableTokens x+10 w185, % AvailableTokens
+		Gui, MyWindow:Add, Text, vAvailableTokens x+10 w220, % AvailableTokens
 		Gui, MyWindow:Add, Text, x15 y+p w110, Medium Bounties:
 		Gui, MyWindow:Add, Text, vCurrentMdBounties x+2 w35 right, % CurrentMdBounties
 		Gui, MyWindow:Add, Text, vCurrentTokens x+10 w185, % CurrentTokens
 		Gui, MyWindow:Add, Text, x15 y+p w110, Large Bounties:
 		Gui, MyWindow:Add, Text, vCurrentLgBounties x+2 w35 right, % CurrentLgBounties
-		Gui, MyWindow:Add, Text, vAvailableFPs x+10 w185, % AvailableFPs
+		Gui, MyWindow:Add, Text, vAvailableFPs x+10 w220, % AvailableFPs
 		
 		Gui, MyWindow:Add, Text, x15 y+5+p w110, Tiny Blacksmiths:
 		Gui, MyWindow:Add, Text, vCurrentTinyBS x+2 w35 right, % CurrentTinyBS
@@ -378,6 +393,15 @@ class MyGui {
 		Gui, MyWindow:Add, Text, x15 y+p w95, Strahd Challenges:
 		Gui, MyWindow:Add, Text, vStrahdChallenges x+p w55 right cRed, % StrahdChallenges
 		Gui, MyWindow:Add, Text, vStrahdCosts x+2 w200 right, % StrahdCosts
+		
+		Gui, MyWindow:Add, Text, x15 y+5+p w75, Zariel Variants:
+		Gui, MyWindow:Add, Text, vZarielVariants x+p w75 right cRed, % ZarielVariants
+		Gui, MyWindow:Add, Text, x15 y+p w95, Zariel FP Currency:
+		Gui, MyWindow:Add, Text, vZarielFPCurrency x+p w55 right cRed, % ZarielFPCurrency
+		Gui, MyWindow:Add, Text, vZarielRequires x+2 w200 right, % ZarielRequires
+		Gui, MyWindow:Add, Text, x15 y+p w95, Zariel Challenges:
+		Gui, MyWindow:Add, Text, vZarielChallenges x+p w55 right cRed, % ZarielChallenges
+		Gui, MyWindow:Add, Text, vZarielCosts x+2 w200 right, % ZarielCosts
 		
 		Gui, Tab, Champions
 		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h150, % ChampDetails
@@ -440,6 +464,7 @@ class MyGui {
 		GuiControl, MyWindow:, NextTGPDrop, % NextTGPDrop, w250 h210
 		GuiControl, MyWindow:, AvailableTGs, % AvailableTGs, w250 h210
 		GuiControl, MyWindow:, AvailableChests, % AvailableChests, w250 h210
+		GuiControl, MyWindow:, CurrentTinyBounties, % CurrentTinyBounties, w250 h210
 		GuiControl, MyWindow:, CurrentSmBounties, % CurrentSmBounties, w250 h210
 		GuiControl, MyWindow:, CurrentMdBounties, % CurrentMdBounties, w250 h210
 		GuiControl, MyWindow:, CurrentLgBounties, % CurrentLgBounties, w250 h210
@@ -467,6 +492,11 @@ class MyGui {
 		GuiControl, MyWindow:, StrahdFPCurrency, % StrahdFPCurrency, w250 h210
 		GuiControl, MyWindow:, StrahdRequires, % StrahdRequires, w250 h210
 		GuiControl, MyWindow:, StrahdCosts, % StrahdCosts, w250 h210
+		GuiControl, MyWindow:, ZarielVariants, % ZarielVariants, w250 h210
+		GuiControl, MyWindow:, ZarielChallenges, % ZarielChallenges, w250 h210
+		GuiControl, MyWindow:, ZarielFPCurrency, % ZarielFPCurrency, w250 h210
+		GuiControl, MyWindow:, ZarielRequires, % ZarielRequires, w250 h210
+		GuiControl, MyWindow:, ZarielCosts, % ZarielCosts, w250 h210		
 		;champions
 		GuiControl, MyWindow:, ChampDetails, % ChampDetails, w250 h210
 		;settings
@@ -1545,6 +1575,7 @@ ParseInventoryData() {
 	for k, v in UserDetails.details.buffs
 		switch v.buff_id
 	{
+		case 17: CurrentTinyBounties := v.inventory_amount
 		case 18: CurrentSmBounties := v.inventory_amount
 		case 19: CurrentMdBounties := v.inventory_amount
 		case 20: CurrentLgBounties := v.inventory_amount
@@ -1554,7 +1585,7 @@ ParseInventoryData() {
 		case 34: CurrentLgBS := v.inventory_amount
 	}
 	AvailableChests := "= " Floor(CurrentGems/50) " Silver Chests"
-	tokencount := (CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
+	tokencount :=  (CurrentTinyBounties*12)+(CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
 	if (UserDetails.details.event_details[1].user_data.event_tokens) {
 		tokentotal := UserDetails.details.event_details[1].user_data.event_tokens
 		AvailableTokens := "= " tokencount " Tokens`t(" Round(tokencount/2500, 2) " FPs)"
@@ -1651,6 +1682,33 @@ ParsePatronData() {
 				StrahdVariants := StrahdCompleted " / " StrahdVariantTotal
 				case "free_play_limit": StrahdFPCurrency := vv.count
 				case "weekly_challenge_porgress": StrahdChallenges := vv.count
+			}
+		}
+		case 4: {
+			if v.unlocked == False {
+				ZarielVariants := "Locked"
+				ZarielFPCurrency := "Requires:"
+				ZarielChallenges := "Costs:"
+				ZarielRequires := UserDetails.details.stats.highest_area_completed_ever_c873 "/575 in Adventure 873 && " TotalChamps "/50 Champs"
+				if ((UserDetails.details.stats.highest_area_completed_ever_c873 > 574) && (TotalChamps > 49)) {
+					Gui, Font, cGreen
+					GuiControl, Font, ZarielFPCurrency
+				}
+				ZarielCosts := CurrentSilvers "/50 Silver Chests"
+				if (CurrentSilvers > 49) {
+					Gui, Font, cGreen
+					GuiControl, Font, ZarielChallenges
+				}
+			}
+			else for kk, vv in v.progress_bars
+				switch vv.id
+			{
+				case "variants_completed":
+				ZarielVariantTotal := vv.goal
+				ZarielCompleted := vv.count
+				ZarielVariants := ZarielCompleted " / " ZarielVariantTotal
+				case "free_play_limit": ZarielFPCurrency := vv.count
+				case "weekly_challenge_porgress": ZarielChallenges := vv.count
 			}
 		}
 	}
@@ -1794,6 +1852,32 @@ CheckPatronProgress() {
 			GuiControl, Font, StrahdVariants
 		}
 	}
+	if !(ZarielVariants == "Locked") {
+		if (ZarielChallenges = "10") {
+			Gui, Font, cGreen
+			GuiControl, Font, ZarielChallenges
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, ZarielChallenges
+		}
+		if (ZarielFPCurrency = "5000") {
+			Gui, Font, cGreen
+			GuiControl, Font, ZarielFPCurrency
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, ZarielFPCurrency
+		}
+		if (ZarielCompleted = ZarielVariantTotal) {
+			Gui, Font, cGreen
+			GuiControl, Font, ZarielVariants
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, ZarielVariants
+		}
+	}
 }
 
 CheckAchievements() {
@@ -1869,7 +1953,7 @@ CheckBlessings() {
 }
 
 ServerCall(callname, parameters) {
-	URLtoCall := "http://ps2.idlechampions.com/~idledragons/post.php?call=" callname parameters
+	URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
 	WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 	WR.SetTimeouts("10000", "10000", "10000", "10000")
 	Try {
@@ -1964,29 +2048,56 @@ Update_Dictionary() {
 
 List_ChampIDs:
 {
+	champnamelen := 0
+	champname := ""
 	id := 1
 	champidlist := ""
-	while (id < 69) {
-		champidlist := champidlist id ": " ChampFromID(id) " `t"
-		if ((id = 9) or (id = 13) or (id = 37) or (id = 41) or (id = 45) or (id = 49) or (id = 53) or (id = 65)) {
-			champidlist := champidlist "`t"
+	while (id < 87) {
+		champname := ChampFromID(id)
+		StringLen, champnamelen, champname
+		while (champnamelen < 16)
+		{
+			champname := champname " "
+			champnamelen += 1
 		}
-		id += 1
-		champidlist := champidlist id ": " ChampFromID(id) " `t"
-		if ((id = 2) or (id = 10) or (id = 14) or (id = 18) or (id = 30) or (id = 42) or (id = 58) or (id = 62)) {
-			champidlist := champidlist "`t"
-		}
-		id += 1
-		champidlist := champidlist id ": " ChampFromID(id) " `t"
-		if ((id = 3) or (id = 7) or (id = 23) or (id = 31) or (id = 30) or (id = 43) or (id = 51) or (id = 59) or (id = 63)) {
-			champidlist := champidlist "`t"
-		}
-		id += 1
-		champidlist := champidlist id ": " ChampFromID(id) "`n"
+		if (!mod(id, 4))
+			champidlist := champidlist id ": " champname "`n"
+		else
+			champidlist := champidlist id ": " champname "`t"
 		id += 1
 	}
-	MsgBox, , Champ ID List, % champidlist
+	;MsgBox, , Champ ID List, % champidlist
+	CustomMsgBox("Champion IDs and Names",champidlist,"Courier New","Blue")
 	return	
+}
+
+CustomMsgBox(Title,Message,Font="",FontOptions="",WindowColor="")
+{
+	Gui,66:Destroy
+	Gui,66:Color,%WindowColor%
+	
+	Gui,66:Font,%FontOptions%,%Font%
+	Gui,66:Add,Text,,%Message%
+	Gui,66:Font
+	
+	GuiControlGet,Text,66:Pos,Static1
+	
+	Gui,66:Add,Button,% "Default y+10 w75 g66OK xp+" (TextW / 2) - 38 ,OK
+	
+	Gui,66:-MinimizeBox
+	Gui,66:-MaximizeBox
+	
+	SoundPlay,*-1
+	Gui,66:Show,,%Title%
+	
+	Gui,66:+LastFound
+	WinWaitClose
+	Gui,66:Destroy
+	return
+	
+	66OK:
+	Gui,66:Destroy
+	return
 }
 
 ViewICSettings() {
@@ -2215,11 +2326,11 @@ IncompleteVariants()
 		AdventureList()
 	}
 	idtocheck := 0
-	InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3), , 250, 200, , , , , % idtocheck
+	InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
 	if ErrorLevel
 		return
-	while ((idtocheck < 0) or (idtocheck > 3)) {
-		InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3), , 250, 200, , , , , % idtocheck
+	while ((idtocheck < 0) or (idtocheck > 4)) {
+		InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
 		if ErrorLevel
 			return
 	}
@@ -2426,7 +2537,7 @@ GearReport() {
 				currentcount += 1
 			}
 		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68)){
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86)){
 			totalcorelevels += (v.enchant + 1)
 			totalcoreitems += 1
 			if (lastshiny) {
