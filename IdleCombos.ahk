@@ -409,8 +409,6 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h150, % ChampDetails
 		
 		Gui, Tab, Settings
-		Gui, MyWindow:Add, Text,, Server Name:
-		Gui, MyWindow:Add, Edit, vServerName w50
 		Gui, MyWindow:Add, CheckBox, vGetDetailsonStart, Get User Details on start?
 		Gui, MyWindow:Add, CheckBox, vLaunchGameonStart, Launch game client on start?
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveChests, Always save Chest Open Results to file?
