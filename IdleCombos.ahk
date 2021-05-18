@@ -38,15 +38,14 @@ ICSettingsFile := ICSettingsFile "LocalLow\Codename Entertainment\Idle Champions
 global GameClient := GameInstallDir "IdleDragons.exe"
 
 ;Settings globals
-global ServerName := "ps7"
 global GetDetailsonStart := 0
 global LaunchGameonStart := 0
 global FirstRun := 1
 global AlwaysSaveChests := 0
 global AlwaysSaveContracts := 0
 global AlwaysSaveCodes := 0
-global SettingsCheckValue := 10 ;used to check for outdated settings file
-global NewSettings := JSON.stringify({"servername":"ps7","firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
+global SettingsCheckValue := 9 ;used to check for outdated settings file
+global NewSettings := JSON.stringify({"firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
 
 ;Server globals
 global DummyData := "&language_id=1&timestamp=0&request_id=0&network_id=11&mobile_client_version=999"
@@ -202,7 +201,6 @@ else {
 	SB_SetText("User ID & Hash not found!")
 }
 ;Loading current settings
-ServerName := CurrentSettings.servername
 GetDetailsonStart := CurrentSettings.getdetailsonstart
 LaunchGameonStart := CurrentSettings.launchgameonstart
 AlwaysSaveChests := CurrentSettings.alwayssavechests
@@ -502,7 +500,6 @@ class MyGui {
 		;champions
 		GuiControl, MyWindow:, ChampDetails, % ChampDetails, w250 h210
 		;settings
-		GuiControl, MyWindow:, ServerName, % ServerName, w50 h210
 		GuiControl, MyWindow:, GetDetailsonStart, % GetDetailsonStart, w250 h210
 		GuiControl, MyWindow:, LaunchGameonStart, % LaunchGameonStart, w250 h210
 		GuiControl, MyWindow:, AlwaysSaveChests, % AlwaysSaveChests, w250 h210
@@ -576,7 +573,6 @@ CrashProtect() {
 Save_Settings:
 {
 	oMyGUI.Submit()
-	CurrentSettings.servername := ServerName
 	CurrentSettings.getdetailsonstart := GetDetailsonStart
 	CurrentSettings.launchgameonstart := LaunchGameonStart
 	CurrentSettings.alwayssavechests := AlwaysSaveChests
@@ -688,7 +684,6 @@ Redeem_Codes:
 		v := Trim(v)
 		CurrentCode := v
 		sCode := RegExReplace(CurrentCode, "&", Replacement := "%26")
-		sCode := RegExReplace(sCode, "#", Replacement := "%23")
 		if !UserID {
 			MsgBox % "Need User ID & Hash."
 			FirstRun()
@@ -1958,7 +1953,7 @@ CheckBlessings() {
 }
 
 ServerCall(callname, parameters) {
-	URLtoCall := "http://" ServerName ".idlechampions.com/~idledragons/post.php?call=" callname parameters
+	URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
 	WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
 	WR.SetTimeouts("10000", "10000", "10000", "10000")
 	Try {
