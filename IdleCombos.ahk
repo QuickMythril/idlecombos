@@ -2,6 +2,9 @@
 #include JSON.ahk
 #include idledict.ahk
 ;Added in 1.91
+;Added DeathoEye Server update
+;Neal's Json escape code for redeaming codes
+;updated dict file to 1.91 champs, chest and feats up to UserDetailsFile
 
 ;Added in 1.9
 ;-Patron Zariel
@@ -18,7 +21,7 @@
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
 global VersionNumber := "1.91"
-global CurrentDictionary := "1.9"
+global CurrentDictionary := "1.91"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"

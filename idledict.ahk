@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.9"
+global DictionaryVersion := "1.91"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -141,8 +141,8 @@ ChampFromID(id) {
 	}
 	else if (id < 87) {
 		switch id {
-			case "81": namefromid := "Y4E13"
-			case "82": namefromid := "Y4E14"
+			case "81": namefromid := "Selise"
+			case "82": namefromid := "Sergeant Knox"
 			case "83": namefromid := "Y4E15"
 			case "84": namefromid := "Y4E16"
 			case "85": namefromid := "Y4E17"
@@ -276,7 +276,7 @@ FeatFromID(id) {
 			case "405": namefromid := "Nova (Global DPS +25%)"
 		}
 	}
-	else if (id < 458) {
+	else if (id < 483) {
 		switch id {
 			case "410": namefromid := "Nova (Close Encounter +40%)"
 			case "412": namefromid := "Omin (Global DPS +25%)"
@@ -292,8 +292,42 @@ FeatFromID(id) {
 			case "450": namefromid := "Ezmerelda (Training Montage +40%)"
 			case "454": namefromid := "Penelope (Global DPS +25%)"
 			case "457": namefromid := "Penelope (Chwinga Mask +40%)"
+			case "465": namefromid := "Lucius (Self DPS +60%)"
+			case "467": namefromid := "Lucius (Arcane Chromat - Acid +40%)"
+			case "471": namefromid := "Baeloth (Global DPS +25%)"
+			case "473": namefromid := "Baeloth (Gold +25%)"
+			case "477": namefromid := "Baeloth (Morbid Excitement +40%)"
+			case "482": namefromid := "Talin (Global DPS +25%)"
 		}
 	}
+	else if (id < 562) {
+		switch id {
+			case "485": namefromid := "Talin (Quick-Release Hook)"
+			case "488": namefromid := "Hew Maan (Global DPS +25%)"
+			case "490": namefromid := "Hew Maan (Hello, Fellow Humans +40%)"
+			case "501": namefromid := "Orisha (Flaming Wings +40%)"
+			case "503": namefromid := "Orisha (Bardic Connection +40%)"
+			case "505": namefromid := "Orisha (Encore Performance)"
+			case "511": namefromid := "Alyndra (Portent +40%)"
+			case "513": namefromid := "Alyndra (Brows of Judgement +40% Brows of Judgement +40% Brows of Judgement +40%)"
+			case "520": namefromid := "Reya (Searing Radiance +40%)"
+			case "522": namefromid := "Reya (Echoes of Zariel +40%)"
+			case "532": namefromid := "Orkira (Elemental Fire +40%)"
+			case "533": namefromid := "Orkira (Healing Flame +25%)"
+			case "539": namefromid := "Shaka (A Celestial Puzzle +40%)"
+			case "539": namefromid := "Shaka (Celestial Resistance +30%)"
+			case "550": namefromid := "Mehen (Gold +25%)"
+			case "551": namefromid := "Mehen (Exiled +40%)"
+			case "552": namefromid := "Mehen (Brimstone Angels +40%)"
+			case "557": namefromid := "Selise (Shield of Psychomancy +40%)"
+			case "560": namefromid := "Selise (Relentless Avenger +50%)"
+			case "561": namefromid := "Selise (Eyes of Tiwaz)"
+		}
+		
+	}
+	
+
+
 	else {
 		namefromid := "UNKNOWN (" id ")"
 	}
@@ -622,8 +656,8 @@ ChestFromID(id) {
 			case "265": namefromid := "Gold Shaka Chest"
 			case "266": namefromid := "Silver Mehan Chest"
 			case "267": namefromid := "Gold Mehan Chest"
-			case "268": namefromid := "Silver Y4E13 Chest"
-			case "269": namefromid := "Gold Y4E13 Chest"
+			case "268": namefromid := "Silver Selise Chest"
+			case "269": namefromid := "Gold Selise Chest"
 			case "270": namefromid := "Silver Y4E14 Chest"
 			case "271": namefromid := "Gold Y4E14 Chest"
 			case "272": namefromid := "Silver Y4E15 Chest"
@@ -637,7 +671,7 @@ ChestFromID(id) {
 			case "280": namefromid := "Gold Feathered Hat Chest"
 		}
 	}
-	else if (id < 290) {
+	else if (id < 301) {
 		switch id {
 			case "281": namefromid := "Gold Experimental Chest"
 			case "282": namefromid := "Electrum Chest"
@@ -647,6 +681,65 @@ ChestFromID(id) {
 			case "287": namefromid := "Gold Dragonscale Chest"
 			case "288": namefromid := "Gold Maze Chest"
 			case "289": namefromid := "Gold Freezing Chest"
+			case "290": namefromid := "Gold Coin-Filled Chest"
+			case "291": namefromid := "Gold Agile Chest"
+			case "292": namefromid := "Gold Tactical Chest"
+			case "293": namefromid := "Gold Starburst Chest"
+			case "294": namefromid := "Gold Radiant Chest"
+			case "295": namefromid := "Gold Heroes of Aerois Chest"
+			case "296": namefromid := "Gold Holiday Chest"
+			case "297": namefromid := "Gold Hunter Chest"
+			case "298": namefromid := "Gold Cold Chest"
+			case "299": namefromid := "Gold Grambars Blades Chest"
+			case "300": namefromid := "Gold Bovine Chest"			
+		}
+	}
+	else if (id < 321) {
+		switch id {
+			case "301": namefromid := "Gold Dungeon Director Chest"
+			case "302": namefromid := "Gold Add Venture Chest"
+			case "303": namefromid := "Gold Glowing Chest"
+			case "304": namefromid := "Gold Frilly Chest"
+			case "305": namefromid := "Gold Sunken Chest"
+			case "306": namefromid := "Gold Ancient Chest"
+			case "307": namefromid := "Gold Speedy Chest"
+			case "308": namefromid := "Gold Commentator Chest"
+			case "309": namefromid := "Gold Orator Chest"
+			case "310": namefromid := "Gold One-HewMaan-Band Chest"
+			case "311": namefromid := "Gold Zariel Patron Chest"
+			case "312": namefromid := "Gold Flaming Chest"
+			case "313": namefromid := "Gold Tidal Chest"
+			case "314": namefromid := "Gold Netherese Chest"
+			case "315": namefromid := "Gold Smores Chest"
+			;case "316": namefromid := "UNKNOWN (" id ")"
+			;case "317": namefromid := "UNKNOWN (" id ")"
+			;case "318": namefromid := "UNKNOWN (" id ")"
+			case "319": namefromid := "Gold Illusion Chest"
+			case "320": namefromid := "Gold Coast Chest"
+		}
+	}
+	else if (id < 323) {
+		switch id {
+			case "321": namefromid := "Gold Rock Star Chest"
+			case "322": namefromid := "Gold Twin Chest"
+			;case "323": namefromid := "UNKNOWN (" id ")"
+			;case "324": namefromid := "UNKNOWN (" id ")"
+			;case "325": namefromid := "UNKNOWN (" id ")"
+			;case "326": namefromid := "UNKNOWN (" id ")"
+			;case "327": namefromid := "UNKNOWN (" id ")"
+			;case "328": namefromid := "UNKNOWN (" id ")"
+			;case "329": namefromid := "UNKNOWN (" id ")"
+			;case "330": namefromid := "UNKNOWN (" id ")"
+			;case "331": namefromid := "UNKNOWN (" id ")"
+			;case "332": namefromid := "UNKNOWN (" id ")"
+			;case "333": namefromid := "UNKNOWN (" id ")"
+			;case "334": namefromid := "UNKNOWN (" id ")"
+			;case "335": namefromid := "UNKNOWN (" id ")"
+			;case "336": namefromid := "UNKNOWN (" id ")"
+			;case "337": namefromid := "UNKNOWN (" id ")"
+			;case "338": namefromid := "UNKNOWN (" id ")"
+			;case "339": namefromid := "UNKNOWN (" id ")"
+			;case "340": namefromid := "UNKNOWN (" id ")"
 		}
 	}
 	else {
