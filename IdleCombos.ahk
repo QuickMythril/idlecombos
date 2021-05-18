@@ -1,6 +1,8 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;Added in 1.91
+
 ;Added in 1.9
 ;-Patron Zariel
 ;-Dictionary file updated to 1.9
@@ -15,7 +17,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.9"
+global VersionNumber := "1.91"
 global CurrentDictionary := "1.9"
 
 ;Local File globals
@@ -38,14 +40,15 @@ ICSettingsFile := ICSettingsFile "LocalLow\Codename Entertainment\Idle Champions
 global GameClient := GameInstallDir "IdleDragons.exe"
 
 ;Settings globals
+global ServerName := "ps7"
 global GetDetailsonStart := 0
 global LaunchGameonStart := 0
 global FirstRun := 1
 global AlwaysSaveChests := 0
 global AlwaysSaveContracts := 0
 global AlwaysSaveCodes := 0
-global SettingsCheckValue := 9 ;used to check for outdated settings file
-global NewSettings := JSON.stringify({"firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
+global SettingsCheckValue := 10 ;used to check for outdated settings file
+global NewSettings := JSON.stringify({"servername":"ps7","firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
 
 ;Server globals
 global DummyData := "&language_id=1&timestamp=0&request_id=0&network_id=11&mobile_client_version=999"
@@ -201,6 +204,7 @@ else {
 	SB_SetText("User ID & Hash not found!")
 }
 ;Loading current settings
+ServerName := CurrentSettings.servername
 GetDetailsonStart := CurrentSettings.getdetailsonstart
 LaunchGameonStart := CurrentSettings.launchgameonstart
 AlwaysSaveChests := CurrentSettings.alwayssavechests
@@ -407,6 +411,8 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h150, % ChampDetails
 		
 		Gui, Tab, Settings
+		Gui, MyWindow:Add, Text,, Server Name:
+		Gui, MyWindow:Add, Edit, vServerName w50
 		Gui, MyWindow:Add, CheckBox, vGetDetailsonStart, Get User Details on start?
 		Gui, MyWindow:Add, CheckBox, vLaunchGameonStart, Launch game client on start?
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveChests, Always save Chest Open Results to file?
@@ -500,6 +506,7 @@ class MyGui {
 		;champions
 		GuiControl, MyWindow:, ChampDetails, % ChampDetails, w250 h210
 		;settings
+		GuiControl, MyWindow:, ServerName, % ServerName, w50 h210
 		GuiControl, MyWindow:, GetDetailsonStart, % GetDetailsonStart, w250 h210
 		GuiControl, MyWindow:, LaunchGameonStart, % LaunchGameonStart, w250 h210
 		GuiControl, MyWindow:, AlwaysSaveChests, % AlwaysSaveChests, w250 h210
@@ -573,6 +580,7 @@ CrashProtect() {
 Save_Settings:
 {
 	oMyGUI.Submit()
+	CurrentSettings.servername := ServerName
 	CurrentSettings.getdetailsonstart := GetDetailsonStart
 	CurrentSettings.launchgameonstart := LaunchGameonStart
 	CurrentSettings.alwayssavechests := AlwaysSaveChests
@@ -684,6 +692,7 @@ Redeem_Codes:
 		v := Trim(v)
 		CurrentCode := v
 		sCode := RegExReplace(CurrentCode, "&", Replacement := "%26")
+		sCode := RegExReplace(sCode, "#", Replacement := "%23")
 		if !UserID {
 			MsgBox % "Need User ID & Hash."
 			FirstRun()
