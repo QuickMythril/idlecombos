@@ -659,17 +659,12 @@ Open_Codes:
 	Gui, CodeWindow:New
 	Gui, CodeWindow:+Resize -MaximizeBox
 	Gui, CodeWindow:Show, w230 h220, Codes
-	Gui, CodeWindow:Add, Button, gPaste, Paste
 	Gui, CodeWindow:Add, Edit, r12 vCodestoEnter w190 x20 y20, IDLE-CHAM-PION-SNOW
 	Gui, CodeWindow:Add, Button, gRedeem_Codes, Submit
 	Gui, CodeWindow:Add, Text, w100 x+6 vCodesPending, Codes pending: 0
 	Gui, CodeWindow:Add, Button, x+4 gClose_Codes, Close
 	return
 }
-Paste:
-{
-	getChestCodes()
-}	
 
 Redeem_Codes:
 {
@@ -2701,20 +2696,4 @@ ShowPityTimers() {
 	}
 	MsgBox % pitylist
 	return
-}
-
-getChestCodes() {
-    clipContents := clipboard
-    regexpPattern = P)([A-Z0-9-@#$`%^&!*]{12,20})
-    foundCodeString := ""
-    while (clipContents ~= regexpPattern) {
-        foundPos := RegExMatch(clipContents, regexpPattern, foundLength)
-        foundCode := SubStr(clipContents, foundPos, foundLength)
-        clipContents := SubStr(clipContents, foundPos + foundLength)
-        if (InStr(foundCodeString, foundCode) = 0) {
-            foundCodeString .= foundCode . "`r`n"
-        }
-    }
-    foundCodeString := RegExReplace(foundCodeString, "`r`n$")
-    return foundCodeString
 }
