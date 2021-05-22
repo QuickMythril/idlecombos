@@ -1,6 +1,8 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;Added in 1.92
+;added Eunomiac code to copy and find code from discord combination channel
 ;Added in 1.91
 ;Added DeathoEye Server update
 ;Neal's Json escape code for redeaming codes
@@ -20,7 +22,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.91"
+global VersionNumber := "1.92"
 global CurrentDictionary := "1.91"
 
 ;Local File globals
