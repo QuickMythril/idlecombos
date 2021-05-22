@@ -143,6 +143,7 @@ global CrashCount := 0
 global LastUpdated := "No data loaded."
 global TrayIcon := systemroot "\system32\imageres.dll"
 global LastBSChamp := ""
+global foundCodeString := ""
 
 ;BEGIN:	default run commands
 if FileExist(TrayIcon) {
@@ -661,10 +662,19 @@ Open_Codes:
 	Gui, CodeWindow:Show, w230 h220, Codes
 	Gui, CodeWindow:Add, Edit, r12 vCodestoEnter w190 x20 y20, IDLE-CHAM-PION-SNOW
 	Gui, CodeWindow:Add, Button, gRedeem_Codes, Submit
-	Gui, CodeWindow:Add, Text, w100 x+6 vCodesPending, Codes pending: 0
-	Gui, CodeWindow:Add, Button, x+4 gClose_Codes, Close
+	Gui, CodeWindow:Add, Button, x+6 gPaste, Paste
+	Gui, CodeWindow:Add, Text, w50 x+6 vCodesPending, Codes Pending: 0
+	Gui, CodeWindow:Add, Button, x+6 gClose_Codes, Close
 	return
 }
+
+
+Paste:
+{
+	getChestCodes()
+	GuiControl,, CodestoEnter, %foundCodeString%
+	return
+}	
 
 Redeem_Codes:
 {
@@ -2696,4 +2706,20 @@ ShowPityTimers() {
 	}
 	MsgBox % pitylist
 	return
+}
+
+getChestCodes() {
+    clipContents := clipboard
+    regexpPattern = P)([A-Z0-9-@#$`%^&!*]{12,20})
+    foundCodeString := ""
+    while (clipContents ~= regexpPattern) {
+        foundPos := RegExMatch(clipContents, regexpPattern, foundLength)
+        foundCode := SubStr(clipContents, foundPos, foundLength)
+        clipContents := SubStr(clipContents, foundPos + foundLength)
+        if (InStr(foundCodeString, foundCode) = 0) {
+            foundCodeString .= foundCode . "`r`n"
+        }
+    }
+    foundCodeString := RegExReplace(foundCodeString, "`r`n$")
+    return foundCodeString
 }
