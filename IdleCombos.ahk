@@ -1,6 +1,11 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;1.94
+;Updated Cleaned up UI around redeam codes with mikebaldi1980 Help
+;added in party 3 and core 3 with code from HPX
+;updated Eunomiac code to copy and find code from discord combination channel
+;should be robust enough to find chest code in most channel but haven't verified
 ;1.93
 ;more work to clean up window for combination code.
 ;Added in 1.92
@@ -24,7 +29,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.93"
+global VersionNumber := "1.94"
 global CurrentDictionary := "1.91"
 
 ;Local File globals
@@ -73,6 +78,9 @@ global CurrentPatron := ""
 global BackgroundAdventure := ""
 global BackgroundArea := ""
 global BackgroundPatron := ""
+global Background2Adventure := ""
+global Background2Area := ""
+global Background2Patron := ""
 global AchievementInfo := "This page intentionally left blank.`n`n`n`n`n`n`n"
 global BlessingInfo := "`n`n`n`n`n`n"
 global ChampDetails := ""
@@ -106,6 +114,7 @@ global BrivZone := 0
 ;Modron globals
 global FGCore := "`n`n"
 global BGCore := "`n`n"
+global BG2Core := "`n`n"
 ;Patron globals
 global MirtVariants := ""
 global MirtCompleted := ""
@@ -273,6 +282,7 @@ class MyGui {
 		Menu, AdvSubmenu, Add, &End Current Adv, EndAdventure
 		;Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
+		Menu, AdvSubmenu, Add, End Background2 Adv, EndBG2Adventure
 		Menu, AdvSubmenu, Add, &Kleho Image, KlehoImage
 		Menu, AdvSubmenu, Add, &Incomplete Variants, IncompleteVariants
 		Menu, AdvSubmenu, Add, Adventure List, AdventureList
@@ -322,21 +332,28 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vBlessingInfo x200 y33 w300, % BlessingInfo
 		
 		Gui, Tab, Adventures
-		Gui, MyWindow:Add, Text, x15 y33 w120, Current Adventure:
+		Gui, MyWindow:Add, Text, x15 y33 w130, Current Adventure:
 		Gui, MyWindow:Add, Text, vCurrentAdventure x+2 w50, % CurrentAdventure
-		Gui, MyWindow:Add, Text, x15 y+p w120, Current Patron:
+		Gui, MyWindow:Add, Text, x15 y+p w130, Current Patron:
 		Gui, MyWindow:Add, Text, vCurrentPatron x+2 w50, % CurrentPatron
-		Gui, MyWindow:Add, Text, x15 y+p w120, Current Area:
+		Gui, MyWindow:Add, Text, x15 y+p w130, Current Area:
 		Gui, MyWindow:Add, Text, vCurrentArea x+2 w50, % CurrentArea
-		Gui, MyWindow:Add, Text, x15 y76 w120, Background Adventure:
+		Gui, MyWindow:Add, Text, x15 y76 w130, Background Adventure:
 		Gui, MyWindow:Add, Text, vBackgroundAdventure x+2 w50, % BackgroundAdventure
-		Gui, MyWindow:Add, Text, x15 y+p w120, Background Patron:
+		Gui, MyWindow:Add, Text, x15 y+p w130, Background Patron:
 		Gui, MyWindow:Add, Text, vBackgroundPatron x+2 w50, % BackgroundPatron
-		Gui, MyWindow:Add, Text, x15 y+p w120, Background Area:
+		Gui, MyWindow:Add, Text, x15 y+p w130, Background Area:
 		Gui, MyWindow:Add, Text, vBackgroundArea x+2 w50, % BackgroundArea
+		Gui, MyWindow:Add, Text, x15 y119 w130, Background2 Adventure:
+		Gui, MyWindow:Add, Text, vBackground2Adventure x+2 w50, % Background2Adventure
+		Gui, MyWindow:Add, Text, x15 y+p w130, Background2 Patron:
+		Gui, MyWindow:Add, Text, vBackground2Patron x+2 w50, % Background2Patron
+		Gui, MyWindow:Add, Text, x15 y+p w130, Background2 Area:
+		Gui, MyWindow:Add, Text, vBackground2Area x+2 w50, % Background2Area
 		
 		Gui, MyWindow:Add, Text, vFGCore x200 y33 w150, % FGCore
 		Gui, MyWindow:Add, Text, vBGCore x200 y76 w150, % BGCore
+		Gui, MyWindow:Add, Text, vBG2Core x200 y119 w150, % BG2Core
 		
 		Gui, Tab, Inventory
 		Gui, MyWindow:Add, Text, x15 y33 w70, Current Gems:
@@ -466,8 +483,12 @@ class MyGui {
 		GuiControl, MyWindow:, BackgroundAdventure, % BackgroundAdventure, w250 h210
 		GuiControl, MyWindow:, BackgroundArea, % BackgroundArea, w250 h210
 		GuiControl, MyWindow:, BackgroundPatron, % BackgroundPatron, w250 h210
+		GuiControl, MyWindow:, Background2Adventure, % Background2Adventure, w250 h210
+		GuiControl, MyWindow:, Background2Area, % Background2Area, w250 h210
+		GuiControl, MyWindow:, Background2Patron, % Background2Patron, w250 h210
 		GuiControl, MyWindow:, FGCore, % FGCore, w250 h210
 		GuiControl, MyWindow:, BGCore, % BGCore, w250 h210
+		GuiControl, MyWindow:, BG2Core, % BG2Core, w250 h210
 		;inventory
 		GuiControl, MyWindow:, CurrentGems, % CurrentGems, w250 h210
 		GuiControl, MyWindow:, SpentGems, % SpentGems, w250 h210
@@ -603,7 +624,7 @@ Save_Settings:
 
 About_Clicked:
 {
-	MsgBox, , About IdleCombos v%VersionNumber%, IdleCombos v%VersionNumber% by QuickMythril`n`nSpecial thanks to all the idle dragons who inspired and assisted me!
+	MsgBox, , About IdleCombos v%VersionNumber%, IdleCombos v%VersionNumber% by QuickMythril Updates by Eldoen`n`nSpecial thanks to all the idle dragons who inspired and assisted me!
 	return
 }
 
@@ -666,9 +687,9 @@ Open_Codes:
 	Gui, CodeWindow:Show, w230 h230, Codes
 	Gui, CodeWindow:Add, Edit, r12 vCodestoEnter w190 x20 y20, IDLE-CHAM-PION-SNOW
 	Gui, CodeWindow:Add, Button, gRedeem_Codes, Submit
-	Gui, CodeWindow:Add, Button, x+4 gPaste, Paste
-	Gui, CodeWindow:Add, Text, w60 x+4 vCodesPending, Pending: 0
-	Gui, CodeWindow:Add, Button, x+4 gClose_Codes, Close
+	Gui, CodeWindow:Add, Button, x+35 gPaste, Paste
+    Gui, CodeWindow:Add, Button, x+35 gClose_Codes, Close
+    Gui, CodeWindow:Add, Text, w190 x20 y+5 vCodesPending, Codes Pending: 0
 	return
 }
 
@@ -683,10 +704,10 @@ Paste:
 Redeem_Codes:
 {
 	Gui, CodeWindow:Submit, NoHide
-	Gui, CodeWindow:Add, Text, x+45, Pending:
+	Gui, CodeWindow:Add, Text, x+45, Codes pending:
 	CodeList := StrSplit(CodestoEnter, "`n")
 	CodeCount := CodeList.Length()
-	CodesPending := "Pending: " CodeCount
+	CodesPending := "Codes pending: " CodeCount
 	GuiControl, , CodesPending, % CodesPending, w250 h210
 	usedcodes := ""
 	someonescodes := ""
@@ -803,10 +824,10 @@ Redeem_Codes:
 			}
 		}
 		sleep, 2000
-		CodesPending := "Pending: " CodeCount
+		CodesPending := "Codes pending: " CodeCount
 		GuiControl, , CodesPending, % CodesPending, w250 h210
 	}
-	CodesPending := "Submitted!"
+	CodesPending := "Codes submitted!"
 	codemessage := ""
 	if !(usedcodes == "") {
 		codemessage := codemessage "You already used:`n" usedcodes "`n"
@@ -1363,13 +1384,13 @@ EndAdventure() {
 }
 
 EndBGAdventure() {
-	if (ActiveInstance == "2") {
-		bginstance := 1
-	}
-	else {
+	if (ActiveInstance == "1") {
 		bginstance := 2
 	}
-	while (BackgroundAdventure == "-1") {
+	else {
+		bginstance := 1
+	}
+	while (BackgroundAdventure == "-1" or BackgroundAdventure == "") {
 		MsgBox, No background adventure active.
 		return
 	}
@@ -1382,6 +1403,29 @@ EndBGAdventure() {
 	sResult := ServerCall("softreset", advparams)
 	GetUserDetails()
 	SB_SetText("Background adventure has been ended.")
+	return
+}
+
+EndBG2Adventure() {
+	if (ActiveInstance == "3") {
+		bginstance := 2
+	}
+	else {
+		bginstance := 3
+	}
+	while (Background2Adventure == "-1" or Background2Adventure == "") {
+		MsgBox, No background2 adventure active.
+		return
+	}
+	MsgBox, 4, , % "Are you sure you want to end your background2 adventure ?`nParty: " bginstance " AdvID: " Background2Adventure " Patron: " Background2Patron
+	IfMsgBox, No
+	{
+		return
+	}
+	advparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" bginstance
+	sResult := ServerCall("softreset", advparams)
+	GetUserDetails()
+	SB_SetText("Background2 adventure has been ended.")
 	return
 }
 
@@ -1490,20 +1534,34 @@ GetUserDetails() {
 }
 
 ParseAdventureData() {
+	bginstance := 0
 	for k, v in UserDetails.details.game_instances
 		if (v.game_instance_id == ActiveInstance) {
 			CurrentAdventure := v.current_adventure_id
 			CurrentArea := v.current_area
 			CurrentPatron := PatronFromID(v.current_patron_id)
 		}
-		else {
+		else if (bginstance == 0){
 			BackgroundAdventure := v.current_adventure_id
 			BackgroundArea := v.current_area
 			BackgroundPatron := PatronFromID(v.current_patron_id)
+			bginstance += 1
+		}
+		else {
+			Background2Adventure := v.current_adventure_id
+			Background2Area := v.current_area
+			Background2Patron := PatronFromID(v.current_patron_id)
 		}
 	;
 	FGCore := "`n"
 	BGCore := "`n"
+	BG2Core := "`n"
+	If (ActiveInstance == 1) {
+		bginstance := 2
+	}
+	Else {
+		bginstance := 1
+	}
 	for k, v in UserDetails.details.modron_saves
 		if (v.instance_id == ActiveInstance) {
 			if (v.core_id == 1) {
@@ -1511,6 +1569,9 @@ ParseAdventureData() {
 			}
 			else if (v.core_id == 2) {
 				FGCore := "Core: Strong"
+			}
+			else if (v.core_id == 3) {
+				FGCore := "Core: Fast"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
 				FGCore := FGCore " (Reset at " v.area_goal ")"
@@ -1529,12 +1590,15 @@ ParseAdventureData() {
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			FGCore := FGCore "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
-		else if !(v.instance_id == ActiveInstance) {
+		else if (v.instance_id == bginstance and v.instance_id != 0) {
 			if (v.core_id == 1) {
 				BGCore := "Core: Modest"
 			}
 			else if (v.core_id == 2) {
 				BGCore := "Core: Strong"
+			}
+			else if (v.core_id == 3) {
+				BGCore := "Core: Fast"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
 				BGCore := BGCore " (Reset at " v.area_goal ")"
@@ -1552,6 +1616,33 @@ ParseAdventureData() {
 			}
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			BGCore := BGCore "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
+		}
+		else if(v.instance_id != 0){
+			if (v.core_id == 1) {
+				BG2Core := "Core: Modest"
+			}
+			else if (v.core_id == 2) {
+				BG2Core := "Core: Strong"
+			}
+			else if (v.core_id == 3) {
+				BG2Core := "Core: Fast"
+			}
+			if (v.properties.toggle_preferences.reset == true) {
+				BG2Core := BG2Core " (Reset at " v.area_goal ")"
+			}
+			xptolevel := v.exp_total
+			corelevel := 1
+			levelxp := 8000
+			while (xptolevel > (levelxp - 1)) {
+				corelevel += 1
+				xptolevel -= levelxp
+				levelxp += 4000
+			}
+			if (corelevel > 15) {
+				corelevel := corelevel " - Max 15"
+			}
+			percenttolevel := Floor((xptolevel / levelxp) * 100)
+			BG2Core := BG2Core "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
 	;
 }
@@ -2714,13 +2805,13 @@ ShowPityTimers() {
 
 getChestCodes() {
     clipContents := clipboard
-    regexpPattern = P)([A-Z0-9-@#$`%^&!*]{12,20})
+    regexpPattern = P)\b(?<![A-Za-z0-9-/@#$`%^&!*])([A-Za-z0-9-@#$`%^&!*]{12,20})(?![A-Za-z0-9-/@#$`%^&!*])
     foundCodeString := ""
     while (clipContents ~= regexpPattern) {
         foundPos := RegExMatch(clipContents, regexpPattern, foundLength)
-        foundCode := SubStr(clipContents, foundPos, foundLength)
+        foundCode := RegExReplace(SubStr(clipContents, foundPos, foundLength), "-")
         clipContents := SubStr(clipContents, foundPos + foundLength)
-        if (InStr(foundCodeString, foundCode) = 0) {
+        if (InStr(foundCodeString, foundCode) = 0 && (StrLen(foundCode) = 12 || StrLen(foundCode) == 16)) {
             foundCodeString .= foundCode . "`r`n"
         }
     }
