@@ -1,6 +1,8 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;1.93
+;more work to clean up window for combination code.
 ;Added in 1.92
 ;added Eunomiac code to copy and find code from discord combination channel
 ;Added in 1.91
@@ -22,7 +24,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.92"
+global VersionNumber := "1.93"
 global CurrentDictionary := "1.91"
 
 ;Local File globals
@@ -661,12 +663,12 @@ Open_Codes:
 {
 	Gui, CodeWindow:New
 	Gui, CodeWindow:+Resize -MaximizeBox
-	Gui, CodeWindow:Show, w230 h220, Codes
+	Gui, CodeWindow:Show, w230 h230, Codes
 	Gui, CodeWindow:Add, Edit, r12 vCodestoEnter w190 x20 y20, IDLE-CHAM-PION-SNOW
 	Gui, CodeWindow:Add, Button, gRedeem_Codes, Submit
-	Gui, CodeWindow:Add, Button, x+6 gPaste, Paste
-	Gui, CodeWindow:Add, Text, w50 x+6 vCodesPending, Codes Pending: 0
-	Gui, CodeWindow:Add, Button, x+6 gClose_Codes, Close
+	Gui, CodeWindow:Add, Button, x+4 gPaste, Paste
+	Gui, CodeWindow:Add, Text, w60 x+4 vCodesPending, Pending: 0
+	Gui, CodeWindow:Add, Button, x+4 gClose_Codes, Close
 	return
 }
 
@@ -681,10 +683,10 @@ Paste:
 Redeem_Codes:
 {
 	Gui, CodeWindow:Submit, NoHide
-	Gui, CodeWindow:Add, Text, x+45, Codes pending:
+	Gui, CodeWindow:Add, Text, x+45, Pending:
 	CodeList := StrSplit(CodestoEnter, "`n")
 	CodeCount := CodeList.Length()
-	CodesPending := "Codes pending: " CodeCount
+	CodesPending := "Pending: " CodeCount
 	GuiControl, , CodesPending, % CodesPending, w250 h210
 	usedcodes := ""
 	someonescodes := ""
@@ -801,10 +803,10 @@ Redeem_Codes:
 			}
 		}
 		sleep, 2000
-		CodesPending := "Codes pending: " CodeCount
+		CodesPending := "Pending: " CodeCount
 		GuiControl, , CodesPending, % CodesPending, w250 h210
 	}
-	CodesPending := "Codes submitted!"
+	CodesPending := "Submitted!"
 	codemessage := ""
 	if !(usedcodes == "") {
 		codemessage := codemessage "You already used:`n" usedcodes "`n"
