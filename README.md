@@ -3,7 +3,8 @@ IMPORTANT - When opening chests with the idlecombos app:</br>
 The game client can save an outdated inventory, overwriting some consumables.</br>
 It's recommended to exit the game first to avoid losing items.</br>
 </br>
-IMPORTANT - Epic Launcer will not open Idlechampion if Idlecombos is open first.</br>
+IMPORTANT - Epic Launcer will not open Idlechampions if</br>
+Idlecombos is open first.</br>
 </br>
 IdleCombos.exe (current standalone exe)</br>
 IdleCombos.ahk (current AHK version)</br>
