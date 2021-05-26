@@ -18,7 +18,7 @@ Features:</br>
 - Easy buying/opening many chests</br>
   - (Can log results to file)</br>
 - Enter multiple combinations at once</br>
-  - (https://i.imgur.com/GrCti3P.jpg)
+  - (<img src=https://i.imgur.com/GrCti3P.jpg>)
 - Briv Stack Calculator [github.com/Deatho0ne]</br>
 - Manual starting/stopping adventures</br>
   - (Sometimes can fix stuck accounts)</br>
