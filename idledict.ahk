@@ -142,7 +142,7 @@ ChampFromID(id) {
 	else if (id < 87) {
 		switch id {
 			case "81": namefromid := "Selise"
-			case "82": namefromid := "Sergeant Knox"
+			case "82": namefromid := "Sgt Knox"
 			case "83": namefromid := "Y4E15"
 			case "84": namefromid := "Y4E16"
 			case "85": namefromid := "Y4E17"
@@ -321,11 +321,18 @@ FeatFromID(id) {
 			case "552": namefromid := "Mehen (Brimstone Angels +40%)"
 			case "557": namefromid := "Selise (Shield of Psychomancy +40%)"
 			case "560": namefromid := "Selise (Relentless Avenger +50%)"
-			case "561": namefromid := "Selise (Eyes of Tiwaz)"
+			case "561": namefromid := "Selise (Eyes of Tiwaz)"			
 		}
 		
 	}
-	
+	else if (id < 568) {
+		switch id {
+			case "565": namefromid := "Sgt Know (Health +30%)"
+			case "567": namefromid := "Sgt Know (Rallying Cry +40%)"
+			;case "565": namefromid := "Sgt Know (Health +30%)"
+		}
+	}
+		
 
 
 	else {
@@ -658,8 +665,8 @@ ChestFromID(id) {
 			case "267": namefromid := "Gold Mehan Chest"
 			case "268": namefromid := "Silver Selise Chest"
 			case "269": namefromid := "Gold Selise Chest"
-			case "270": namefromid := "Silver Y4E14 Chest"
-			case "271": namefromid := "Gold Y4E14 Chest"
+			case "270": namefromid := "Silver Sgt Knox Chest"
+			case "271": namefromid := "Gold Sgt Knox Chest"
 			case "272": namefromid := "Silver Y4E15 Chest"
 			case "273": namefromid := "Gold Y4E15 Chest"
 			case "274": namefromid := "Silver Y4E16 Chest"
@@ -718,12 +725,12 @@ ChestFromID(id) {
 			case "320": namefromid := "Gold Coast Chest"
 		}
 	}
-	else if (id < 323) {
+	else if (id < 325) {
 		switch id {
 			case "321": namefromid := "Gold Rock Star Chest"
 			case "322": namefromid := "Gold Twin Chest"
-			;case "323": namefromid := "UNKNOWN (" id ")"
-			;case "324": namefromid := "UNKNOWN (" id ")"
+			case "323": namefromid := "Glory of Bahamut Chest"
+			case "324": namefromid := "Gold Winged Chest"
 			;case "325": namefromid := "UNKNOWN (" id ")"
 			;case "326": namefromid := "UNKNOWN (" id ")"
 			;case "327": namefromid := "UNKNOWN (" id ")"
