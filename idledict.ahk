@@ -327,9 +327,9 @@ FeatFromID(id) {
 	}
 	else if (id < 568) {
 		switch id {
-			case "565": namefromid := "Sgt Know (Health +30%)"
-			case "567": namefromid := "Sgt Know (Rallying Cry +40%)"
-			;case "565": namefromid := "Sgt Know (Health +30%)"
+			case "565": namefromid := "Sgt Knox (Health +30%)"
+			case "567": namefromid := "Sgt Knox (Rallying Cry +40%)"
+			;case "565": namefromid := "Sgt Knox (Health +30%)"
 		}
 	}
 		
