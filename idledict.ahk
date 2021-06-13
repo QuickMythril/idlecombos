@@ -725,14 +725,14 @@ ChestFromID(id) {
 			case "320": namefromid := "Gold Coast Chest"
 		}
 	}
-	else if (id < 325) {
+	else if (id < 327) {
 		switch id {
 			case "321": namefromid := "Gold Rock Star Chest"
 			case "322": namefromid := "Gold Twin Chest"
 			case "323": namefromid := "Glory of Bahamut Chest"
 			case "324": namefromid := "Gold Winged Chest"
-			;case "325": namefromid := "UNKNOWN (" id ")"
-			;case "326": namefromid := "UNKNOWN (" id ")"
+			case "325": namefromid := "Gold A-maze-ing Chest"
+			case "326": namefromid := "Gold Spiky Chest"
 			;case "327": namefromid := "UNKNOWN (" id ")"
 			;case "328": namefromid := "UNKNOWN (" id ")"
 			;case "329": namefromid := "UNKNOWN (" id ")"

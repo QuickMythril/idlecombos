@@ -681,7 +681,7 @@ Open_Gold:
 		;{
 		;	return
 		;}
-	};
+	}
 }
 
 Open_Codes:
