@@ -650,6 +650,7 @@ Open_Silver:
 	}
 	else {
 		MsgBox, 0, , % "Note: It's recommended to close the game client before opening chests."
+			return 
 		;MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?"
 		;IfMsgBox, Yes
 		;{
@@ -671,6 +672,7 @@ Open_Gold:
 	}
 	else {
 		MsgBox, 0, , % "Note: It's recommended to close the game client before opening chests."
+			return
 		;MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?`n`n(Feats earned using this app do not count towards the related achievement.)"
 		;IfMsgBox, Yes
 		;{
