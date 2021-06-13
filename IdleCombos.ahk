@@ -1,6 +1,8 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;1.95
+;disabled opening chest while client is open, 
 ;1.94
 ;Updated Cleaned up UI around redeam codes with mikebaldi1980 Help
 ;added in party 3 and core 3 with code from HPX
@@ -29,7 +31,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.94"
+global VersionNumber := "1.95"
 global CurrentDictionary := "1.91"
 
 ;Local File globals
@@ -647,16 +649,17 @@ Open_Silver:
 		return
 	}
 	else {
-		MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?"
-		IfMsgBox, Yes
-		{
-			Open_Chests(1)
-			return
-		}
-		else IfMsgBox, No
-		{
-			return
-		}
+		MsgBox, 0, , % "Note: It's recommended to close the game client before opening chests."
+		;MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?"
+		;IfMsgBox, Yes
+		;{
+			;Open_Chests(1)
+		;	return
+		;}
+		;else IfMsgBox, No
+		;{
+		;	return
+		;}
 	}
 }
 
@@ -667,17 +670,18 @@ Open_Gold:
 		return
 	}
 	else {
-		MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?`n`n(Feats earned using this app do not count towards the related achievement.)"
-		IfMsgBox, Yes
-		{
-			Open_Chests(2)
-			return
-		}
-		else IfMsgBox, No
-		{
-			return
-		}
-	}
+		MsgBox, 0, , % "Note: It's recommended to close the game client before opening chests."
+		;MsgBox, 4, , % "Note: It's recommended to close the game client before opening chests.`nWould you like to continue anyway?`n`n(Feats earned using this app do not count towards the related achievement.)"
+		;IfMsgBox, Yes
+		;{
+		;	;Open_Chests(2)
+		;	return
+		;}
+		;else IfMsgBox, No
+		;{
+		;	return
+		;}
+	};
 }
 
 Open_Codes:
