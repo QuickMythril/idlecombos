@@ -144,7 +144,7 @@ ChampFromID(id) {
 			case "81": namefromid := "Selise"
 			case "82": namefromid := "Sgt Knox"
 			case "83": namefromid := "Y4E15"
-			case "84": namefromid := "Y4E16"
+			case "84": namefromid := "Prudence"
 			case "85": namefromid := "Y4E17"
 			case "86": namefromid := "Reya"
 		}
@@ -725,7 +725,7 @@ ChestFromID(id) {
 			case "320": namefromid := "Gold Coast Chest"
 		}
 	}
-	else if (id < 327) {
+	else if (id < 328) {
 		switch id {
 			case "321": namefromid := "Gold Rock Star Chest"
 			case "322": namefromid := "Gold Twin Chest"
@@ -733,7 +733,7 @@ ChestFromID(id) {
 			case "324": namefromid := "Gold Winged Chest"
 			case "325": namefromid := "Gold A-maze-ing Chest"
 			case "326": namefromid := "Gold Spiky Chest"
-			;case "327": namefromid := "UNKNOWN (" id ")"
+			case "327": namefromid := "Gold Silvershield Chest"
 			;case "328": namefromid := "UNKNOWN (" id ")"
 			;case "329": namefromid := "UNKNOWN (" id ")"
 			;case "330": namefromid := "UNKNOWN (" id ")"
