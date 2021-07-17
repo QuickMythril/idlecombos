@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.91"
+global DictionaryVersion := "1.96"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -145,7 +145,7 @@ ChampFromID(id) {
 			case "82": namefromid := "Sgt Knox"
 			case "83": namefromid := "Ellywick"
 			case "84": namefromid := "Prudence"
-			case "85": namefromid := "Y4E17"
+			case "85": namefromid := "Corazon"
 			case "86": namefromid := "Reya"
 		}
 	}
@@ -309,7 +309,7 @@ FeatFromID(id) {
 			case "503": namefromid := "Orisha (Bardic Connection +40%)"
 			case "505": namefromid := "Orisha (Encore Performance)"
 			case "511": namefromid := "Alyndra (Portent +40%)"
-			case "513": namefromid := "Alyndra (Brows of Judgement +40% Brows of Judgement +40% Brows of Judgement +40%)"
+			case "513": namefromid := "Alyndra (Brows of Judgement +40%)"
 			case "520": namefromid := "Reya (Searing Radiance +40%)"
 			case "522": namefromid := "Reya (Echoes of Zariel +40%)"
 			case "532": namefromid := "Orkira (Elemental Fire +40%)"
@@ -329,6 +329,11 @@ FeatFromID(id) {
 		switch id {
 			case "565": namefromid := "Sgt Knox (Health +30%)"
 			case "567": namefromid := "Sgt Knox (Rallying Cry +40%)"
+			case "574": namefromid := "Ellywick (Powerful Following +40%)"
+			case "576": namefromid := "Ellywick (Fortunate Soul +40%)"
+			;case "565": namefromid := "Sgt Knox (Health +30%)"
+			;case "565": namefromid := "Sgt Knox (Health +30%)"
+			;case "565": namefromid := "Sgt Knox (Health +30%)"
 			;case "565": namefromid := "Sgt Knox (Health +30%)"
 		}
 	}
@@ -671,8 +676,8 @@ ChestFromID(id) {
 			case "273": namefromid := "Gold Ellywick Chest"
 			case "274": namefromid := "Silver Prudence Chest"
 			case "275": namefromid := "Gold Prudence Chest"
-			case "276": namefromid := "Silver Y4E17 Chest"
-			case "277": namefromid := "Gold Y4E17 Chest"
+			case "276": namefromid := "Silver Corazon Chest"
+			case "277": namefromid := "Gold Corazon Chest"
 			case "278": namefromid := "Gold Bold Chest"
 			case "279": namefromid := "Gold Rime Chest"
 			case "280": namefromid := "Gold Feathered Hat Chest"
@@ -725,7 +730,7 @@ ChestFromID(id) {
 			case "320": namefromid := "Gold Coast Chest"
 		}
 	}
-	else if (id < 328) {
+	else if (id < 331) {
 		switch id {
 			case "321": namefromid := "Gold Rock Star Chest"
 			case "322": namefromid := "Gold Twin Chest"
@@ -734,9 +739,9 @@ ChestFromID(id) {
 			case "325": namefromid := "Gold A-maze-ing Chest"
 			case "326": namefromid := "Gold Spiky Chest"
 			case "327": namefromid := "Gold Silvershield Chest"
-			;case "328": namefromid := "UNKNOWN (" id ")"
-			;case "329": namefromid := "UNKNOWN (" id ")"
-			;case "330": namefromid := "UNKNOWN (" id ")"
+			case "328": namefromid := "Gold Sun Chest"
+			case "329": namefromid := "Gold Moon Chest"
+			case "330": namefromid := "Gold Shard Chest"
 			;case "331": namefromid := "UNKNOWN (" id ")"
 			;case "332": namefromid := "UNKNOWN (" id ")"
 			;case "333": namefromid := "UNKNOWN (" id ")"

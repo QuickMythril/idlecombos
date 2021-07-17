@@ -1,6 +1,8 @@
 ﻿#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;1.96
+;update dict file to latest content and versioned to 1.96
 ;1.95
 ;disabled opening chest while client is open, 
 ;1.94
@@ -31,8 +33,8 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.95"
-global CurrentDictionary := "1.91"
+global VersionNumber := "1.96"
+global CurrentDictionary := "1.96"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
