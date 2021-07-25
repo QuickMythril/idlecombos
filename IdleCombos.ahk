@@ -2,7 +2,7 @@
 #include JSON.ahk
 #include idledict.ahk
 ;1.96
-;update dict file to latest content and versioned to 1.96
+;update dict file to latest content and versioned to 1.96 
 ;1.95
 ;disabled opening chest while client is open, 
 ;1.94
