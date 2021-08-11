@@ -1,4 +1,5 @@
-﻿#include %A_ScriptDir%
+﻿#SingleInstance Force
+#include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
 ;1.96
@@ -63,8 +64,10 @@ global FirstRun := 1
 global AlwaysSaveChests := 0
 global AlwaysSaveContracts := 0
 global AlwaysSaveCodes := 0
-global SettingsCheckValue := 10 ;used to check for outdated settings file
-global NewSettings := JSON.stringify({"servername":"ps7","firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1})
+global NoSaveSetting := 0
+global SettingsCheckValue := 11 ;used to check for outdated settings file
+global NewSettings := JSON.stringify({"servername":"ps7","firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1, "NoSaveSetting":0})
+
 
 ;Server globals
 global DummyData := "&language_id=1&timestamp=0&request_id=0&network_id=11&mobile_client_version=999"
@@ -231,6 +234,7 @@ LaunchGameonStart := CurrentSettings.launchgameonstart
 AlwaysSaveChests := CurrentSettings.alwayssavechests
 AlwaysSaveContracts := CurrentSettings.alwayssavecontracts
 AlwaysSaveCodes := CurrentSettings.alwayssavecodes
+NoSaveSetting := CurrentSettings.NoSaveSetting
 if (GetDetailsonStart == "1") {
 	GetUserDetails()
 }
@@ -447,6 +451,7 @@ class MyGui {
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveChests, Always save Chest Open Results to file?
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveContracts, Always save Blacksmith Results to file?
 		Gui, MyWindow:Add, CheckBox, vAlwaysSaveCodes, Always save Code Redeem Results to file?
+		Gui, MyWindow:Add, Checkbox, vNoSaveSetting, Never save results to file?
 		Gui, MyWindow:Add, Button, gSave_Settings, Save Settings
 		
 		Gui, Tab, Log
@@ -545,6 +550,7 @@ class MyGui {
 		GuiControl, MyWindow:, AlwaysSaveChests, % AlwaysSaveChests, w250 h210
 		GuiControl, MyWindow:, AlwaysSaveContracts, % AlwaysSaveContracts, w250 h210
 		GuiControl, MyWindow:, AlwaysSaveCodes, % AlwaysSaveCodes, w250 h210
+		GuiControl, MyWindow:, NoSaveSetting, % NoSaveSetting, w250 h210
 		;this.Show() - removed
 	}
 }
@@ -619,6 +625,7 @@ Save_Settings:
 	CurrentSettings.alwayssavechests := AlwaysSaveChests
 	CurrentSettings.alwayssavecontracts := AlwaysSaveContracts
 	CurrentSettings.alwayssavecodes := AlwaysSaveCodes
+	CurrentSettings.nosavesetting := NoSaveSetting
 	newsettings := JSON.stringify(CurrentSettings)
 	FileDelete, %SettingsFile%
 	FileAppend, %newsettings%, %SettingsFile%
@@ -730,7 +737,6 @@ Redeem_Codes:
 	codetgps := 0
 	codepolish := 0
 	tempsavesetting := 0
-	tempnosavesetting := 0
 	for k, v in CodeList
 	{
 		v := StrReplace(v, "`r")
@@ -760,6 +766,8 @@ Redeem_Codes:
 				codeparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&code=" sCode
 				rawresults := ServerCall("redeemcoupon", codeparams)
 				coderesults := JSON.parse(rawresults)
+				rawloot := JSON.stringify(coderesults.loot_details)
+				codeloot := JSON.parse(rawloot)
 			}
 			else {
 				return
@@ -818,17 +826,13 @@ Redeem_Codes:
 			FileAppend, %sCode%`n, %RedeemCodeLogFile%
 			FileAppend, %rawresults%`n, %RedeemCodeLogFile%
 		}
-		else if !(tempnosavesetting) {
+		else if !(CurrentSettings.nosavesetting) {
 			MsgBox, 4, , "Save to File?"
 			IfMsgBox, Yes
 			{
 				tempsavesetting := 1
 				FileAppend, %sCode%`n, %RedeemCodeLogFile%
 				FileAppend, %rawresults%`n, %RedeemCodeLogFile%
-			}
-			else IfMsgBox, No
-			{
-				tempnosavesetting := 1
 			}
 		}
 		sleep, 2000
@@ -1085,7 +1089,6 @@ Open_Chests(chestid) {
 	}
 	chestparams := "&gold_per_second=0&checksum=4c5f019b6fc6eefa4d47d21cfaf1bc68&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&chest_type_id=" chestid "&game_instance_id=" ActiveInstance "&count="
 	tempsavesetting := 0
-	tempnosavesetting := 0
 	lastfeat := ""
 	newfeats := ""
 	lastshiny := ""
@@ -1104,15 +1107,12 @@ Open_Chests(chestid) {
 			FileAppend, %rawresults%`n, %ChestOpenLogFile%
 		}
 		else {
-			if !tempnosavesetting {
+			if !CurrentSettings.nosavesetting {
 				InputBox, dummyvar, Chest Results, Save to File?, , 250, 150, , , , , % rawresults
 				dummyvar := ""
 				if !ErrorLevel {
 					FileAppend, %rawresults%`n, %ChestOpenLogFile%
 					tempsavesetting := 1
-				}
-				if ErrorLevel {
-					tempnosavesetting := 1
 				}
 			}
 		}
@@ -1159,7 +1159,6 @@ Open_Chests(chestid) {
 		}
 	}
 	tempsavesetting := 0
-	tempnosavesetting := 0
 	switch chestid
 {
 	case "1": {
@@ -1258,7 +1257,6 @@ UseBlacksmith(buffid) {
 	LastBSChamp := heroid
 	bscontractparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&buff_id=" buffid "&hero_id=" heroid "&num_uses="
 	tempsavesetting := 0
-	tempnosavesetting := 0
 	slot1lvs := 0
 	slot2lvs := 0
 	slot3lvs := 0
@@ -1279,15 +1277,12 @@ UseBlacksmith(buffid) {
 			FileAppend, %rawresults%`n, %BlacksmithLogFile%
 		}
 		else {
-			if !tempnosavesetting {
+			if !CurrentSettings.nosavesetting {
 				InputBox, dummyvar, Contracts Results, Save to File?, , 250, 150, , , , , % rawresults
 				dummyvar := ""
 				if !ErrorLevel {
 					FileAppend, %rawresults%`n, %ContractLogFile%
 					tempsavesetting := 1
-				}
-				if ErrorLevel {
-					tempnosavesetting := 1
 				}
 			}
 		}
@@ -1327,7 +1322,6 @@ UseBlacksmith(buffid) {
 	}
 	MsgBox % ChampFromID(heroid) " levels gained:`nSlot 1: " slot1lvs "`nSlot 2: " slot2lvs "`nSlot 3: " slot3lvs "`nSlot 4: " slot4lvs "`nSlot 5: " slot5lvs "`nSlot 6: " slot6lvs
 	tempsavesetting := 0
-	tempnosavesetting := 0
 	switch buffid {
 		case 31: contractsused := (CurrentTinyBS - blacksmithresults.buffs_remaining)
 		case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
