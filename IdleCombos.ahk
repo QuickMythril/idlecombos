@@ -2,6 +2,8 @@
 #include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;1.97
+;include fixes for single instance from mikebaldi
 ;1.96
 ;update dict file to latest content and versioned to 1.96 
 ;1.95
@@ -34,7 +36,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.96"
+global VersionNumber := "1.97"
 global CurrentDictionary := "1.96"
 
 ;Local File globals
