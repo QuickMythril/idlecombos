@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.96"
+global DictionaryVersion := "1.98"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -139,7 +139,7 @@ ChampFromID(id) {
 			case "80": namefromid := "Mehen"
 		}
 	}
-	else if (id < 87) {
+	else if (id < 90) {
 		switch id {
 			case "81": namefromid := "Selise"
 			case "82": namefromid := "Sgt Knox"
@@ -147,8 +147,46 @@ ChampFromID(id) {
 			case "84": namefromid := "Prudence"
 			case "85": namefromid := "Corazon"
 			case "86": namefromid := "Reya"
+			case "87": namefromid := "NERDS"
+			case "88": namefromid := "UNKNOWN (" id ")"
+			case "89": namefromid := "D'hani"
+			case "90": namefromid := "UNKNOWN (" id ")"
+			case "91": namefromid := "UNKNOWN (" id ")"
+			case "92": namefromid := "UNKNOWN (" id ")"
+			case "93": namefromid := "UNKNOWN (" id ")"
+			case "94": namefromid := "UNKNOWN (" id ")"
+			case "95": namefromid := "UNKNOWN (" id ")"
+			case "96": namefromid := "UNKNOWN (" id ")"
+			case "97": namefromid := "UNKNOWN (" id ")"
+			case "98": namefromid := "UNKNOWN (" id ")"
+			case "99": namefromid := "UNKNOWN (" id ")"
+			case "100": namefromid := "UNKNOWN (" id ")"
 		}
 	}
+	;else if (id < 90) {
+	;	switch id {
+	;		case "81": namefromid := "Selise"
+	;		case "82": namefromid := "Sgt Knox"
+	;		case "83": namefromid := "Ellywick"
+	;		case "84": namefromid := "Prudence"
+	;		case "85": namefromid := "Corazon"
+	;		case "86": namefromid := "Reya"
+	;		case "87": namefromid := "NERDS"
+	;		case "88": namefromid := "UNKNOWN (" id ")"
+	;		case "89": namefromid := "D'hani"
+	;		case "90": namefromid := "UNKNOWN (" id ")"
+	;		case "91": namefromid := "UNKNOWN (" id ")"
+	;		case "92": namefromid := "UNKNOWN (" id ")"
+	;		case "93": namefromid := "UNKNOWN (" id ")"
+	;		case "94": namefromid := "UNKNOWN (" id ")"
+	;		case "95": namefromid := "UNKNOWN (" id ")"
+	;		case "96": namefromid := "UNKNOWN (" id ")"
+	;		case "97": namefromid := "UNKNOWN (" id ")"
+	;		case "98": namefromid := "UNKNOWN (" id ")"
+	;		case "99": namefromid := "UNKNOWN (" id ")"
+	;		case "100": namefromid := "UNKNOWN (" id ")"
+	;	}
+	;}	
 	else {
 		namefromid := "UNKNOWN (" id ")"
 	}
@@ -325,17 +363,23 @@ FeatFromID(id) {
 		}
 		
 	}
-	else if (id < 568) {
+	else if (id < 577) {
 		switch id {
 			case "565": namefromid := "Sgt Knox (Health +30%)"
 			case "567": namefromid := "Sgt Knox (Rallying Cry +40%)"
 			case "574": namefromid := "Ellywick (Powerful Following +40%)"
 			case "576": namefromid := "Ellywick (Fortunate Soul +40%)"
+			case "588": namefromid := "Prudence (Glee +40%)"
+			case "590": namefromid := "Prudence (Frustration +40%)"
+			case "600": namefromid := "Corazón (Pirate's Code +40%)"
+			case "601": namefromid := "Corazón (G.O.A.T. Pirate +40%)"
 			;case "565": namefromid := "Sgt Knox (Health +30%)"
 			;case "565": namefromid := "Sgt Knox (Health +30%)"
 			;case "565": namefromid := "Sgt Knox (Health +30%)"
 			;case "565": namefromid := "Sgt Knox (Health +30%)"
+			
 		}
+		
 	}
 		
 
@@ -730,7 +774,7 @@ ChestFromID(id) {
 			case "320": namefromid := "Gold Coast Chest"
 		}
 	}
-	else if (id < 331) {
+	else if (id < 341) {
 		switch id {
 			case "321": namefromid := "Gold Rock Star Chest"
 			case "322": namefromid := "Gold Twin Chest"
@@ -742,16 +786,64 @@ ChestFromID(id) {
 			case "328": namefromid := "Gold Sun Chest"
 			case "329": namefromid := "Gold Moon Chest"
 			case "330": namefromid := "Gold Shard Chest"
-			;case "331": namefromid := "UNKNOWN (" id ")"
-			;case "332": namefromid := "UNKNOWN (" id ")"
-			;case "333": namefromid := "UNKNOWN (" id ")"
-			;case "334": namefromid := "UNKNOWN (" id ")"
-			;case "335": namefromid := "UNKNOWN (" id ")"
-			;case "336": namefromid := "UNKNOWN (" id ")"
-			;case "337": namefromid := "UNKNOWN (" id ")"
-			;case "338": namefromid := "UNKNOWN (" id ")"
-			;case "339": namefromid := "UNKNOWN (" id ")"
-			;case "340": namefromid := "UNKNOWN (" id ")"
+			case "331": namefromid := "Gold Painted Chest"
+			case "332": namefromid := "Gold Performance Chest"
+			case "333": namefromid := "Gold Cloudy Chest"
+			case "334": namefromid := "Silver Y5E1 Chest"
+			case "335": namefromid := "Gold Y5E1 Chest"
+			case "336": namefromid := "Silver Y5E2 Chest"
+			case "337": namefromid := "Gold Y5E2 Chest"
+			case "338": namefromid := "Silver Y5E3 Chest"
+			case "339": namefromid := "Gold Y5E3 Chest"
+			case "340": namefromid := "Silver Y5E4 Chest"
+		}
+	}
+	else if (id < 361) {
+		switch id {
+			case "341": namefromid := "Gold Y5E4 Chest"
+			case "342": namefromid := "Silver Y5E5 Chest"
+			case "343": namefromid := "Gold Y5E5 Chest"
+			case "344": namefromid := "Silver Y5E6 Chest"
+			case "345": namefromid := "Gold Y5E6 Chest"
+			case "346": namefromid := "Silver Y5E7 Chest"
+			case "347": namefromid := "Gold Y5E7 Chest"
+			case "348": namefromid := "Silver Y5E8 Chest"
+			case "349": namefromid := "Gold Y5E8 Chest"
+			case "350": namefromid := "Silver Y5E9 Chest"
+			case "351": namefromid := "Gold Y5E9 Chest"
+			case "352": namefromid := "Silver Y5E10 Chest"
+			case "353": namefromid := "Gold Y5E10 Chest"
+			case "354": namefromid := "Silver Y5E11 Chest"
+			case "355": namefromid := "Gold Y5E11 Chest"
+			case "356": namefromid := "Silver Y5E12 Chest"
+			case "357": namefromid := "Gold Y5E12 Chest"
+			case "358": namefromid := "Silver Y5E13 Chest"
+			case "359": namefromid := "Gold Y5E13 Chest"
+			case "360": namefromid := "Silver Y5E14 Chest"
+		}
+	}
+	else if (id < 381) {
+		switch id {
+			case "361": namefromid := "Gold Y5E14 Chest"
+			case "362": namefromid := "Silver Y5E15 Chest"
+			case "363": namefromid := "Gold Y5E15 Chest"
+			case "364": namefromid := "Silver Y5E16 Chest"
+			case "365": namefromid := "Gold Y5E16 Chest"
+			case "366": namefromid := "Silver Y5E17 Chest"
+			case "367": namefromid := "Gold Y5E17 Chest"
+			case "368": namefromid := "Gold Barred Chest"
+			case "369": namefromid := "Gold Charred Chest"
+			case "370": namefromid := "Gold Weighted Chest"
+			case "371": namefromid := "UNKNOWN (" id ")"
+			case "372": namefromid := "UNKNOWN (" id ")"
+			case "373": namefromid := "UNKNOWN (" id ")"
+			case "374": namefromid := "UNKNOWN (" id ")"
+			case "375": namefromid := "UNKNOWN (" id ")"
+			case "376": namefromid := "UNKNOWN (" id ")"
+			case "377": namefromid := "UNKNOWN (" id ")"
+			case "378": namefromid := "UNKNOWN (" id ")"
+			case "379": namefromid := "UNKNOWN (" id ")"
+			case "380": namefromid := "UNKNOWN (" id ")"
 		}
 	}
 	else {

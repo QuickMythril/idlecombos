@@ -2,6 +2,9 @@
 #include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;1.98
+;update idledict content, 
+;added NERDS as evergreen for equipment screen
 ;1.97
 ;include fixes for single instance from mikebaldi
 ;1.96
@@ -36,8 +39,8 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.97"
-global CurrentDictionary := "1.96"
+global VersionNumber := "1.98"
+global CurrentDictionary := "1.98"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -2658,7 +2661,7 @@ GearReport() {
 				currentcount += 1
 			}
 		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86)){
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87)){
 			totalcorelevels += (v.enchant + 1)
 			totalcoreitems += 1
 			if (lastshiny) {
