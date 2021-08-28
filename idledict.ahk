@@ -139,7 +139,7 @@ ChampFromID(id) {
 			case "80": namefromid := "Mehen"
 		}
 	}
-	else if (id < 90) {
+	else if (id < 101) {
 		switch id {
 			case "81": namefromid := "Selise"
 			case "82": namefromid := "Sgt Knox"
@@ -363,7 +363,7 @@ FeatFromID(id) {
 		}
 		
 	}
-	else if (id < 577) {
+	else if (id < 602) {
 		switch id {
 			case "565": namefromid := "Sgt Knox (Health +30%)"
 			case "567": namefromid := "Sgt Knox (Rallying Cry +40%)"

@@ -2176,7 +2176,7 @@ List_ChampIDs:
 	champname := ""
 	id := 1
 	champidlist := ""
-	while (id < 87) {
+	while (id < 101) {
 		champname := ChampFromID(id)
 		StringLen, champnamelen, champname
 		while (champnamelen < 16)
