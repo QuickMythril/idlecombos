@@ -3,7 +3,7 @@
 #include JSON.ahk
 #include idledict.ahk
 ;1.98
-;update idledict content, epic games setup 
+;update idledict content, 
 ;added NERDS as evergreen for equipment screen
 ;1.97
 ;include fixes for single instance from mikebaldi
@@ -51,7 +51,7 @@ global BlacksmithLogFile := "blacksmithlog.json"
 global RedeemCodeLogFile := "redeemcodelog.json"
 global JournalFile := "journal.json"
 global CurrentSettings := []
-global GameInstallDir := "C:\Program Files\Epic Games\IdleChampions\"
+global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
 global DictionaryFile := "https://raw.githubusercontent.com/QuickMythril/idlecombos/master/idledict.ahk"
 global LocalDictionary := "idledict.ahk"
@@ -72,7 +72,6 @@ global AlwaysSaveCodes := 0
 global NoSaveSetting := 0
 global SettingsCheckValue := 11 ;used to check for outdated settings file
 global NewSettings := JSON.stringify({"servername":"ps7","firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1, "NoSaveSetting":0})
-global GameClient := "com.epicgames.launcher://apps/40cb42e38c0b4a14a1bb133eb3291572?action=launch&silent=true"
 
 ;Server globals
 global DummyData := "&language_id=1&timestamp=0&request_id=0&network_id=11&mobile_client_version=999"
