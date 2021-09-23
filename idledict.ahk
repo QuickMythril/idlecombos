@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.98"
+global DictionaryVersion := "2.00"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -150,8 +150,8 @@ ChampFromID(id) {
 			case "87": namefromid := "NERDS"
 			case "88": namefromid := "UNKNOWN (" id ")"
 			case "89": namefromid := "D'hani"
-			case "90": namefromid := "UNKNOWN (" id ")"
-			case "91": namefromid := "UNKNOWN (" id ")"
+			case "90": namefromid := "Brig"
+			case "91": namefromid := "Widdle"
 			case "92": namefromid := "UNKNOWN (" id ")"
 			case "93": namefromid := "UNKNOWN (" id ")"
 			case "94": namefromid := "UNKNOWN (" id ")"
@@ -789,12 +789,12 @@ ChestFromID(id) {
 			case "331": namefromid := "Gold Painted Chest"
 			case "332": namefromid := "Gold Performance Chest"
 			case "333": namefromid := "Gold Cloudy Chest"
-			case "334": namefromid := "Silver Y5E1 Chest"
-			case "335": namefromid := "Gold Y5E1 Chest"
-			case "336": namefromid := "Silver Y5E2 Chest"
-			case "337": namefromid := "Gold Y5E2 Chest"
-			case "338": namefromid := "Silver Y5E3 Chest"
-			case "339": namefromid := "Gold Y5E3 Chest"
+			case "334": namefromid := "Silver D'hani Chest"
+			case "335": namefromid := "Gold D'hani Chest"
+			case "336": namefromid := "Silver Briv Chest"
+			case "337": namefromid := "Gold Briv Chest"
+			case "338": namefromid := "Silver Widdle Chest"
+			case "339": namefromid := "Gold Widdle Chest"
 			case "340": namefromid := "Silver Y5E4 Chest"
 		}
 	}
