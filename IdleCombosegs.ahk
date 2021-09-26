@@ -40,7 +40,7 @@
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
 global VersionNumber := "1.98"
-global CurrentDictionary := "1.98"
+global CurrentDictionary := "2.00"
 
 ;Local File globals
 global OutputLogFile := "idlecombolog.txt"
@@ -53,7 +53,7 @@ global JournalFile := "journal.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files\Epic Games\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
-global DictionaryFile := "https://raw.githubusercontent.com/QuickMythril/idlecombos/master/idledict.ahk"
+global DictionaryFile := "https://raw.githubusercontent.com/dhusemann/idlecombos/master/idledict.ahk"
 global LocalDictionary := "idledict.ahk"
 
 global ICSettingsFile := A_AppData
