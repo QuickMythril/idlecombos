@@ -1170,6 +1170,7 @@ Open_Chests(chestid) {
 		if (extraspent) {
 			chestsopened += (extraspent/50)
 		}
+		MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
 		UpdateLogTime()
 		FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
 	}
