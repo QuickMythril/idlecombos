@@ -1874,10 +1874,44 @@ Lg_Blacksmith:
 		if (v.owned == 1) {
 			TotalChamps += 1
 		}
-		;
-		ChampDetails := ""
-		if (UserDetails.details.stats.black_viper_total_gems) {
-			ChampDetails := ChampDetails "Black Viper Red Gems: " UserDetails.details.stats.black_viper_total_gems "`n`n"
+	;
+	ChampDetails := ""
+	if (UserDetails.details.stats.black_viper_total_gems) {
+		ChampDetails := ChampDetails "Black Viper Red Gems: " UserDetails.details.stats.black_viper_total_gems "`n`n"
+	}
+	if (UserDetails.details.stats.total_paid_up_front_gold) {
+		morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
+		epos := InStr(UserDetails.details.stats.total_paid_up_front_gold, "E")
+		morgaengold := morgaengold SubStr(UserDetails.details.stats.total_paid_up_front_gold, epos)
+		ChampDetails := ChampDetails "M" Chr(244) "rg" Chr(230) "n Gold Collected: " morgaengold "`n`n"
+	}
+	if (UserDetails.details.stats.torogar_lifetime_zealot_stacks) {
+		torostacks := UserDetails.details.stats.torogar_lifetime_zealot_stacks
+		ChampDetails := ChampDetails "Torogar Zealot Stacks: " torostacks "`n`n"
+	}
+	
+	if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
+		ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow "`n`n"
+	}
+	if (UserDetails.details.stats.dhani_monsters_painted) {
+		dhanipaint := UserDetails.details.stats.dhani_monsters_painted
+		ChampDetails := ChampDetails "D'hani Paints: " dhanipaint "`n`n"
+	}
+}
+
+CheckPatronProgress() {
+	if !(MirtVariants == "Locked") {
+		if (MirtFPCurrency = "5000") {
+			Gui, Font, cGreen
+			GuiControl, Font, MirtFPCurrency
+		}
+		else {
+			Gui, Font, cRed
+			GuiControl, Font, MirtFPCurrency
+		}
+		if (MirtChallenges = "10") {
+			Gui, Font, cGreen
+			GuiControl, Font, MirtChallenges
 		}
 		if (UserDetails.details.stats.total_paid_up_front_gold) {
 			morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
