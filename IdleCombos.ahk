@@ -1095,6 +1095,7 @@ Clear_Log:
 		newfeats := ""
 		lastshiny := ""
 		newshinies := ""
+		chestresults_cumulative := {}
 		while (count > 0) {
 			SB_SetText("Chests remaining to open: " count)
 			if (count < 100) {
@@ -1148,46 +1149,78 @@ Clear_Log:
 			}
 			for k, v in chestresults.loot_details {
 				if (v.unlock_hero_feat) {
-					lastfeat := (FeatFromID(v.unlock_hero_feat) "`n")
+					lastfeat := (FeatFromID(v.unlock_hero_feat) "n")
 					newfeats := newfeats lastfeat
 				}
 				if (v.gilded) {
-					lastshiny := (ChampFromID(v.hero_id) " (Slot " v.slot_id ")")
-					if (v.disenchant_amount == 125) {
-						lastshiny := lastshiny " +125"
+					if ( !IsObject( chestresults_cumulative[ v.hero_id ] ) )
+					{
+						chestresults_cumulative[ v.hero_id ] := {}
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
+						if (v.disenchant_amount == 125)
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
 					}
-					newshinies := newshinies lastshiny "`n"
+					else if ( !IsObject( chestresults_cumulative[ v.hero_id ][ v.slot_id ] )
+						{
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
+							if (v.disenchant_amount == 125)
+								chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
+						}
+						Else
+						{
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] += 1
+							if (v.disenchant_amount == 125)
+								chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] += v.disenchant_amount
+						}
+
+					}
 				}
 			}
 		}
-		tempsavesetting := 0
-		switch chestid
+		for k, v in chestresults_cumulative
 		{
-			case "1": {
-				chestsopened := (CurrentSilvers - chestresults.chests_remaining)
-				if (extraspent) {
-					chestsopened += (extraspent/50)
-				}
-				MsgBox % "New Shinies:`n" newshinies
-				UpdateLogTime()
-				FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
-			}
-			case "2": {
-				chestsopened := (CurrentGolds - chestresults.chests_remaining)
-				if (extraspent) {
-					chestsopened += (extraspent/500)
-				}
-				MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
-				UpdateLogTime()
-				FileAppend, % "(" CurrentTime ") Gold Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
+			for k2, v2 in v
+			{
+				if ( v2.gilded_count <= 1 )
+					lastshiny := ( ChampFromID( k ) " (Slot " k2 ")" )
+				else
+					lastshiny := ( ChampFromID( k ) " (Slot " k2 " x " v2.gilded_count ")" )
+				if ( v2.disenchant_amount )
+					lastshiny .= " +" v2.disenchant_amount
+				newshinies .= lastshiny "`n"
 			}
 		}
-		FileRead, OutputText, %OutputLogFile%
-		oMyGUI.Update()
-		GetUserDetails()
-		SB_SetText("Chest opening completed.")
-		return
 	}
+	tempsavesetting := 0
+	switch chestid
+	{
+		case "1": {
+			chestsopened := (CurrentSilvers - chestresults.chests_remaining)
+			if (extraspent) {
+				chestsopened += (extraspent/50)
+			}
+			MsgBox % "New Shinies:`n" newshinies
+			UpdateLogTime()
+			FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
+		}
+		case "2": {
+			chestsopened := (CurrentGolds - chestresults.chests_remaining)
+			if (extraspent) {
+				chestsopened += (extraspent/500)
+			}
+			MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
+			UpdateLogTime()
+			FileAppend, % "(" CurrentTime ") Gold Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
+		}
+	}
+	FileRead, OutputText, %OutputLogFile%
+	oMyGUI.Update()
+	GetUserDetails()
+	SB_SetText("Chest opening completed.")
+return
+}
 
 Tiny_Blacksmith:
 	{
@@ -1891,9 +1924,13 @@ Lg_Blacksmith:
 		}
 
 		if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
-			ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
+			ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow "`n`n"
 		}
-	}
+		if (UserDetails.details.stats.dhani_monsters_painted) {
+			dhanipaint := UserDetails.details.stats.dhani_monsters_painted
+			ChampDetails := ChampDetails "D'hani Paints: " dhanipaint "`n`n"
+		}
+	}	
 
 	CheckPatronProgress() {
 		if !(MirtVariants == "Locked") {
