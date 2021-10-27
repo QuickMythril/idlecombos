@@ -1162,35 +1162,34 @@ Clear_Log:
 							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
 					}
 					else if ( !IsObject( chestresults_cumulative[ v.hero_id ][ v.slot_id ] ) )
-						{
-							chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
-							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
-							if (v.disenchant_amount == 125)
-								chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
-						}
-						Else
-						{
-							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] += 1
-							if (v.disenchant_amount == 125)
-								chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] += v.disenchant_amount
-						}
-
+					{
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
+						if (v.disenchant_amount == 125)
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
 					}
+					Else
+					{
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] += 1
+						if (v.disenchant_amount == 125)
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] += v.disenchant_amount
+					}
+
 				}
 			}
 		}
-		for k, v in chestresults_cumulative
+	}
+	for k, v in chestresults_cumulative
+	{
+		for k2, v2 in v
 		{
-			for k2, v2 in v
-			{
-				if ( v2.gilded_count <= 1 )
-					lastshiny := ( ChampFromID( k ) " (Slot " k2 ")" )
-				else
-					lastshiny := ( ChampFromID( k ) " (Slot " k2 " x " v2.gilded_count ")" )
-				if ( v2.disenchant_amount )
-					lastshiny .= " +" v2.disenchant_amount
-				newshinies .= lastshiny "`n"
-			}
+			if ( v2.gilded_count <= 1 )
+				lastshiny := ( ChampFromID( k ) " (Slot " k2 ")" )
+			else
+				lastshiny := ( ChampFromID( k ) " (Slot " k2 " x " v2.gilded_count ")" )
+			if ( v2.disenchant_amount )
+				lastshiny .= " +" v2.disenchant_amount
+			newshinies .= lastshiny "`n"
 		}
 	}
 	tempsavesetting := 0
@@ -1220,7 +1219,7 @@ Clear_Log:
 	GetUserDetails()
 	SB_SetText("Chest opening completed.")
 return
-}
+
 
 Tiny_Blacksmith:
 	{
