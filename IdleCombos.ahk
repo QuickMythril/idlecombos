@@ -1161,7 +1161,7 @@ Clear_Log:
 						if (v.disenchant_amount == 125)
 							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
 					}
-					else if ( !IsObject( chestresults_cumulative[ v.hero_id ][ v.slot_id ] )
+					else if ( !IsObject( chestresults_cumulative[ v.hero_id ][ v.slot_id ] ) )
 						{
 							chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
 							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
