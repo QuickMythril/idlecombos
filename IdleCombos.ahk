@@ -1874,44 +1874,10 @@ Lg_Blacksmith:
 		if (v.owned == 1) {
 			TotalChamps += 1
 		}
-	;
-	ChampDetails := ""
-	if (UserDetails.details.stats.black_viper_total_gems) {
-		ChampDetails := ChampDetails "Black Viper Red Gems: " UserDetails.details.stats.black_viper_total_gems "`n`n"
-	}
-	if (UserDetails.details.stats.total_paid_up_front_gold) {
-		morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
-		epos := InStr(UserDetails.details.stats.total_paid_up_front_gold, "E")
-		morgaengold := morgaengold SubStr(UserDetails.details.stats.total_paid_up_front_gold, epos)
-		ChampDetails := ChampDetails "M" Chr(244) "rg" Chr(230) "n Gold Collected: " morgaengold "`n`n"
-	}
-	if (UserDetails.details.stats.torogar_lifetime_zealot_stacks) {
-		torostacks := UserDetails.details.stats.torogar_lifetime_zealot_stacks
-		ChampDetails := ChampDetails "Torogar Zealot Stacks: " torostacks "`n`n"
-	}
-	
-	if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
-		ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow "`n`n"
-	}
-	if (UserDetails.details.stats.dhani_monsters_painted) {
-		dhanipaint := UserDetails.details.stats.dhani_monsters_painted
-		ChampDetails := ChampDetails "D'hani Paints: " dhanipaint "`n`n"
-	}
-}
-
-CheckPatronProgress() {
-	if !(MirtVariants == "Locked") {
-		if (MirtFPCurrency = "5000") {
-			Gui, Font, cGreen
-			GuiControl, Font, MirtFPCurrency
-		}
-		else {
-			Gui, Font, cRed
-			GuiControl, Font, MirtFPCurrency
-		}
-		if (MirtChallenges = "10") {
-			Gui, Font, cGreen
-			GuiControl, Font, MirtChallenges
+		;
+		ChampDetails := ""
+		if (UserDetails.details.stats.black_viper_total_gems) {
+			ChampDetails := ChampDetails "Black Viper Red Gems: " UserDetails.details.stats.black_viper_total_gems "`n`n"
 		}
 		if (UserDetails.details.stats.total_paid_up_front_gold) {
 			morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
@@ -1925,7 +1891,11 @@ CheckPatronProgress() {
 		}
 
 		if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
-			ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
+			ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow "`n`n"
+		}
+		if (UserDetails.details.stats.dhani_monsters_painted) {
+			dhanipaint := UserDetails.details.stats.dhani_monsters_painted
+			ChampDetails := ChampDetails "D'hani Paints: " dhanipaint "`n`n"
 		}
 	}
 
@@ -1943,917 +1913,947 @@ CheckPatronProgress() {
 				Gui, Font, cGreen
 				GuiControl, Font, MirtChallenges
 			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, MirtChallenges
+			if (UserDetails.details.stats.total_paid_up_front_gold) {
+				morgaengold := SubStr(UserDetails.details.stats.total_paid_up_front_gold, 1, 4)
+				epos := InStr(UserDetails.details.stats.total_paid_up_front_gold, "E")
+				morgaengold := morgaengold SubStr(UserDetails.details.stats.total_paid_up_front_gold, epos)
+				ChampDetails := ChampDetails "M" Chr(244) "rg" Chr(230) "n Gold Collected: " morgaengold "`n`n"
 			}
-			if (MirtCompleted = MirtVariantTotal) {
-				Gui, Font, cGreen
-				GuiControl, Font, MirtVariants
+			if (UserDetails.details.stats.torogar_lifetime_zealot_stacks) {
+				torostacks := UserDetails.details.stats.torogar_lifetime_zealot_stacks
+				ChampDetails := ChampDetails "Torogar Zealot Stacks: " torostacks "`n`n"
 			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, MirtVariants
-			}
-		}
-		if !(VajraVariants == "Locked") {
-			if (VajraFPCurrency = "5000") {
-				Gui, Font, cGreen
-				GuiControl, Font, VajraFPCurrency
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, VajraFPCurrency
-			}
-			if (VajraChallenges = "10") {
-				Gui, Font, cGreen
-				GuiControl, Font, VajraChallenges
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, VajraChallenges
-			}
-			if (VajraCompleted = VajraVariantTotal) {
-				Gui, Font, cGreen
-				GuiControl, Font, VajraVariants
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, VajraVariants
-			}
-		}
-		if !(StrahdVariants == "Locked") {
-			if (StrahdChallenges = "10") {
-				Gui, Font, cGreen
-				GuiControl, Font, StrahdChallenges
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, StrahdChallenges
-			}
-			if (StrahdFPCurrency = "5000") {
-				Gui, Font, cGreen
-				GuiControl, Font, StrahdFPCurrency
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, StrahdFPCurrency
-			}
-			if (StrahdCompleted = StrahdVariantTotal) {
-				Gui, Font, cGreen
-				GuiControl, Font, StrahdVariants
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, StrahdVariants
-			}
-		}
-		if !(ZarielVariants == "Locked") {
-			if (ZarielChallenges = "10") {
-				Gui, Font, cGreen
-				GuiControl, Font, ZarielChallenges
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, ZarielChallenges
-			}
-			if (ZarielFPCurrency = "5000") {
-				Gui, Font, cGreen
-				GuiControl, Font, ZarielFPCurrency
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, ZarielFPCurrency
-			}
-			if (ZarielCompleted = ZarielVariantTotal) {
-				Gui, Font, cGreen
-				GuiControl, Font, ZarielVariants
-			}
-			else {
-				Gui, Font, cRed
-				GuiControl, Font, ZarielVariants
-			}
-		}
-	}
 
-	CheckAchievements() {
-		if (UserDetails.details.stats.asharra_bonds < 3) {
-			if !(UserDetails.details.stats.asharra_bond_human)
-				ashexotic := " human"
-			if !(UserDetails.details.stats.asharra_bond_elf)
-				ashelf := " elf"
-			if !(UserDetails.details.stats.asharra_bond_exotic)
-				ashhuman := " exotic"
-			todoasharra := "`nAsharra needs:" ashhuman ashelf ashexotic
-		}
-		if !((UserDetails.details.stats.area_175_gromma_spec_a + UserDetails.details.stats.area_175_gromma_spec_b + UserDetails.details.stats.area_175_gromma_spec_c) == 3) {
-			if !(UserDetails.details.stats.area_175_gromma_spec_a == 1)
-				groma := " mountain"
-			if !(UserDetails.details.stats.area_175_gromma_spec_b == 1)
-				gromb := " arctic"
-			if !(UserDetails.details.stats.area_175_gromma_spec_c == 1)
-				gromc := " swamp"
-			todogromma := "`nGromma needs:" groma gromb gromc
-		}
-		if !((UserDetails.details.stats.krond_cantrip_1_kills > 99) && (UserDetails.details.stats.krond_cantrip_2_kills > 99) && (UserDetails.details.stats.krond_cantrip_3_kills > 99)) {
-			if !(UserDetails.details.stats.krond_cantrip_1_kills > 99)
-				krond1 := " thunderclap"
-			if !(UserDetails.details.stats.krond_cantrip_2_kills > 99)
-				krond2 := " shockinggrasp"
-			if !(UserDetails.details.stats.krond_cantrip_3_kills > 99)
-				krond3 := " firebolt"
-			todokrond := "`nKrond needs:" krond1 krond2 krond3
-		}
-		if (UserDetails.details.stats.regis_specializations < 6) {
-			if !(UserDetails.details.stats.regis_back_magic == 1)
-				regis1 := " <-magic"
-			if !(UserDetails.details.stats.regis_back_melee == 1)
-				regis2 := " <-melee"
-			if !(UserDetails.details.stats.regis_back_ranged == 1)
-				regis3 := " <-ranged"
-			if !(UserDetails.details.stats.regis_front_magic == 1)
-				regis4 := " magic->"
-			if !(UserDetails.details.stats.regis_front_melee == 1)
-				regis5 := " melee->"
-			if !(UserDetails.details.stats.regis_front_ranged == 1)
-				regis6 := " ranged->"
-			todoregis := "`nRegis needs:" regis1 regis2 regis3 regis4 regis5 regis6
-		}
-		if (UserDetails.details.stats.krydle_return_to_baldurs_gate < 3) {
-			if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_delina == 1)
-				krydle1 := " delina"
-			if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_krydle == 1)
-				krydle2 := " krydle"
-			if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_minsc == 1)
-				krydle3 := " minsc"
-			todokrydle := "`nKrydle needs:" krydle1 krydle2 krydle3
-		}
-		AchievementInfo := AchievementInfo todoasharra todogromma todokrond todoregis todokrydle
-	}
-
-	CheckBlessings() {
-		epiccount := ""
-		epicvalue := Round((1.02 ** EpicGearCount), 2)
-		if (UserDetails.details.reset_upgrade_levels.44) { ;Helm-Slow and Steady (X Epics)
-			epiccount := "Slow and Steady:`nx" epicvalue " damage (" EpicGearCount " epics)`n`n"
-		}
-		veterancount := ""
-		veteranvalue := Round(1 + (0.1 * UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22), 2)
-		if (UserDetails.details.reset_upgrade_levels.56) { ;Tiamat-Veterans of Avernus (X Adventures)
-			veterancount := "Veterans of Avernus:`nx" veteranvalue " damage (" UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22 " adventures)`n`n"
-		}
-		BlessingInfo := "Blessing Details`n`n" epiccount veterancount
-		if (BlessingInfo == "Blessing Details`n`n") {
-			BlessingInfo := "Blessing Details: N/A"
-		}
-	}
-
-	ServerCall(callname, parameters) {
-		URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
-		WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		WR.SetTimeouts("10000", "10000", "10000", "10000")
-		Try {
-			WR.Open("POST", URLtoCall, false)
-			WR.SetRequestHeader("Content-Type","application/x-www-form-urlencoded")
-			WR.Send()
-			WR.WaitForResponse(-1)
-			data := WR.ResponseText
-		}
-		UpdateLogTime()
-		FileAppend, (%CurrentTime%) Server request: "%callname%"`n, %OutputLogFile%
-		FileRead, OutputText, %OutputLogFile%
-		oMyGUI.Update()
-		return data
-	}
-
-	LaunchGame() {
-		if (Not WinExist("ahk_exe IdleDragons.exe")) {
-			Run, %GameClient%
-			SB_SetText("Game client starting...")
-			WinWait, "ahk_exe IdleDragons.exe"
-			SB_SetText("Game client has started!")
-		}
-		else {
-			if !FirstRun {
-				SB_SetText("Game client is already running!")
+			if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
+				ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
 			}
-		}
-		return
-	}
-
-	Get_Journal:
-		{
-			if !UserID {
-				MsgBox % "Need User ID & Hash."
-				FirstRun()
-			}
-			if (InstanceID = 0) {
-				MsgBox, 4, , No Instance ID detected. Check server for user details?
-					IfMsgBox, Yes
-				{
-					GetUserDetails()
-				}
-				else
-					return
-			}
-			journalparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&page="
-			InputBox, pagecount, Journal, % "How many pages of Journal to retreive?`n`n(This will overwrite any previous download.)", , 350, 180
-			if ErrorLevel
-				return
-			pagenum := 1
-			FileDelete, %JournalFile%
-			while !(pagenum > pagecount) {
-				SB_SetText("Journal pages remaining to download: " ((pagecount - pagenum) + 1))
-				rawresults := ServerCall("getPlayHistory", journalparams pagenum)
-				FileAppend, %rawresults%`n, %JournalFile%
-				pagenum += 1
-				sleep 1000
-			}
-			UpdateLogTime()
-			FileAppend, % "(" CurrentTime ") Journal pages downloaded: " (pagenum - 1) "`n", %OutputLogFile%
-			FileRead, OutputText, %OutputLogFile%
-			oMyGUI.Update()
-			SB_SetText("Journal download completed.")
-			return
 		}
 
-	Open_Ticket:
-		{
-			Run, % "https://help.idlechampions.com/?page=help&display=open_tickets&user_id=" UserID "&hash=" UserHash
-			return
-		}
-
-	Discord_Clicked:
-		{
-			Run, % "https://discord.com/invite/N3U8xtB"
-			return
-		}
-
-		Update_Dictionary() {
-			if !(DictionaryVersion == CurrentDictionary) {
-				FileDelete, %LocalDictionary%
-				UrlDownloadToFile, %DictionaryFile%, %LocalDictionary%
-				Reload
-				return
-			}
-			else {
-				MsgBox % "Dictionary file up to date."
-			}
-			return
-		}
-
-	List_ChampIDs:
-		{
-			champnamelen := 0
-			champname := ""
-			id := 1
-			champidlist := ""
-			while (id < 101) {
-				champname := ChampFromID(id)
-				StringLen, champnamelen, champname
-				while (champnamelen < 16)
-				{
-					champname := champname " "
-					champnamelen += 1
-				}
-				if (!mod(id, 4))
-					champidlist := champidlist id ": " champname "`n"
-				else
-					champidlist := champidlist id ": " champname "`t"
-				id += 1
-			}
-			;MsgBox, , Champ ID List, % champidlist
-			CustomMsgBox("Champion IDs and Names",champidlist,"Courier New","Blue")
-			return	
-		}
-
-		CustomMsgBox(Title,Message,Font="",FontOptions="",WindowColor="")
-		{
-			Gui,66:Destroy
-			Gui,66:Color,%WindowColor%
-
-			Gui,66:Font,%FontOptions%,%Font%
-			Gui,66:Add,Text,,%Message%
-			Gui,66:Font
-
-			GuiControlGet,Text,66:Pos,Static1
-
-			Gui,66:Add,Button,% "Default y+10 w75 g66OK xp+" (TextW / 2) - 38 ,OK
-
-			Gui,66:-MinimizeBox
-			Gui,66:-MaximizeBox
-
-			SoundPlay,*-1
-			Gui,66:Show,,%Title%
-
-			Gui,66:+LastFound
-			WinWaitClose
-			Gui,66:Destroy
-			return
-
-			66OK:
-				Gui,66:Destroy
-			return
-		}
-
-		ViewICSettings() {
-			rawicsettings := ""
-			FileRead, rawicsettings, %ICSettingsFile%
-			CurrentICSettings := JSON.parse(rawicsettings)
-			MsgBox, , localSettings.json file, % rawicsettings
-		}
-
-		SetUIScale() {
-			FileRead, rawicsettings, %ICSettingsFile%
-			CurrentICSettings := JSON.parse(rawicsettings)
-			newuiscale := 1
-			InputBox, newuiscale, UI Scale, Please enter the desired UI Scale.`n(0.5 - 1.25), , 250, 150, , , , , % CurrentICSettings.UIScale
-			if ErrorLevel
-			return
-		while ((newuiscale < 0.5) || (newuiscale > 1.25)) {
-			InputBox, newuiscale, UI Scale, Please enter a valid UI Scale.`n(0.5 - 1.25), , 250, 150, , , , , % CurrentICSettings.UIScale
-			if ErrorLevel
-			return
-	}
-	if (InStr(newuiscale, ".") == 1) {
-		newuiscale := "0" newuiscale
-	}
-	newicsettings := ""
-	for k, v in CurrentICSettings {
-		if (k == "UIScale") {
-			newicsettings := newicsettings """" k """:" newuiscale ","
-		}
-		else {
-			newicsettings := newicsettings """" k """:" v ","
-		}
-	}
-	StringTrimRight, newicsettings, newicsettings, 1
-	newicsettings := "{" newicsettings "}"
-	MsgBox % newicsettings
-	FileDelete, %ICSettingsFile%
-	FileAppend, %newicsettings%, %ICSettingsFile%
-	UpdateLogTime()
-	FileAppend, % "(" CurrentTime ") UI Scale changed to " newuiscale "`n", %OutputLogFile%
-	FileRead, OutputText, %OutputLogFile%
-	oMyGUI.Update()
-	SB_SetText("UI Scale changed to " newuiscale)
-}
-
-SetFramerate() {
-	FileRead, rawicsettings, %ICSettingsFile%
-	CurrentICSettings := JSON.parse(rawicsettings)
-	newframerate := 60
-	InputBox, newframerate, Framerate, Please enter the desired Framerate.`n(1 - 240), , 250, 150, , , , , % CurrentICSettings.TargetFramerate
-	if ErrorLevel
-		return
-	while ((newframerate < 1) || (newframerate > 240)) {
-		InputBox, newframerate, Framerate, Please enter a valid Framerate.`n(1 - 240), , 250, 150, , , , , % CurrentICSettings.TargetFramerate
-		if ErrorLevel
-			return
-	}
-	newicsettings := ""
-	for k, v in CurrentICSettings {
-		if (k == "TargetFramerate") {
-			newicsettings := newicsettings """" k """:" newframerate ","
-		}
-		else {
-			newicsettings := newicsettings """" k """:" v ","
-		}
-	}
-	StringTrimRight, newicsettings, newicsettings, 1
-	newicsettings := "{" newicsettings "}"
-	MsgBox % newicsettings
-	FileDelete, %ICSettingsFile%
-	FileAppend, %newicsettings%, %ICSettingsFile%
-	UpdateLogTime()
-	FileAppend, % "(" CurrentTime ") Framerate changed to " newframerate "`n", %OutputLogFile%
-	FileRead, OutputText, %OutputLogFile%
-	oMyGUI.Update()
-	SB_SetText("Framerate changed to " newframerate)
-}
-
-SetParticles() {
-	FileRead, rawicsettings, %ICSettingsFile%
-	CurrentICSettings := JSON.parse(rawicsettings)
-	newparticles := 100
-	InputBox, newparticles, Particles, Please enter the desired Percentage.`n(0 - 100), , 250, 150, , , , , % CurrentICSettings.PercentOfParticlesSpawned
-	if ErrorLevel
-		return
-	while ((newparticles < 0) || (newparticles > 100)) {
-		InputBox, newparticles, Particles, Please enter a valid Percentage.`n(0 - 100), , 250, 150, , , , , % CurrentICSettings.PercentOfParticlesSpawned
-		if ErrorLevel
-			return
-	}
-	newicsettings := ""
-	for k, v in CurrentICSettings {
-		if (k == "PercentOfParticlesSpawned") {
-			newicsettings := newicsettings """" k """:" newparticles ","
-		}
-		else {
-			newicsettings := newicsettings """" k """:" v ","
-		}
-	}
-	StringTrimRight, newicsettings, newicsettings, 1
-	newicsettings := "{" newicsettings "}"
-	MsgBox % newicsettings
-	FileDelete, %ICSettingsFile%
-	FileAppend, %newicsettings%, %ICSettingsFile%
-	UpdateLogTime()
-	FileAppend, % "(" CurrentTime ") Paticles changed to " newparticles "`n", %OutputLogFile%
-	FileRead, OutputText, %OutputLogFile%
-	oMyGUI.Update()
-	SB_SetText("Particles changed to " newparticles)
-}
-
-SimulateBriv(i) {
-	SB_SetText("Calculating...")
-	;Original version by Gladio Stricto - pastebin.com/Rd8wWSVC
-	;Copied from updated version - github.com/Deatho0ne
-	chance := ((BrivSlot4 / 100) + 1) * 0.25
-	trueChance := chance
-	skipLevels := 1
-	if (chance > 2) {
-		while chance >= 1 {
-			skipLevels++
-			chance /= 2
-		}
-		;trueChance := ((chance - Floor(chance)) / 2)
-	} else {
-		skipLevels := Floor(chance + 1)
-		If (skipLevels > 1) {
-			trueChance := 0.5 + ((chance - Floor(chance)) / 2)
-		}
-	}
-	totalLevels := 0
-	totalSkips := 0
-	Loop % i {
-		level := 0.0
-		skips := 0.0
-		Loop {
-			Random, x, 0.0, 1.0
-			If (x < trueChance) {
-				level += skipLevels
-				skips++
-			}
-			level++
-		}
-		Until level > BrivZone
-		totalLevels += level
-		totalSkips += skips
-	}
-	;chance := Round(chance, 2)
-	if skipLevels < 3
-		trueChance := Round(trueChance * 100, 2)
-	else
-		trueChance := Round(chance * 100, 2)
-	avgSkips := Round(totalSkips / i, 2)
-	avgSkipped := Round(avgSkips * skipLevels, 2)
-	avgZones := Round(totalLevels / i, 2)
-	avgSkipRate := Round((avgSkipped / avgZones) * 100, 2)
-	avgStacks := Round((1.032**avgSkips) * 48, 2)
-	multiplier := 0.1346894362, additve := 41.86396406
-	roughTime := Round(((multiplier * avgStacks) + additve), 2)
-	message = With Briv skip %skipLevels% until zone %BrivZone%`n(%trueChance%`% chance to skip %skipLevels% zones)`n`n%i% simulations produced an average:`n%avgSkips% skips (%avgSkipped% zones skipped)`n%avgZones% end zone`n%avgSkipRate%`% true skip rate`n%avgStacks% required stacks with`n%roughTime% time in secs to build said stacks very rough guess
-	SB_SetText("Calculation has completed.")
-	Return message
-}
-
-KlehoImage()
-{
-	campaignid := 0
-	currenttimegate := ""
-	kleholink := "https://idle.kleho.ru/assets/fb/"
-	for k, v in UserDetails.defines.campaign_defines {
-		campaignid := v.id
-	}
-	if (campaignid == 17) {
-		for k, v in UserDetails.details.game_instances {
-			if (v.game_instance_id == ActiveInstance) {
-				currenttimegate := JSON.stringify(v.defines.adventure_defines[1].requirements[1].champion_id)
-			}
-		}
-		campaignid := KlehoFromID(currenttimegate)
-	}
-	else if !((campaignid < 3) or (campaignid == 15) or (campaignid > 21)) {
-		for k, v in UserDetails.details.game_instances {
-			if (v.game_instance_id == ActiveInstance) {
-				campaignid := campaignid "a" JSON.stringify(v.defines.adventure_defines[1].requirements[1].adventure_id)
-			}
-		}
-	}
-	kleholink := kleholink campaignid "/"
-	for k, v in UserDetails.details.game_instances {
-		if (v.game_instance_id == ActiveInstance) {
-			for kk, vv in v.formation {
-				if (vv > 0) {
-					kleholink := kleholink vv "_"
+		CheckPatronProgress() {
+			if !(MirtVariants == "Locked") {
+				if (MirtFPCurrency = "5000") {
+					Gui, Font, cGreen
+					GuiControl, Font, MirtFPCurrency
 				}
 				else {
-					kleholink := kleholink "_"
+					Gui, Font, cRed
+					GuiControl, Font, MirtFPCurrency
+				}
+				if (MirtChallenges = "10") {
+					Gui, Font, cGreen
+					GuiControl, Font, MirtChallenges
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, MirtChallenges
+				}
+				if (MirtCompleted = MirtVariantTotal) {
+					Gui, Font, cGreen
+					GuiControl, Font, MirtVariants
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, MirtVariants
+				}
+			}
+			if !(VajraVariants == "Locked") {
+				if (VajraFPCurrency = "5000") {
+					Gui, Font, cGreen
+					GuiControl, Font, VajraFPCurrency
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, VajraFPCurrency
+				}
+				if (VajraChallenges = "10") {
+					Gui, Font, cGreen
+					GuiControl, Font, VajraChallenges
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, VajraChallenges
+				}
+				if (VajraCompleted = VajraVariantTotal) {
+					Gui, Font, cGreen
+					GuiControl, Font, VajraVariants
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, VajraVariants
+				}
+			}
+			if !(StrahdVariants == "Locked") {
+				if (StrahdChallenges = "10") {
+					Gui, Font, cGreen
+					GuiControl, Font, StrahdChallenges
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, StrahdChallenges
+				}
+				if (StrahdFPCurrency = "5000") {
+					Gui, Font, cGreen
+					GuiControl, Font, StrahdFPCurrency
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, StrahdFPCurrency
+				}
+				if (StrahdCompleted = StrahdVariantTotal) {
+					Gui, Font, cGreen
+					GuiControl, Font, StrahdVariants
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, StrahdVariants
+				}
+			}
+			if !(ZarielVariants == "Locked") {
+				if (ZarielChallenges = "10") {
+					Gui, Font, cGreen
+					GuiControl, Font, ZarielChallenges
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, ZarielChallenges
+				}
+				if (ZarielFPCurrency = "5000") {
+					Gui, Font, cGreen
+					GuiControl, Font, ZarielFPCurrency
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, ZarielFPCurrency
+				}
+				if (ZarielCompleted = ZarielVariantTotal) {
+					Gui, Font, cGreen
+					GuiControl, Font, ZarielVariants
+				}
+				else {
+					Gui, Font, cRed
+					GuiControl, Font, ZarielVariants
 				}
 			}
 		}
+
+		CheckAchievements() {
+			if (UserDetails.details.stats.asharra_bonds < 3) {
+				if !(UserDetails.details.stats.asharra_bond_human)
+					ashexotic := " human"
+				if !(UserDetails.details.stats.asharra_bond_elf)
+					ashelf := " elf"
+				if !(UserDetails.details.stats.asharra_bond_exotic)
+					ashhuman := " exotic"
+				todoasharra := "`nAsharra needs:" ashhuman ashelf ashexotic
+			}
+			if !((UserDetails.details.stats.area_175_gromma_spec_a + UserDetails.details.stats.area_175_gromma_spec_b + UserDetails.details.stats.area_175_gromma_spec_c) == 3) {
+				if !(UserDetails.details.stats.area_175_gromma_spec_a == 1)
+					groma := " mountain"
+				if !(UserDetails.details.stats.area_175_gromma_spec_b == 1)
+					gromb := " arctic"
+				if !(UserDetails.details.stats.area_175_gromma_spec_c == 1)
+					gromc := " swamp"
+				todogromma := "`nGromma needs:" groma gromb gromc
+			}
+			if !((UserDetails.details.stats.krond_cantrip_1_kills > 99) && (UserDetails.details.stats.krond_cantrip_2_kills > 99) && (UserDetails.details.stats.krond_cantrip_3_kills > 99)) {
+				if !(UserDetails.details.stats.krond_cantrip_1_kills > 99)
+					krond1 := " thunderclap"
+				if !(UserDetails.details.stats.krond_cantrip_2_kills > 99)
+					krond2 := " shockinggrasp"
+				if !(UserDetails.details.stats.krond_cantrip_3_kills > 99)
+					krond3 := " firebolt"
+				todokrond := "`nKrond needs:" krond1 krond2 krond3
+			}
+			if (UserDetails.details.stats.regis_specializations < 6) {
+				if !(UserDetails.details.stats.regis_back_magic == 1)
+					regis1 := " <-magic"
+				if !(UserDetails.details.stats.regis_back_melee == 1)
+					regis2 := " <-melee"
+				if !(UserDetails.details.stats.regis_back_ranged == 1)
+					regis3 := " <-ranged"
+				if !(UserDetails.details.stats.regis_front_magic == 1)
+					regis4 := " magic->"
+				if !(UserDetails.details.stats.regis_front_melee == 1)
+					regis5 := " melee->"
+				if !(UserDetails.details.stats.regis_front_ranged == 1)
+					regis6 := " ranged->"
+				todoregis := "`nRegis needs:" regis1 regis2 regis3 regis4 regis5 regis6
+			}
+			if (UserDetails.details.stats.krydle_return_to_baldurs_gate < 3) {
+				if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_delina == 1)
+					krydle1 := " delina"
+				if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_krydle == 1)
+					krydle2 := " krydle"
+				if !(UserDetails.details.stats.krydle_return_to_baldurs_gate_minsc == 1)
+					krydle3 := " minsc"
+				todokrydle := "`nKrydle needs:" krydle1 krydle2 krydle3
+			}
+			AchievementInfo := AchievementInfo todoasharra todogromma todokrond todoregis todokrydle
+		}
+
+		CheckBlessings() {
+			epiccount := ""
+			epicvalue := Round((1.02 ** EpicGearCount), 2)
+			if (UserDetails.details.reset_upgrade_levels.44) { ;Helm-Slow and Steady (X Epics)
+				epiccount := "Slow and Steady:`nx" epicvalue " damage (" EpicGearCount " epics)`n`n"
+			}
+			veterancount := ""
+			veteranvalue := Round(1 + (0.1 * UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22), 2)
+			if (UserDetails.details.reset_upgrade_levels.56) { ;Tiamat-Veterans of Avernus (X Adventures)
+				veterancount := "Veterans of Avernus:`nx" veteranvalue " damage (" UserDetails.details.stats.completed_adventures_variants_and_patron_variants_c22 " adventures)`n`n"
+			}
+			BlessingInfo := "Blessing Details`n`n" epiccount veterancount
+			if (BlessingInfo == "Blessing Details`n`n") {
+				BlessingInfo := "Blessing Details: N/A"
+			}
+		}
+
+		ServerCall(callname, parameters) {
+			URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
+			WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+			WR.SetTimeouts("10000", "10000", "10000", "10000")
+			Try {
+				WR.Open("POST", URLtoCall, false)
+				WR.SetRequestHeader("Content-Type","application/x-www-form-urlencoded")
+				WR.Send()
+				WR.WaitForResponse(-1)
+				data := WR.ResponseText
+			}
+			UpdateLogTime()
+			FileAppend, (%CurrentTime%) Server request: "%callname%"`n, %OutputLogFile%
+			FileRead, OutputText, %OutputLogFile%
+			oMyGUI.Update()
+			return data
+		}
+
+		LaunchGame() {
+			if (Not WinExist("ahk_exe IdleDragons.exe")) {
+				Run, %GameClient%
+				SB_SetText("Game client starting...")
+				WinWait, "ahk_exe IdleDragons.exe"
+				SB_SetText("Game client has started!")
+			}
+			else {
+				if !FirstRun {
+					SB_SetText("Game client is already running!")
+				}
+			}
+			return
+		}
+
+		Get_Journal:
+			{
+				if !UserID {
+					MsgBox % "Need User ID & Hash."
+					FirstRun()
+				}
+				if (InstanceID = 0) {
+					MsgBox, 4, , No Instance ID detected. Check server for user details?
+						IfMsgBox, Yes
+					{
+						GetUserDetails()
+					}
+					else
+						return
+				}
+				journalparams := "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&page="
+				InputBox, pagecount, Journal, % "How many pages of Journal to retreive?`n`n(This will overwrite any previous download.)", , 350, 180
+				if ErrorLevel
+					return
+				pagenum := 1
+				FileDelete, %JournalFile%
+				while !(pagenum > pagecount) {
+					SB_SetText("Journal pages remaining to download: " ((pagecount - pagenum) + 1))
+					rawresults := ServerCall("getPlayHistory", journalparams pagenum)
+					FileAppend, %rawresults%`n, %JournalFile%
+					pagenum += 1
+					sleep 1000
+				}
+				UpdateLogTime()
+				FileAppend, % "(" CurrentTime ") Journal pages downloaded: " (pagenum - 1) "`n", %OutputLogFile%
+				FileRead, OutputText, %OutputLogFile%
+				oMyGUI.Update()
+				SB_SetText("Journal download completed.")
+				return
+			}
+
+		Open_Ticket:
+			{
+				Run, % "https://help.idlechampions.com/?page=help&display=open_tickets&user_id=" UserID "&hash=" UserHash
+				return
+			}
+
+		Discord_Clicked:
+			{
+				Run, % "https://discord.com/invite/N3U8xtB"
+				return
+			}
+
+			Update_Dictionary() {
+				if !(DictionaryVersion == CurrentDictionary) {
+					FileDelete, %LocalDictionary%
+					UrlDownloadToFile, %DictionaryFile%, %LocalDictionary%
+					Reload
+					return
+				}
+				else {
+					MsgBox % "Dictionary file up to date."
+				}
+				return
+			}
+
+		List_ChampIDs:
+			{
+				champnamelen := 0
+				champname := ""
+				id := 1
+				champidlist := ""
+				while (id < 101) {
+					champname := ChampFromID(id)
+					StringLen, champnamelen, champname
+					while (champnamelen < 16)
+					{
+						champname := champname " "
+						champnamelen += 1
+					}
+					if (!mod(id, 4))
+						champidlist := champidlist id ": " champname "`n"
+					else
+						champidlist := champidlist id ": " champname "`t"
+					id += 1
+				}
+				;MsgBox, , Champ ID List, % champidlist
+				CustomMsgBox("Champion IDs and Names",champidlist,"Courier New","Blue")
+				return	
+			}
+
+			CustomMsgBox(Title,Message,Font="",FontOptions="",WindowColor="")
+			{
+				Gui,66:Destroy
+				Gui,66:Color,%WindowColor%
+
+				Gui,66:Font,%FontOptions%,%Font%
+				Gui,66:Add,Text,,%Message%
+				Gui,66:Font
+
+				GuiControlGet,Text,66:Pos,Static1
+
+				Gui,66:Add,Button,% "Default y+10 w75 g66OK xp+" (TextW / 2) - 38 ,OK
+
+				Gui,66:-MinimizeBox
+				Gui,66:-MaximizeBox
+
+				SoundPlay,*-1
+				Gui,66:Show,,%Title%
+
+				Gui,66:+LastFound
+				WinWaitClose
+				Gui,66:Destroy
+				return
+
+				66OK:
+					Gui,66:Destroy
+				return
+			}
+
+			ViewICSettings() {
+				rawicsettings := ""
+				FileRead, rawicsettings, %ICSettingsFile%
+				CurrentICSettings := JSON.parse(rawicsettings)
+				MsgBox, , localSettings.json file, % rawicsettings
+			}
+
+			SetUIScale() {
+				FileRead, rawicsettings, %ICSettingsFile%
+				CurrentICSettings := JSON.parse(rawicsettings)
+				newuiscale := 1
+				InputBox, newuiscale, UI Scale, Please enter the desired UI Scale.`n(0.5 - 1.25), , 250, 150, , , , , % CurrentICSettings.UIScale
+				if ErrorLevel
+				return
+			while ((newuiscale < 0.5) || (newuiscale > 1.25)) {
+				InputBox, newuiscale, UI Scale, Please enter a valid UI Scale.`n(0.5 - 1.25), , 250, 150, , , , , % CurrentICSettings.UIScale
+				if ErrorLevel
+				return
+		}
+		if (InStr(newuiscale, ".") == 1) {
+			newuiscale := "0" newuiscale
+		}
+		newicsettings := ""
+		for k, v in CurrentICSettings {
+			if (k == "UIScale") {
+				newicsettings := newicsettings """" k """:" newuiscale ","
+			}
+			else {
+				newicsettings := newicsettings """" k """:" v ","
+			}
+		}
+		StringTrimRight, newicsettings, newicsettings, 1
+		newicsettings := "{" newicsettings "}"
+		MsgBox % newicsettings
+		FileDelete, %ICSettingsFile%
+		FileAppend, %newicsettings%, %ICSettingsFile%
+		UpdateLogTime()
+		FileAppend, % "(" CurrentTime ") UI Scale changed to " newuiscale "`n", %OutputLogFile%
+		FileRead, OutputText, %OutputLogFile%
+		oMyGUI.Update()
+		SB_SetText("UI Scale changed to " newuiscale)
 	}
-	StringTrimRight, kleholink, kleholink, 1
-	kleholink := kleholink ".png"
-	InputBox, dummyvar, Kleho Image, % "Copy link for formation sharing.`n`nSave image to the following file?`nformationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png", , , , , , , , % kleholink
-	if ErrorLevel {
+
+	SetFramerate() {
+		FileRead, rawicsettings, %ICSettingsFile%
+		CurrentICSettings := JSON.parse(rawicsettings)
+		newframerate := 60
+		InputBox, newframerate, Framerate, Please enter the desired Framerate.`n(1 - 240), , 250, 150, , , , , % CurrentICSettings.TargetFramerate
+		if ErrorLevel
+			return
+		while ((newframerate < 1) || (newframerate > 240)) {
+			InputBox, newframerate, Framerate, Please enter a valid Framerate.`n(1 - 240), , 250, 150, , , , , % CurrentICSettings.TargetFramerate
+			if ErrorLevel
+				return
+		}
+		newicsettings := ""
+		for k, v in CurrentICSettings {
+			if (k == "TargetFramerate") {
+				newicsettings := newicsettings """" k """:" newframerate ","
+			}
+			else {
+				newicsettings := newicsettings """" k """:" v ","
+			}
+		}
+		StringTrimRight, newicsettings, newicsettings, 1
+		newicsettings := "{" newicsettings "}"
+		MsgBox % newicsettings
+		FileDelete, %ICSettingsFile%
+		FileAppend, %newicsettings%, %ICSettingsFile%
+		UpdateLogTime()
+		FileAppend, % "(" CurrentTime ") Framerate changed to " newframerate "`n", %OutputLogFile%
+		FileRead, OutputText, %OutputLogFile%
+		oMyGUI.Update()
+		SB_SetText("Framerate changed to " newframerate)
+	}
+
+	SetParticles() {
+		FileRead, rawicsettings, %ICSettingsFile%
+		CurrentICSettings := JSON.parse(rawicsettings)
+		newparticles := 100
+		InputBox, newparticles, Particles, Please enter the desired Percentage.`n(0 - 100), , 250, 150, , , , , % CurrentICSettings.PercentOfParticlesSpawned
+		if ErrorLevel
+			return
+		while ((newparticles < 0) || (newparticles > 100)) {
+			InputBox, newparticles, Particles, Please enter a valid Percentage.`n(0 - 100), , 250, 150, , , , , % CurrentICSettings.PercentOfParticlesSpawned
+			if ErrorLevel
+				return
+		}
+		newicsettings := ""
+		for k, v in CurrentICSettings {
+			if (k == "PercentOfParticlesSpawned") {
+				newicsettings := newicsettings """" k """:" newparticles ","
+			}
+			else {
+				newicsettings := newicsettings """" k """:" v ","
+			}
+		}
+		StringTrimRight, newicsettings, newicsettings, 1
+		newicsettings := "{" newicsettings "}"
+		MsgBox % newicsettings
+		FileDelete, %ICSettingsFile%
+		FileAppend, %newicsettings%, %ICSettingsFile%
+		UpdateLogTime()
+		FileAppend, % "(" CurrentTime ") Paticles changed to " newparticles "`n", %OutputLogFile%
+		FileRead, OutputText, %OutputLogFile%
+		oMyGUI.Update()
+		SB_SetText("Particles changed to " newparticles)
+	}
+
+	SimulateBriv(i) {
+		SB_SetText("Calculating...")
+		;Original version by Gladio Stricto - pastebin.com/Rd8wWSVC
+		;Copied from updated version - github.com/Deatho0ne
+		chance := ((BrivSlot4 / 100) + 1) * 0.25
+		trueChance := chance
+		skipLevels := 1
+		if (chance > 2) {
+			while chance >= 1 {
+				skipLevels++
+				chance /= 2
+			}
+			;trueChance := ((chance - Floor(chance)) / 2)
+		} else {
+			skipLevels := Floor(chance + 1)
+			If (skipLevels > 1) {
+				trueChance := 0.5 + ((chance - Floor(chance)) / 2)
+			}
+		}
+		totalLevels := 0
+		totalSkips := 0
+		Loop % i {
+			level := 0.0
+			skips := 0.0
+			Loop {
+				Random, x, 0.0, 1.0
+				If (x < trueChance) {
+					level += skipLevels
+					skips++
+				}
+				level++
+			}
+			Until level > BrivZone
+			totalLevels += level
+			totalSkips += skips
+		}
+		;chance := Round(chance, 2)
+		if skipLevels < 3
+			trueChance := Round(trueChance * 100, 2)
+		else
+			trueChance := Round(chance * 100, 2)
+		avgSkips := Round(totalSkips / i, 2)
+		avgSkipped := Round(avgSkips * skipLevels, 2)
+		avgZones := Round(totalLevels / i, 2)
+		avgSkipRate := Round((avgSkipped / avgZones) * 100, 2)
+		avgStacks := Round((1.032**avgSkips) * 48, 2)
+		multiplier := 0.1346894362, additve := 41.86396406
+		roughTime := Round(((multiplier * avgStacks) + additve), 2)
+		message = With Briv skip %skipLevels% until zone %BrivZone%`n(%trueChance%`% chance to skip %skipLevels% zones)`n`n%i% simulations produced an average:`n%avgSkips% skips (%avgSkipped% zones skipped)`n%avgZones% end zone`n%avgSkipRate%`% true skip rate`n%avgStacks% required stacks with`n%roughTime% time in secs to build said stacks very rough guess
+		SB_SetText("Calculation has completed.")
+		Return message
+	}
+
+	KlehoImage()
+	{
+		campaignid := 0
+		currenttimegate := ""
+		kleholink := "https://idle.kleho.ru/assets/fb/"
+		for k, v in UserDetails.defines.campaign_defines {
+			campaignid := v.id
+		}
+		if (campaignid == 17) {
+			for k, v in UserDetails.details.game_instances {
+				if (v.game_instance_id == ActiveInstance) {
+					currenttimegate := JSON.stringify(v.defines.adventure_defines[1].requirements[1].champion_id)
+				}
+			}
+			campaignid := KlehoFromID(currenttimegate)
+		}
+		else if !((campaignid < 3) or (campaignid == 15) or (campaignid > 21)) {
+			for k, v in UserDetails.details.game_instances {
+				if (v.game_instance_id == ActiveInstance) {
+					campaignid := campaignid "a" JSON.stringify(v.defines.adventure_defines[1].requirements[1].adventure_id)
+				}
+			}
+		}
+		kleholink := kleholink campaignid "/"
+		for k, v in UserDetails.details.game_instances {
+			if (v.game_instance_id == ActiveInstance) {
+				for kk, vv in v.formation {
+					if (vv > 0) {
+						kleholink := kleholink vv "_"
+					}
+					else {
+						kleholink := kleholink "_"
+					}
+				}
+			}
+		}
+		StringTrimRight, kleholink, kleholink, 1
+		kleholink := kleholink ".png"
+		InputBox, dummyvar, Kleho Image, % "Copy link for formation sharing.`n`nSave image to the following file?`nformationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png", , , , , , , , % kleholink
+		if ErrorLevel {
+			dummyvar := ""
+			return
+		}
+		if !(FileExist("\formationimages\")) {
+			FileCreateDir, formationimages
+		}
+		if !(FileExist("\formationimages\Patron-" CurrentPatron)) {
+			FileCreateDir, % "formationimages\Patron-" CurrentPatron
+		}
+		if !(FileExist("\formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure)) {
+			FileCreateDir, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure
+		}
+		UrlDownloadToFile, %kleholink%, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png"
 		dummyvar := ""
 		return
 	}
-	if !(FileExist("\formationimages\")) {
-		FileCreateDir, formationimages
-	}
-	if !(FileExist("\formationimages\Patron-" CurrentPatron)) {
-		FileCreateDir, % "formationimages\Patron-" CurrentPatron
-	}
-	if !(FileExist("\formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure)) {
-		FileCreateDir, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure
-	}
-	UrlDownloadToFile, %kleholink%, % "formationimages\Patron-" CurrentPatron "\AdvID-" CurrentAdventure "\Area-" CurrentArea ".png"
-	dummyvar := ""
-	return
-}
 
-IncompleteVariants()
-{
-	if !FileExist("advdefs.json") {
-		MsgBox % "Downloading adventure defines."
-		AdventureList()
-	}
-	idtocheck := 0
-	InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
-	if ErrorLevel
-		return
-	while ((idtocheck < 0) or (idtocheck > 4)) {
-		InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
+	IncompleteVariants()
+	{
+		if !FileExist("advdefs.json") {
+			MsgBox % "Downloading adventure defines."
+			AdventureList()
+		}
+		idtocheck := 0
+		InputBox, idtocheck, Incomplete Adventures, Please enter the Patron to check.`nNone (0)`tMirt (1)`nVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
 		if ErrorLevel
 			return
-	}
-	if (idtocheck == 0) {
-		IncompleteBase()
-	}
-	else {
-		IncompletePatron(idtocheck)
-	}
-	return
-}
-
-IncompleteBase()
-{
-	FileRead, AdventureFile, advdefs.json
-	AdventureNames := JSON.parse(AdventureFile)
-
-	missingvariants := "No Patron:"
-	campaignvariants := ""
-	availablelist := {}
-	completelist := {}
-	freeplaylist := {}
-	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
-	sResult := ServerCall("getcampaigndetails", getparams)
-	FileDelete, campaign.json
-	FileAppend, %sResult%, campaign.json
-	campaignresults := JSON.parse(sResult)
-	for k, v in campaignresults.defines.adventure_defines {
-		if (v.repeatable) {
-			freeplaylist.push(v.id)
+		while ((idtocheck < 0) or (idtocheck > 4)) {
+			InputBox, idtocheck, Incomplete Adventures, Please enter a valid Patron ID.`nMirt (1)`tVajra (2)`tStrahd (3)`nZariel (4), , 250, 200, , , , , % idtocheck
+			if ErrorLevel
+				return
 		}
-	}
-	for k, v in campaignresults.campaigns {
-		for k2, v2 in v.available_adventure_ids {
-			availablelist.push(v2)
-		}
-		for k2, v2 in v.completed_adventure_ids {
-			completelist.push(v2)
-		}
-		if (availablelist[1]) {
-			campaignvariants := campaignvariants "`n" CampaignFromID(v.campaign_id) "- "
-		}
-		for k2, v2 in availablelist {
-			campaignvariants := campaignvariants v2 ", "
-		}
-		for k2, v2 in completelist {
-			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
-		}
-		for k2, v2 in freeplaylist {
-			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
-		}
-		if (availablelist[1]) {
-			StringTrimRight, campaignvariants, campaignvariants, 2
-		}
-		availablelist := {}
-		completelist := {}
-		if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
-			missingvariants := missingvariants campaignvariants
-		}
-		campaignvariants := ""
-	}
-	missingvariants := StrReplace(missingvariants, "-", ":`n")
-	MsgBox % missingvariants
-	return
-}
-
-IncompletePatron(patronid)
-{
-	FileRead, AdventureFile, advdefs.json
-	AdventureNames := JSON.parse(AdventureFile)
-
-	missingvariants := PatronFromID(patronid) ":"
-	campaignvariants := ""
-	availablelist := {}
-	completelist := {}
-	freeplaylist := {}
-	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
-	sResult := ServerCall("getcampaigndetails", getparams)
-	FileDelete, campaign.json
-	FileAppend, %sResult%, campaign.json
-	campaignresults := JSON.parse(sResult)
-	for k, v in campaignresults.defines.adventure_defines {
-		if (v.repeatable) {
-			freeplaylist.push(v.id)
-		}
-	}
-	for k, v in campaignresults.campaigns {
-		for k2, v2 in v.available_patron_adventure_ids {
-			for k3, v3 in v2 {
-				if ((k3 == patronid) && (v3[1] == 1))
-					availablelist.push(k2)
-			}
-		}
-		for k2, v2 in v.completed_patron_adventure_ids {
-			for k3, v3 in v2 {
-				if ((k3 == patronid) && (v3[1] == 1))
-					completelist.push(k2)
-			}
-		}
-		if (availablelist[1]) {
-			campaignvariants := campaignvariants "`n" CampaignFromID(v.campaign_id) "- "
-		}
-		for k2, v2 in availablelist {
-			campaignvariants := campaignvariants v2 ", "
-		}
-		for k2, v2 in completelist {
-			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
-		}
-		for k2, v2 in freeplaylist {
-			campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
-		}
-		if (availablelist[1]) {
-			StringTrimRight, campaignvariants, campaignvariants, 2
-		}
-		availablelist := {}
-		completelist := {}
-		if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
-			missingvariants := missingvariants campaignvariants
-		}
-		campaignvariants := ""
-	}
-	missingvariants := StrReplace(missingvariants, "-", ":`n")
-	MsgBox % missingvariants
-	return
-}
-
-AdventureList() {
-	getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
-	sResult := ServerCall("getcampaigndetails", getparams)
-	campaignresults := JSON.parse(sResult)
-	freeplayids := {}
-	freeplaynames := {}
-	for k, v in campaignresults.defines.adventure_defines {
-		freeplayids.push(v.id)
-		freeplaynames.push(v.name)
-	}
-	count := 1
-	testvar := "{"
-	while (count < freeplayids.Count()) {
-		testvar := testvar """" JSON.stringify(freeplayids[count]) """:"
-		tempname := JSON.stringify(freeplaynames[count])
-		testvar := testvar tempname ","
-		count += 1
-	}
-	StringTrimRight, testvar, testvar, 1
-	testvar := testvar "}"
-	FileDelete, advdefs.json
-	FileAppend, %testvar%, advdefs.json
-	MsgBox % "advdefs.json saved to file."
-	return
-}
-
-GearReport() {
-	totalgearlevels := -1
-	totalgearitems := -1
-	totalcorelevels := -1
-	totalcoreitems := -1
-	totaleventlevels := 0
-	totaleventitems := 0
-	totalshinycore := 0
-	totalshinyevent := 0
-	highestcorelevel := 0
-	highesteventlevel := 0
-	highestcoreid := 0
-	highesteventid := 0
-	lowestcorelevel := 10000000000
-	lowesteventlevel := 10000000000
-	lowestcoreid := 0
-	lowesteventid := 0
-	currentchamplevel := 0
-	currentcount := 0
-	lastchamp := 0
-	lastshiny := 0
-	currentloot := UserDetails.details.loot
-	dummyitem := {}
-	currentloot.push(dummyitem)
-
-	for k, v in currentloot {
-		totalgearlevels += (v.enchant + 1)
-		totalgearitems += 1
-
-		if (lastchamp < 13) {
-			totalcorelevels += (v.enchant + 1)
-			totalcoreitems += 1
-			if (lastshiny) {
-				totalshinycore += 1
-			}
-			if ((v.hero_id != lastchamp) and (lastchamp != 0)) {
-				if (currentchamplevel > highestcorelevel) {
-					highestcorelevel := currentchamplevel
-					highestcoreid := lastchamp
-				}
-				if (currentchamplevel < lowestcorelevel) {
-					lowestcorelevel := currentchamplevel
-					lowestcoreid := lastchamp
-				}
-				currentchamplevel := 0
-				currentcount := 0
-				currentchamplevel := (v.enchant + 1)
-				currentcount += 1
-			}
-			else {
-				currentchamplevel += (v.enchant + 1)
-				currentcount += 1
-			}
-		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87)){
-			totalcorelevels += (v.enchant + 1)
-			totalcoreitems += 1
-			if (lastshiny) {
-				totalshinycore += 1
-			}
-			if (v.hero_id != lastchamp) {
-				if (currentchamplevel > highestcorelevel) {
-					highestcorelevel := currentchamplevel
-					highestcoreid := lastchamp
-				}
-				if (currentchamplevel < lowestcorelevel) {
-					lowestcorelevel := currentchamplevel
-					lowestcoreid := lastchamp
-				}
-				currentchamplevel := 0
-				currentcount := 0
-				currentchamplevel := (v.enchant + 1)
-				currentcount += 1
-			}
-			else {
-				currentchamplevel += (v.enchant + 1)
-				currentcount += 1
-			}
+		if (idtocheck == 0) {
+			IncompleteBase()
 		}
 		else {
-			totaleventlevels += (v.enchant + 1)
-			totaleventitems += 1
-			if (lastshiny) {
-				totalshinyevent += 1
+			IncompletePatron(idtocheck)
+		}
+		return
+	}
+
+	IncompleteBase()
+	{
+		FileRead, AdventureFile, advdefs.json
+		AdventureNames := JSON.parse(AdventureFile)
+
+		missingvariants := "No Patron:"
+		campaignvariants := ""
+		availablelist := {}
+		completelist := {}
+		freeplaylist := {}
+		getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
+		sResult := ServerCall("getcampaigndetails", getparams)
+		FileDelete, campaign.json
+		FileAppend, %sResult%, campaign.json
+		campaignresults := JSON.parse(sResult)
+		for k, v in campaignresults.defines.adventure_defines {
+			if (v.repeatable) {
+				freeplaylist.push(v.id)
 			}
-			if (v.hero_id != lastchamp) {
-				if (currentchamplevel > highesteventlevel) {
-					highesteventlevel := currentchamplevel
-					highesteventid := lastchamp
+		}
+		for k, v in campaignresults.campaigns {
+			for k2, v2 in v.available_adventure_ids {
+				availablelist.push(v2)
+			}
+			for k2, v2 in v.completed_adventure_ids {
+				completelist.push(v2)
+			}
+			if (availablelist[1]) {
+				campaignvariants := campaignvariants "`n" CampaignFromID(v.campaign_id) "- "
+			}
+			for k2, v2 in availablelist {
+				campaignvariants := campaignvariants v2 ", "
+			}
+			for k2, v2 in completelist {
+				campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
+			}
+			for k2, v2 in freeplaylist {
+				campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
+			}
+			if (availablelist[1]) {
+				StringTrimRight, campaignvariants, campaignvariants, 2
+			}
+			availablelist := {}
+			completelist := {}
+			if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
+				missingvariants := missingvariants campaignvariants
+			}
+			campaignvariants := ""
+		}
+		missingvariants := StrReplace(missingvariants, "-", ":`n")
+		MsgBox % missingvariants
+		return
+	}
+
+	IncompletePatron(patronid)
+	{
+		FileRead, AdventureFile, advdefs.json
+		AdventureNames := JSON.parse(AdventureFile)
+
+		missingvariants := PatronFromID(patronid) ":"
+		campaignvariants := ""
+		availablelist := {}
+		completelist := {}
+		freeplaylist := {}
+		getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
+		sResult := ServerCall("getcampaigndetails", getparams)
+		FileDelete, campaign.json
+		FileAppend, %sResult%, campaign.json
+		campaignresults := JSON.parse(sResult)
+		for k, v in campaignresults.defines.adventure_defines {
+			if (v.repeatable) {
+				freeplaylist.push(v.id)
+			}
+		}
+		for k, v in campaignresults.campaigns {
+			for k2, v2 in v.available_patron_adventure_ids {
+				for k3, v3 in v2 {
+					if ((k3 == patronid) && (v3[1] == 1))
+						availablelist.push(k2)
 				}
-				if (currentchamplevel < lowesteventlevel) {
-					lowesteventlevel := currentchamplevel
-					lowesteventid := lastchamp
+			}
+			for k2, v2 in v.completed_patron_adventure_ids {
+				for k3, v3 in v2 {
+					if ((k3 == patronid) && (v3[1] == 1))
+						completelist.push(k2)
 				}
-				currentchamplevel := 0
-				currentcount := 0
-				currentchamplevel := (v.enchant + 1)
-				currentcount += 1
 			}
-			else {
-				currentchamplevel += (v.enchant + 1)
-				currentcount += 1
+			if (availablelist[1]) {
+				campaignvariants := campaignvariants "`n" CampaignFromID(v.campaign_id) "- "
 			}
-		}
-
-		lastchamp := v.hero_id
-		lastshiny := v.gild
-	}
-	dummyitem := currentloot.pop()
-	shortreport := ""
-
-	shortreport := shortreport "Avg item level:`t" Round(totalgearlevels/totalgearitems)
-
-	shortreport := shortreport "`n`nAvg core level:`t" Round(totalcorelevels/totalcoreitems)
-	shortreport := shortreport "`nHighest avg core:`t" Round(highestcorelevel/6) " (" ChampFromID(highestcoreid) ")"
-	shortreport := shortreport "`nLowest avg core:`t" Round(lowestcorelevel/6) " (" ChampFromID(lowestcoreid) ")"
-	shortreport := shortreport "`nCore Shinies:`t" totalshinycore "/" totalcoreitems
-
-	shortreport := shortreport "`n`nAvg event level:`t" Round(totaleventlevels/totaleventitems)
-	shortreport := shortreport "`nHighest avg event:`t" Round(highesteventlevel/6) " (" ChampFromID(highesteventid) ")"
-	shortreport := shortreport "`nLowest avg event:`t" Round(lowesteventlevel/6) " (" ChampFromID(lowesteventid) ")"
-	shortreport := shortreport "`nEvent Shinies:`t" totalshinyevent "/" totaleventitems
-
-	MsgBox % shortreport
-	return
-}
-
-PatronFeats() {
-	assignedfeats := ""
-	for k, v in UserDetails.details.heroes {
-		for k2, v2 in v.active_feats {
-			switch JSON.stringify(v2) {
-				case "272": assignedfeats := assignedfeats "Celeste CON+1`n"
-				case "13": assignedfeats := assignedfeats "Celeste INT+1`n"
-				case "107": assignedfeats := assignedfeats "Drizzt INT+1`n"
-				case "138": assignedfeats := assignedfeats "Nrakk INT+1`n"
-				case "193": assignedfeats := assignedfeats "Zorbu INT+1`n"
-				case "208": assignedfeats := assignedfeats "Nerys INT+1`n"
-				case "229": assignedfeats := assignedfeats "Rosie INT+1`n"
-				case "361": assignedfeats := assignedfeats "Gromma INT+1`n"
-				default: assignedfeats := assignedfeats
+			for k2, v2 in availablelist {
+				campaignvariants := campaignvariants v2 ", "
 			}
+			for k2, v2 in completelist {
+				campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
+			}
+			for k2, v2 in freeplaylist {
+				campaignvariants := StrReplace(campaignvariants, " " v2 ", ", " ")
+			}
+			if (availablelist[1]) {
+				StringTrimRight, campaignvariants, campaignvariants, 2
+			}
+			availablelist := {}
+			completelist := {}
+			if !(campaignvariants == ("`n" CampaignFromID(v.campaign_id))) {
+				missingvariants := missingvariants campaignvariants
+			}
+			campaignvariants := ""
 		}
+		missingvariants := StrReplace(missingvariants, "-", ":`n")
+		MsgBox % missingvariants
+		return
 	}
-	if (assignedfeats = "") {
-		assignedfeats := "None"
-	}
-	MsgBox % assignedfeats
-	return
-}
 
-ShowPityTimers() {
-	pitylist := ""
-	pityjson := JSON.stringify(UserDetails.details.stats)
-	pityjson := StrReplace(pityjson, """forced_tutorial_done"":""0"",""", """forced_win"":{""")
-	pityjson := StrReplace(pityjson, "forced_win_counter_", "")
-	pityjson := StrReplace(pityjson, ",""free_plays_completed""", "},""free_plays_completed""")
-	pityjson := JSON.parse(pityjson)
-	newestchamp := JSON.stringify(UserDetails.details.heroes[UserDetails.details.heroes.MaxIndex()].hero_id)
-	newestchamp := StrReplace(newestchamp, """")
-	chestsforepic := 1
-	while (chestsforepic < 11) {
-		if (chestsforepic == 1) {
-			pitylist := pitylist "Epic in Next Chest for:`n "
+	AdventureList() {
+		getparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID
+		sResult := ServerCall("getcampaigndetails", getparams)
+		campaignresults := JSON.parse(sResult)
+		freeplayids := {}
+		freeplaynames := {}
+		for k, v in campaignresults.defines.adventure_defines {
+			freeplayids.push(v.id)
+			freeplaynames.push(v.name)
 		}
-		else {
-			pitylist := pitylist "Epic in next " chestsforepic " Chests for:`n "
+		count := 1
+		testvar := "{"
+		while (count < freeplayids.Count()) {
+			testvar := testvar """" JSON.stringify(freeplayids[count]) """:"
+			tempname := JSON.stringify(freeplaynames[count])
+			testvar := testvar tempname ","
+			count += 1
 		}
-		currentchamp := 14
+		StringTrimRight, testvar, testvar, 1
+		testvar := testvar "}"
+		FileDelete, advdefs.json
+		FileAppend, %testvar%, advdefs.json
+		MsgBox % "advdefs.json saved to file."
+		return
+	}
+
+	GearReport() {
+		totalgearlevels := -1
+		totalgearitems := -1
+		totalcorelevels := -1
+		totalcoreitems := -1
+		totaleventlevels := 0
+		totaleventitems := 0
+		totalshinycore := 0
+		totalshinyevent := 0
+		highestcorelevel := 0
+		highesteventlevel := 0
+		highestcoreid := 0
+		highesteventid := 0
+		lowestcorelevel := 10000000000
+		lowesteventlevel := 10000000000
+		lowestcoreid := 0
+		lowesteventid := 0
+		currentchamplevel := 0
 		currentcount := 0
-		currentchest := 0
-		currentpity := ""
-		while (currentchamp < newestchamp) {
-			currentchest := ChestIDFromChampID(currentchamp)
-			for k, v in (pityjson.forced_win) {
-				if (k = currentchest) {
-					currentpity := v
+		lastchamp := 0
+		lastshiny := 0
+		currentloot := UserDetails.details.loot
+		dummyitem := {}
+		currentloot.push(dummyitem)
+
+		for k, v in currentloot {
+			totalgearlevels += (v.enchant + 1)
+			totalgearitems += 1
+
+			if (lastchamp < 13) {
+				totalcorelevels += (v.enchant + 1)
+				totalcoreitems += 1
+				if (lastshiny) {
+					totalshinycore += 1
+				}
+				if ((v.hero_id != lastchamp) and (lastchamp != 0)) {
+					if (currentchamplevel > highestcorelevel) {
+						highestcorelevel := currentchamplevel
+						highestcoreid := lastchamp
+					}
+					if (currentchamplevel < lowestcorelevel) {
+						lowestcorelevel := currentchamplevel
+						lowestcoreid := lastchamp
+					}
+					currentchamplevel := 0
+					currentcount := 0
+					currentchamplevel := (v.enchant + 1)
+					currentcount += 1
+				}
+				else {
+					currentchamplevel += (v.enchant + 1)
+					currentcount += 1
 				}
 			}
-			if (currentpity = chestsforepic) {
-				pitylist := pitylist ChampFromID(currentchamp) ", "
-				currentcount += 1
+			else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87)){
+				totalcorelevels += (v.enchant + 1)
+				totalcoreitems += 1
+				if (lastshiny) {
+					totalshinycore += 1
+				}
+				if (v.hero_id != lastchamp) {
+					if (currentchamplevel > highestcorelevel) {
+						highestcorelevel := currentchamplevel
+						highestcoreid := lastchamp
+					}
+					if (currentchamplevel < lowestcorelevel) {
+						lowestcorelevel := currentchamplevel
+						lowestcoreid := lastchamp
+					}
+					currentchamplevel := 0
+					currentcount := 0
+					currentchamplevel := (v.enchant + 1)
+					currentcount += 1
+				}
+				else {
+					currentchamplevel += (v.enchant + 1)
+					currentcount += 1
+				}
 			}
-			switch currentchamp {
-				case "17": currentchamp += 2
-				case "29": currentchamp += 2
-				case "66": currentchamp += 3
-				default: currentchamp += 1
+			else {
+				totaleventlevels += (v.enchant + 1)
+				totaleventitems += 1
+				if (lastshiny) {
+					totalshinyevent += 1
+				}
+				if (v.hero_id != lastchamp) {
+					if (currentchamplevel > highesteventlevel) {
+						highesteventlevel := currentchamplevel
+						highesteventid := lastchamp
+					}
+					if (currentchamplevel < lowesteventlevel) {
+						lowesteventlevel := currentchamplevel
+						lowesteventid := lastchamp
+					}
+					currentchamplevel := 0
+					currentcount := 0
+					currentchamplevel := (v.enchant + 1)
+					currentcount += 1
+				}
+				else {
+					currentchamplevel += (v.enchant + 1)
+					currentcount += 1
+				}
 			}
-		}
-		if !(currentcount) {
-			pitylist := pitylist "(None)`n"
-		}
-		else {
-			StringTrimRight, pitylist, pitylist, 2
-			pitylist := pitylist "`n"
-		}
-		chestsforepic += 1
-	}
-	MsgBox % pitylist
-	return
-}
 
-getChestCodes() {
-	clipContents := clipboard
-regexpPattern = P)\b(?<![A-Za-z0-9-/@#$`%^&!*])([A-Za-z0-9-@#$`%^&!*]{12,20})(?![A-Za-z0-9-/@#$`%^&!*])
-foundCodeString := ""
-while (clipContents ~= regexpPattern) {
-	foundPos := RegExMatch(clipContents, regexpPattern, foundLength)
-	foundCode := RegExReplace(SubStr(clipContents, foundPos, foundLength), "-")
-	clipContents := SubStr(clipContents, foundPos + foundLength)
-	if (InStr(foundCodeString, foundCode) = 0 && (StrLen(foundCode) = 12 || StrLen(foundCode) == 16)) {
-		foundCodeString .= foundCode . "`r`n"
+			lastchamp := v.hero_id
+			lastshiny := v.gild
+		}
+		dummyitem := currentloot.pop()
+		shortreport := ""
+
+		shortreport := shortreport "Avg item level:`t" Round(totalgearlevels/totalgearitems)
+
+		shortreport := shortreport "`n`nAvg core level:`t" Round(totalcorelevels/totalcoreitems)
+		shortreport := shortreport "`nHighest avg core:`t" Round(highestcorelevel/6) " (" ChampFromID(highestcoreid) ")"
+		shortreport := shortreport "`nLowest avg core:`t" Round(lowestcorelevel/6) " (" ChampFromID(lowestcoreid) ")"
+		shortreport := shortreport "`nCore Shinies:`t" totalshinycore "/" totalcoreitems
+
+		shortreport := shortreport "`n`nAvg event level:`t" Round(totaleventlevels/totaleventitems)
+		shortreport := shortreport "`nHighest avg event:`t" Round(highesteventlevel/6) " (" ChampFromID(highesteventid) ")"
+		shortreport := shortreport "`nLowest avg event:`t" Round(lowesteventlevel/6) " (" ChampFromID(lowesteventid) ")"
+		shortreport := shortreport "`nEvent Shinies:`t" totalshinyevent "/" totaleventitems
+
+		MsgBox % shortreport
+		return
 	}
-}
-foundCodeString := RegExReplace(foundCodeString, "`r`n$")
-return foundCodeString
+
+	PatronFeats() {
+		assignedfeats := ""
+		for k, v in UserDetails.details.heroes {
+			for k2, v2 in v.active_feats {
+				switch JSON.stringify(v2) {
+					case "272": assignedfeats := assignedfeats "Celeste CON+1`n"
+					case "13": assignedfeats := assignedfeats "Celeste INT+1`n"
+					case "107": assignedfeats := assignedfeats "Drizzt INT+1`n"
+					case "138": assignedfeats := assignedfeats "Nrakk INT+1`n"
+					case "193": assignedfeats := assignedfeats "Zorbu INT+1`n"
+					case "208": assignedfeats := assignedfeats "Nerys INT+1`n"
+					case "229": assignedfeats := assignedfeats "Rosie INT+1`n"
+					case "361": assignedfeats := assignedfeats "Gromma INT+1`n"
+					default: assignedfeats := assignedfeats
+				}
+			}
+		}
+		if (assignedfeats = "") {
+			assignedfeats := "None"
+		}
+		MsgBox % assignedfeats
+		return
+	}
+
+	ShowPityTimers() {
+		pitylist := ""
+		pityjson := JSON.stringify(UserDetails.details.stats)
+		pityjson := StrReplace(pityjson, """forced_tutorial_done"":""0"",""", """forced_win"":{""")
+		pityjson := StrReplace(pityjson, "forced_win_counter_", "")
+		pityjson := StrReplace(pityjson, ",""free_plays_completed""", "},""free_plays_completed""")
+		pityjson := JSON.parse(pityjson)
+		newestchamp := JSON.stringify(UserDetails.details.heroes[UserDetails.details.heroes.MaxIndex()].hero_id)
+		newestchamp := StrReplace(newestchamp, """")
+		chestsforepic := 1
+		while (chestsforepic < 11) {
+			if (chestsforepic == 1) {
+				pitylist := pitylist "Epic in Next Chest for:`n "
+			}
+			else {
+				pitylist := pitylist "Epic in next " chestsforepic " Chests for:`n "
+			}
+			currentchamp := 14
+			currentcount := 0
+			currentchest := 0
+			currentpity := ""
+			while (currentchamp < newestchamp) {
+				currentchest := ChestIDFromChampID(currentchamp)
+				for k, v in (pityjson.forced_win) {
+					if (k = currentchest) {
+						currentpity := v
+					}
+				}
+				if (currentpity = chestsforepic) {
+					pitylist := pitylist ChampFromID(currentchamp) ", "
+					currentcount += 1
+				}
+				switch currentchamp {
+					case "17": currentchamp += 2
+					case "29": currentchamp += 2
+					case "66": currentchamp += 3
+					default: currentchamp += 1
+				}
+			}
+			if !(currentcount) {
+				pitylist := pitylist "(None)`n"
+			}
+			else {
+				StringTrimRight, pitylist, pitylist, 2
+				pitylist := pitylist "`n"
+			}
+			chestsforepic += 1
+		}
+		MsgBox % pitylist
+		return
+	}
+
+	getChestCodes() {
+		clipContents := clipboard
+	regexpPattern = P)\b(?<![A-Za-z0-9-/@#$`%^&!*])([A-Za-z0-9-@#$`%^&!*]{12,20})(?![A-Za-z0-9-/@#$`%^&!*])
+	foundCodeString := ""
+	while (clipContents ~= regexpPattern) {
+		foundPos := RegExMatch(clipContents, regexpPattern, foundLength)
+		foundCode := RegExReplace(SubStr(clipContents, foundPos, foundLength), "-")
+		clipContents := SubStr(clipContents, foundPos + foundLength)
+		if (InStr(foundCodeString, foundCode) = 0 && (StrLen(foundCode) = 12 || StrLen(foundCode) == 16)) {
+			foundCodeString .= foundCode . "`r`n"
+		}
+	}
+	foundCodeString := RegExReplace(foundCodeString, "`r`n$")
+	return foundCodeString
 }
