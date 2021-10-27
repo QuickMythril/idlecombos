@@ -1178,48 +1178,48 @@ Clear_Log:
 				}
 			}
 		}
-	}
-	for k, v in chestresults_cumulative
-	{
-		for k2, v2 in v
-		{
-			if ( v2.gilded_count <= 1 )
-				lastshiny := ( ChampFromID( k ) " (Slot " k2 ")" )
-			else
-				lastshiny := ( ChampFromID( k ) " (Slot " k2 " x " v2.gilded_count ")" )
-			if ( v2.disenchant_amount )
-				lastshiny .= " +" v2.disenchant_amount
-			newshinies .= lastshiny "`n"
-		}
-	}
-	tempsavesetting := 0
-	switch chestid
-	{
-		case "1": {
-			chestsopened := (CurrentSilvers - chestresults.chests_remaining)
-			if (extraspent) {
-				chestsopened += (extraspent/50)
-			}
-			MsgBox % "New Shinies:`n" newshinies
-			UpdateLogTime()
-			FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
-		}
-		case "2": {
-			chestsopened := (CurrentGolds - chestresults.chests_remaining)
-			if (extraspent) {
-				chestsopened += (extraspent/500)
-			}
-			MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
-			UpdateLogTime()
-			FileAppend, % "(" CurrentTime ") Gold Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
-		}
-	}
-	FileRead, OutputText, %OutputLogFile%
-	oMyGUI.Update()
-	GetUserDetails()
-	SB_SetText("Chest opening completed.")
-return
 
+		for k, v in chestresults_cumulative
+		{
+			for k2, v2 in v
+			{
+				if ( v2.gilded_count <= 1 )
+					lastshiny := ( ChampFromID( k ) " (Slot " k2 ")" )
+				else
+					lastshiny := ( ChampFromID( k ) " (Slot " k2 " x " v2.gilded_count ")" )
+				if ( v2.disenchant_amount )
+					lastshiny .= " +" v2.disenchant_amount
+				newshinies .= lastshiny "`n"
+			}
+		}
+		tempsavesetting := 0
+		switch chestid
+		{
+			case "1": {
+				chestsopened := (CurrentSilvers - chestresults.chests_remaining)
+				if (extraspent) {
+					chestsopened += (extraspent/50)
+				}
+				MsgBox % "New Shinies:`n" newshinies
+				UpdateLogTime()
+				FileAppend, % "(" CurrentTime ") Silver Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
+			}
+			case "2": {
+				chestsopened := (CurrentGolds - chestresults.chests_remaining)
+				if (extraspent) {
+					chestsopened += (extraspent/500)
+				}
+				MsgBox % "New Feats:`n" newfeats "`nNew Shinies:`n" newshinies
+				UpdateLogTime()
+				FileAppend, % "(" CurrentTime ") Gold Chests Opened: " Floor(chestsopened) "`n", %OutputLogFile%
+			}
+		}
+		FileRead, OutputText, %OutputLogFile%
+		oMyGUI.Update()
+		GetUserDetails()
+		SB_SetText("Chest opening completed.")
+		return
+	}
 
 Tiny_Blacksmith:
 	{
