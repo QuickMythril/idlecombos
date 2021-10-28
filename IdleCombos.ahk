@@ -2,6 +2,14 @@
 #include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;2.00
+;work to clean up chest open message box with help from community
+;TODO::note community help names from discord.
+;work to clean up menu so links work in progress, most of it backed Out 
+;due to a wierd git conflict that would never resolve and roll back to earlier
+;client. including most of the work that had been done to limit log files locally
+;once steam idlecombos working merge recent changes into egs client, and maybe
+;make the dhani paint work. Or focus Idlecombos.
 ;1.98
 ;update idledict content, 
 ;added NERDS as evergreen for equipment screen
@@ -39,7 +47,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.98"
+global VersionNumber := "2.00"
 global CurrentDictionary := "2.00"
 
 ;Local File globals
@@ -1927,7 +1935,7 @@ Lg_Blacksmith:
 		}
 		if (UserDetails.details.stats.dhani_monsters_painted) {
 			dhanipaint := UserDetails.details.stats.dhani_monsters_painted
-			ChampDetails := ChampDetails "D'hani Paints: " dhanipaint "`n`n"
+			ChampDetails := ChampDetails "D hani Paints: " dhanipaint "`n`n"
 		}
 	}	
 
@@ -2695,7 +2703,7 @@ GearReport() {
 				currentcount += 1
 			}
 		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87)){
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87) or (lastchamp = 88)){
 			totalcorelevels += (v.enchant + 1)
 			totalcoreitems += 1
 			if (lastshiny) {

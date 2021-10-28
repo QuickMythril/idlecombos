@@ -148,12 +148,12 @@ ChampFromID(id) {
 			case "85": namefromid := "Corazon"
 			case "86": namefromid := "Reya"
 			case "87": namefromid := "NERDS"
-			case "88": namefromid := "UNKNOWN (" id ")"
+			case "88": namefromid := "Xerophon"
 			case "89": namefromid := "D'hani"
 			case "90": namefromid := "Brig"
 			case "91": namefromid := "Widdle"
-			case "92": namefromid := "UNKNOWN (" id ")"
-			case "93": namefromid := "UNKNOWN (" id ")"
+			case "92": namefromid := "Yorven"
+			case "93": namefromid := "Viconia"
 			case "94": namefromid := "UNKNOWN (" id ")"
 			case "95": namefromid := "UNKNOWN (" id ")"
 			case "96": namefromid := "UNKNOWN (" id ")"
@@ -363,7 +363,7 @@ FeatFromID(id) {
 		}
 		
 	}
-	else if (id < 602) {
+	else if (id < 639) {
 		switch id {
 			case "565": namefromid := "Sgt Knox (Health +30%)"
 			case "567": namefromid := "Sgt Knox (Rallying Cry +40%)"
@@ -373,10 +373,15 @@ FeatFromID(id) {
 			case "590": namefromid := "Prudence (Frustration +40%)"
 			case "600": namefromid := "Corazón (Pirate's Code +40%)"
 			case "601": namefromid := "Corazón (G.O.A.T. Pirate +40%)"
-			;case "565": namefromid := "Sgt Knox (Health +30%)"
-			;case "565": namefromid := "Sgt Knox (Health +30%)"
-			;case "565": namefromid := "Sgt Knox (Health +30%)"
-			;case "565": namefromid := "Sgt Knox (Health +30%)"
+			case "613": namefromid := "D'hani (Paint Them Red +40%)"
+			case "615": namefromid := "D'hani (Friendly Rivalry +40%)"
+			case "636": namefromid := "Brig (Global DPS +25%)"
+			case "638": namefromid := "Brig (Hype +40%)"
+			case "642": namefromid := "Widdle (Global DPS +25%)"
+			case "646": namefromid := "Widdle (Tasty Friends +40%)"
+			;case "638": namefromid := "Brig (Harmonies Hype +40%)"
+			;case "638": namefromid := "Brig (Harmonies Hype +40%)"
+
 			
 		}
 		
@@ -795,14 +800,14 @@ ChestFromID(id) {
 			case "337": namefromid := "Gold Briv Chest"
 			case "338": namefromid := "Silver Widdle Chest"
 			case "339": namefromid := "Gold Widdle Chest"
-			case "340": namefromid := "Silver Y5E4 Chest"
+			case "340": namefromid := "Silver Yorven Chest"
 		}
 	}
 	else if (id < 361) {
 		switch id {
-			case "341": namefromid := "Gold Y5E4 Chest"
-			case "342": namefromid := "Silver Y5E5 Chest"
-			case "343": namefromid := "Gold Y5E5 Chest"
+			case "341": namefromid := "Gold Yorven Chest"
+			case "342": namefromid := "Silver Viconia Chest"
+			case "343": namefromid := "Gold Viconia Chest"
 			case "344": namefromid := "Silver Y5E6 Chest"
 			case "345": namefromid := "Gold Y5E6 Chest"
 			case "346": namefromid := "Silver Y5E7 Chest"
@@ -834,15 +839,15 @@ ChestFromID(id) {
 			case "368": namefromid := "Gold Barred Chest"
 			case "369": namefromid := "Gold Charred Chest"
 			case "370": namefromid := "Gold Weighted Chest"
-			case "371": namefromid := "UNKNOWN (" id ")"
-			case "372": namefromid := "UNKNOWN (" id ")"
-			case "373": namefromid := "UNKNOWN (" id ")"
-			case "374": namefromid := "UNKNOWN (" id ")"
-			case "375": namefromid := "UNKNOWN (" id ")"
-			case "376": namefromid := "UNKNOWN (" id ")"
-			case "377": namefromid := "UNKNOWN (" id ")"
-			case "378": namefromid := "UNKNOWN (" id ")"
-			case "379": namefromid := "UNKNOWN (" id ")"
+			case "371": namefromid := "Gold Fey Chest"
+			case "372": namefromid := "Gold Contract Chest"
+			case "373": namefromid := "Gold Blasted Chest"
+			case "374": namefromid := "Gold Big Top Chest"
+			case "375": namefromid := "Gold Spinnaker Chest"
+			case "376": namefromid := "Gold Weapons Chest"
+			case "377": namefromid := "Gold Powered Chest"
+			case "378": namefromid := "Gold Pumpkin Chest"
+			case "379": namefromid := "Gold Polymorphed Chest"
 			case "380": namefromid := "UNKNOWN (" id ")"
 		}
 	}
