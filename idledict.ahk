@@ -881,7 +881,7 @@ ChestFromID(id) {
 			case "381": namefromid := "Gold Freshly Painted Chest"
 			case "382": namefromid := "Gold Branched Chest"
 			case "383": namefromid := "Gold Blazed Chest"
-			;	case "384": namefromid := "UNKNOWN (" id ")"
+			case "384": namefromid := "Gold Spotlight Chest"
 			;	case "385": namefromid := "UNKNOWN (" id ")"
 			;	case "386": namefromid := "UNKNOWN (" id ")"
 			;	case "387": namefromid := "UNKNOWN (" id ")"

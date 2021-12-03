@@ -2,6 +2,14 @@
 #include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;2.00
+;work to clean up chest open message box with help from community
+;TODO::note community help names from discord.
+;work to clean up menu so links work in progress, most of it backed Out 
+;due to a wierd git conflict that would never resolve and roll back to earlier
+;client. including most of the work that had been done to limit log files locally
+;once steam idlecombos working merge recent changes into egs client, and maybe
+;make the dhani paint work. Or focus Idlecombos.
 ;1.98
 ;update idledict content, epic games setup 
 ;added NERDS as evergreen for equipment screen
@@ -39,7 +47,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "1.98"
+global VersionNumber := "2.00"
 global CurrentDictionary := "2.00"
 
 ;Local File globals
@@ -210,10 +218,10 @@ if !(CurrentSettings.Count() == SettingsCheckValue) {
 	FileRead, rawsettings, %SettingsFile%
 	CurrentSettings := JSON.parse(rawsettings)
 	oMyGUI.Update()
-	MsgBox, Your settings file has been deleted due to an update to IdleCombos.  Please verify that your settings are set as preferred.
+	MsgBox, Your settings file has been deleted due to an update to IdleCombos. Please verify that your settings are set as preferred.
 }
 if FileExist(A_ScriptDir "\webRequestLog.txt") {
-	MsgBox, 4, , % "WRL File detected.  Use file?"
+	MsgBox, 4, , % "WRL File detected. Use file?"
 	IfMsgBox, Yes
 	{
 		WRLFile := A_ScriptDir "\webRequestLog.txt"
@@ -446,7 +454,7 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vZarielCosts x+2 w200 right, % ZarielCosts
 		
 		Gui, Tab, Champions
-		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h150, % ChampDetails
+		Gui, MyWindow:Add, Text, vChampDetails x15 y33 w300 h180, % ChampDetails
 		
 		Gui, Tab, Settings
 		Gui, MyWindow:Add, Text,, Server Name:
@@ -967,7 +975,7 @@ Buy_Chests(chestid) {
 		FirstRun()
 	}
 	if !CurrentGems {
-		MsgBox, 4, , No gems detected.  Check server for user details?
+			MsgBox, 4, , No gems detected. Check server for user details?
 		IfMsgBox, Yes
 		{
 			GetUserDetails()
@@ -1051,7 +1059,7 @@ Open_Chests(chestid) {
 		FirstRun()
 	}
 	if (!CurrentGolds && !CurrentSilvers && !CurrentGems) {
-		MsgBox, 4, , No chests or gems detected.  Check server for user details?
+			MsgBox, 4, , No chests or gems detected. Check server for user details?
 		IfMsgBox, Yes
 		{
 			GetUserDetails()
@@ -1098,6 +1106,7 @@ Open_Chests(chestid) {
 	newfeats := ""
 	lastshiny := ""
 	newshinies := ""
+		chestresults_cumulative := {}
 	while (count > 0) {
 		SB_SetText("Chests remaining to open: " count)
 		if (count < 100) {
@@ -1151,17 +1160,48 @@ Open_Chests(chestid) {
 		}
 		for k, v in chestresults.loot_details {
 			if (v.unlock_hero_feat) {
-				lastfeat := (FeatFromID(v.unlock_hero_feat) "`n")
+					lastfeat := (FeatFromID(v.unlock_hero_feat) "n")
 				newfeats := newfeats lastfeat
 			}
 			if (v.gilded) {
-				lastshiny := (ChampFromID(v.hero_id) " (Slot " v.slot_id ")")
-				if (v.disenchant_amount == 125) {
-					lastshiny := lastshiny " +125"
+					if ( !IsObject( chestresults_cumulative[ v.hero_id ] ) )
+					{
+						chestresults_cumulative[ v.hero_id ] := {}
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
+						if (v.disenchant_amount == 125)
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
 				}
-				newshinies := newshinies lastshiny "`n"
+					else if ( !IsObject( chestresults_cumulative[ v.hero_id ][ v.slot_id ] ) )
+					{
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ] := {}
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] := 1
+						if (v.disenchant_amount == 125)
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] := v.disenchant_amount
+					}
+					Else
+					{
+						chestresults_cumulative[ v.hero_id ][ v.slot_id ][ gilded_count ] += 1
+						if (v.disenchant_amount == 125)
+							chestresults_cumulative[ v.hero_id ][ v.slot_id ][ disenchant_amount ] += v.disenchant_amount
+					}
+
+				}
 			}
 		}
+
+		for k, v in chestresults_cumulative
+		{
+			for k2, v2 in v
+			{
+				if ( v2.gilded_count <= 1 )
+					lastshiny := ( ChampFromID( k ) " (Slot " k2 ")" )
+				else
+					lastshiny := ( ChampFromID( k ) " (Slot " k2 " x " v2.gilded_count ")" )
+				if ( v2.disenchant_amount )
+					lastshiny .= " +" v2.disenchant_amount
+				newshinies .= lastshiny "`n"
+			}
 	}
 	tempsavesetting := 0
 	switch chestid
@@ -1229,7 +1269,7 @@ UseBlacksmith(buffid) {
 	case 34: currentcontracts := CurrentLgBS
 }	
 	if !(currentcontracts) {
-		MsgBox, 4, , No Blacksmith Contracts of that size detected.  Check server for user details?
+			MsgBox, 4, , No Blacksmith Contracts of that size detected. Check server for user details?
 		IfMsgBox, Yes
 		{
 			GetUserDetails()
@@ -1894,8 +1934,14 @@ ParseChampData() {
 	}
 	
 	if (UserDetails.details.stats.zorbu_lifelong_hits_beast || UserDetails.details.stats.zorbu_lifelong_hits_undead || UserDetails.details.stats.zorbu_lifelong_hits_drow) {
-		ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow
+			ChampDetails := ChampDetails "Zorbu Kills:`n(Humanoid)`t" UserDetails.details.stats.zorbu_lifelong_hits_humanoid "`n(Beast)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_beast "`n(Undead)`t" UserDetails.details.stats.zorbu_lifelong_hits_undead "`n(Drow)`t`t" UserDetails.details.stats.zorbu_lifelong_hits_drow "`n`n"
 	}
+
+		if (UserDetails.details.stats.dhani_monsters_painted) {
+			dhanipaint := UserDetails.details.stats.dhani_monsters_painted
+			ChampDetails := ChampDetails "D hani Paints: " dhanipaint "`n`n"
+		}
+
 }
 
 CheckPatronProgress() {
@@ -2662,7 +2708,7 @@ GearReport() {
 				currentcount += 1
 			}
 		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87)){
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87) or (lastchamp = 88)){
 			totalcorelevels += (v.enchant + 1)
 			totalcoreitems += 1
 			if (lastshiny) {
