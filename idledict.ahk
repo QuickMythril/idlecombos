@@ -876,7 +876,7 @@ ChestFromID(id) {
 			case "380": namefromid := "Gold Captain Boo Chest"
 		}
 	}
-	else if (id < 384) {
+	else if (id < 385) {
 		switch id {
 			case "381": namefromid := "Gold Freshly Painted Chest"
 			case "382": namefromid := "Gold Branched Chest"
