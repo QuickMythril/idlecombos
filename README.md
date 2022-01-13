@@ -6,7 +6,6 @@ It's recommended to exit the game first to avoid losing items.</br>
 IMPORTANT - Epic Launcher will not open Idlechampions if</br>
 Idlecombos is open first.</br>
 </br>
-IdleCombos.exe (current standalone exe)</br>
 IdleCombos.ahk (current AHK version)</br>
 idledict.ahk (id definitions file)</br>
 json.ahk (json parsing, included in exe)</br>
