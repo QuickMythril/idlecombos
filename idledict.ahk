@@ -388,7 +388,7 @@ FeatFromID(id) {
 		}
 
 	}
-	else if (id < 685) {
+	else if (id < 708) {
 		switch id {
 			case "669": namefromid := "Yorven (Blood Fury Tattoo +40%)"
 			case "672": namefromid := "Viconia (Global DPS +25%)"
@@ -397,11 +397,11 @@ FeatFromID(id) {
 			case "680": namefromid := "Rust (One Gold Piece +40%)"
 			case "682": namefromid := "Rust (Rust For Hire +40%)"
 			case "684": namefromid := "Rust (Close Friends +40%)"
-			;case "685": namefromid := "Rust (G.O.A.T. Pirate +40%)"
-			;case "613": namefromid := "Rust (Paint Them Red +40%)"
-			;case "615": namefromid := "Rust (Friendly Rivalry +40%)"
-			;case "636": namefromid := "Rust (Global DPS +25%)"
-			;case "638": namefromid := "Rust (Hype +40%)"
+			case "687": namefromid := "Evelyn (Divine Prayer +40%)"
+			case "694": namefromid := "Walnut (Documancer +40%)"
+			case "703": namefromid := "Vi (Gold +25%)"
+			case "706": namefromid := "Vi (Catch and Release +40%)"
+			case "707": namefromid := "Vi (I'm Too Old For This #*&! +40%)"
 			;case "642": namefromid := "Rust (Global DPS +25%)"
 			;case "646": namefromid := "Rust (Tasty Friends +40%)"
 			;case "652": namefromid := "Brig (Harmonies Hype +40%)"
@@ -876,18 +876,18 @@ ChestFromID(id) {
 			case "380": namefromid := "Gold Captain Boo Chest"
 		}
 	}
-	else if (id < 385) {
+	else if (id < 391) {
 		switch id {
 			case "381": namefromid := "Gold Freshly Painted Chest"
 			case "382": namefromid := "Gold Branched Chest"
 			case "383": namefromid := "Gold Blazed Chest"
 			case "384": namefromid := "Gold Spotlight Chest"
-			;	case "385": namefromid := "UNKNOWN (" id ")"
-			;	case "386": namefromid := "UNKNOWN (" id ")"
-			;	case "387": namefromid := "UNKNOWN (" id ")"
-			;	case "388": namefromid := "UNKNOWN (" id ")"
-			;	case "389": namefromid := "UNKNOWN (" id ")"
-			;	case "390": namefromid := "UNKNOWN (" id ")"
+			case "385": namefromid := "Gold Pirate Chest"
+			case "386": namefromid := "Gold Gingerbread Chest"
+			case "387": namefromid := "Gold Candy Cane Chest"
+			case "388": namefromid := "Gold Carrot Chest"
+			case "389": namefromid := "Gold Overstuffed Chest"
+			case "390": namefromid := "Gold Ice Dagger Chest"
 			;	case "391": namefromid := "UNKNOWN (" id ")"
 			;	case "392": namefromid := "UNKNOWN (" id ")"
 			;	case "393": namefromid := "UNKNOWN (" id ")"
