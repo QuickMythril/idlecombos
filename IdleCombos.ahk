@@ -1392,7 +1392,7 @@ Lg_Blacksmith:
 		if (ErrorLevel=1) {
 			return
 		}
-		if !((advtoload > 0) && (advtoload < 999)) {
+		if !((advtoload > 0) && (advtoload < 9999)) {
 			MsgBox % "Invalid adventure_id: " advtoload
 			return
 		}
