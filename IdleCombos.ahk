@@ -1103,14 +1103,8 @@ Clear_Log:
 		newfeats := ""
 		lastshiny := ""
 		newshinies := ""
-		needcount := 0
 		chestresults_cumulative := {}
 
-		case chestid
-		{
-			case "1":{needcount := 99}
-			case "2":{needcount := 99}
-		}
 		while (count > 0) {
 			SB_SetText("Chests remaining to open: " count)
 			if (count < 100) {
@@ -1119,9 +1113,9 @@ Clear_Log:
 				count -= count
 			}
 			else {
-				rawresults := ServerCall("opengenericchest", chestparams needcount)
+				rawresults := ServerCall("opengenericchest", chestparams 99)
 				Sleep, 1000
-				count -= needcount
+				count -= 99
 			}
 			if (CurrentSettings.alwayssavechests || tempsavesetting) {
 				FileAppend, %rawresults%`n, %ChestOpenLogFile%
