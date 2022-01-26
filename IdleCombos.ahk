@@ -1389,7 +1389,7 @@ Lg_Blacksmith:
 			IfMsgBox Cancel
 			return
 		}
-		advtoload := 31
+		advtoload := 592
 		patrontoload := 0
 		InputBox, advtoload, Adventure to Load, Please enter the adventure_id`nyou would like to load., , 250, 150, , , , , %advtoload%
 		if (ErrorLevel=1) {
