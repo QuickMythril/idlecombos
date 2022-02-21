@@ -3,6 +3,8 @@
 #include JSON.ahk
 #include idledict.ahk
 ;2.00
+;2/15/22 servers settle down, reduce timer to .5 secs for Chest
+;open routine 
 ;work to clean up chest open message box with help from community
 ;TODO::note community help names from discord.
 ;work to clean up menu so links work in progress, most of it backed Out 
@@ -1109,12 +1111,12 @@ Clear_Log:
 			SB_SetText("Chests remaining to open: " count)
 			if (count < 100) {
 				rawresults := ServerCall("opengenericchest", chestparams count)
-				Sleep, 1000
+				Sleep, 500
 				count -= count
 			}
 			else {
 				rawresults := ServerCall("opengenericchest", chestparams 99)
-				Sleep, 1000
+				Sleep, 500
 				count -= 99
 			}
 			if (CurrentSettings.alwayssavechests || tempsavesetting) {
