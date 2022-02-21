@@ -49,7 +49,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "2.00"
+global VersionNumber := "2.00.01"
 global CurrentDictionary := "2.00"
 
 ;Local File globals
