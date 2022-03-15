@@ -2208,7 +2208,7 @@ Lg_Blacksmith:
 				champname := ""
 				id := 1
 				champidlist := ""
-				while (id < 101) {
+				while (id < 121) {
 					champname := ChampFromID(id)
 					StringLen, champnamelen, champname
 					while (champnamelen < 16)
