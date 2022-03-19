@@ -2225,7 +2225,7 @@ Lg_Blacksmith:
 			champname := ""
 			id := 1
 			champidlist := ""
-			while (id < 101) {
+			while (id < 121) {
 				champname := ChampFromID(id)
 				StringLen, champnamelen, champname
 				while (champnamelen < 16)
@@ -2710,7 +2710,7 @@ GearReport() {
 				currentcount += 1
 			}
 		}
-		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87) or (lastchamp = 88)){
+		else if ((lastchamp = 13) or (lastchamp = 18) or (lastchamp = 30) or (lastchamp = 67) or (lastchamp = 68) or (lastchamp = 86) or (lastchamp = 87) or (lastchamp = 88) or (lastchamp = 106)){
 			totalcorelevels += (v.enchant + 1)
 			totalcoreitems += 1
 			if (lastshiny) {
