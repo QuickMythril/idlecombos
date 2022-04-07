@@ -2,6 +2,8 @@
 #include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;3.00
+;disabled log files by default
 ;2.00
 ;2/15/22 servers settle down, reduce timer to .5 secs for Chest
 ;open routine 
@@ -49,11 +51,12 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "2.00.01"
+global VersionNumber := "3.00"
 global CurrentDictionary := "2.00"
 
 ;Local File globals
-global OutputLogFile := "idlecombolog.txt"
+;global OutputLogFile := "idlecombolog.txt"
+global OutputLogFile := ""
 global SettingsFile := "idlecombosettings.json"
 global UserDetailsFile := "userdetails.json"
 global ChestOpenLogFile := "chestopenlog.json"
