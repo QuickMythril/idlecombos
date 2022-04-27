@@ -159,14 +159,14 @@ ChampFromID(id) {
 			case "96": namefromid := "Desmond"
 			case "97": namefromid := "Tatyana"
 			case "98": namefromid := "Gazrick"
-			case "99": namefromid := "UNKNOWN (" id ")"
-			case "100": namefromid := "UNKNOWN (" id ")"
+			case "99": namefromid := "Dungeon Master"
+			case "100": namefromid := "Nordom"
 		}
 	}
 	else if (id < 107) {
 		switch id {
-			case "101": namefromid := "UNKNOWN (" id ")"
-			case "102": namefromid := "UNKNOWN (" id ")"
+			case "101": namefromid := "Merilwen"
+			case "102": namefromid := "Nahara"
 			case "103": namefromid := "UNKNOWN (" id ")"
 			case "104": namefromid := "UNKNOWN (" id ")"
 			case "105": namefromid := "UNKNOWN (" id ")"
@@ -412,7 +412,7 @@ FeatFromID(id) {
 		}
 
 	}
-	else if (id < 726) {
+	else if (id < 746) {
 		switch id {
 			case "669": namefromid := "Yorven (Blood Fury Tattoo +40%)"
 			case "672": namefromid := "Viconia (Global DPS +25%)"
@@ -424,6 +424,31 @@ FeatFromID(id) {
 			case "687": namefromid := "Evelyn (Divine Prayer +40%)"
 			case "694": namefromid := "Walnut (Documancer +40%)"
 			case "703": namefromid := "Vi (Gold +25%)"
+			case "706": namefromid := "Vi (Catch and Release +40%)"
+			case "707": namefromid := "Vi (I'm Too Old For This #*&! +40%)"
+			case "718": namefromid := "Desmond (The Beast Within)"
+			case "719": namefromid := "Desmond (What Lies in Shadow)"
+			case "724": namefromid := "Desmond (Running with the Pack +40%)"
+			case "725": namefromid := "Desmond (Lament the Lost +40%)"
+			case "729": namefromid := "Mehen (Where my girls go, I go.)"
+			case "741": namefromid := "Blooshi (Soul Gatherer +40%)"
+			case "744": namefromid := "Blooshi (Hey! Skull guy! Look how good I'm doing!)"
+			case "745": namefromid := "Tatyana (Health +30%)"
+		}
+		
+	}
+	else if (id < 726) {
+		switch id {
+			case "746": namefromid := "Tatyana (Faithful Friend +40%)"
+			case "748": namefromid := "Tatyana (Rising Fury +40%)"
+			case "754": namefromid := "Gazrick (Frosty Friendship +40%)"
+			case "756": namefromid := "Gazrick (CON +1)"
+			case "767": namefromid := "Tatyana (Overwhelm point +10)"
+			case "769": namefromid := "Nova (Overwhelm point +10)"
+			case "771": namefromid := "Blooshi (Overwhelm point +10)"
+			case "775": namefromid := "Dungeon Master (Patience, Young Ones! +40%)"
+			case "777": namefromid := "Dungeon Master (Words of Encouragement +40%)"
+			case "784": namefromid := "Nordom (Rule of Law +40%)"
 			case "706": namefromid := "Vi (Catch and Release +40%)"
 			case "707": namefromid := "Vi (I'm Too Old For This #*&! +40%)"
 			case "718": namefromid := "Desmond (The Beast Within)"
@@ -867,18 +892,18 @@ ChestFromID(id) {
 			case "351": namefromid := "Gold Tatyana Chest"
 			case "352": namefromid := "Silver Gazrick Chest"
 			case "353": namefromid := "Gold Gazrick Chest"
-			case "354": namefromid := "Silver Y5E11 Chest"
-			case "355": namefromid := "Gold Y5E11 Chest"
-			case "356": namefromid := "Silver Y5E12 Chest"
-			case "357": namefromid := "Gold Y5E12 Chest"
-			case "358": namefromid := "Silver Y5E13 Chest"
-			case "359": namefromid := "Gold Y5E13 Chest"
-			case "360": namefromid := "Silver Y5E14 Chest"
+			case "354": namefromid := "Silver Dungeon Master Chest"
+			case "355": namefromid := "Gold Dungeon Master Chest"
+			case "356": namefromid := "Silver Nordom Chest"
+			case "357": namefromid := "Gold Nordom Chest"
+			case "358": namefromid := "Silver Merilwen Chest"
+			case "359": namefromid := "Gold Merilwen Chest"
+			case "360": namefromid := "Silver Nahara Chest"
 		}
 	}
 	else if (id < 381) {
 		switch id {
-			case "361": namefromid := "Gold Y5E14 Chest"
+			case "361": namefromid := "Gold Nahara Chest"
 			case "362": namefromid := "Silver Y5E15 Chest"
 			case "363": namefromid := "Gold Y5E15 Chest"
 			case "364": namefromid := "Silver Y5E16 Chest"
@@ -900,7 +925,7 @@ ChestFromID(id) {
 			case "380": namefromid := "Gold Captain Boo Chest"
 		}
 	}
-	else if (id < 396) {
+	else if (id < 401) {
 		switch id {
 			case "381": namefromid := "Gold Freshly Painted Chest"
 			case "382": namefromid := "Gold Branched Chest"
@@ -917,11 +942,35 @@ ChestFromID(id) {
 			case "393": namefromid := "Gold Gold Piece Chest"
 			case "394": namefromid := "Gold Pouch Chest"
 			case "395": namefromid := "Gold Tarrasque Chest"
-			;	case "396": namefromid := "UNKNOWN (" id ")"
-			;	case "397": namefromid := "UNKNOWN (" id ")"
-			;	case "398": namefromid := "UNKNOWN (" id ")"
-			;	case "399": namefromid := "UNKNOWN (" id ")"
-			;	case "400": namefromid := "UNKNOWN (" id ")"
+			case "396": namefromid := "Gold Wheeled Chest"
+			case "397": namefromid := "Gold Shadow Chest"
+			case "398": namefromid := "Gold Shenanigan Chest"
+			case "399": namefromid := "Gold Raven Queens Chest"
+			case "400": namefromid := "Gold Shadow-Eberron Chest"
+		}
+	}
+	else if (id < 412) {
+		switch id {
+			case "401": namefromid := "Gold Rescue Chest"
+			case "402": namefromid := "Gold New Moon Chest"
+			case "403": namefromid := "Gold Vampiric Chest"
+			case "404": namefromid := "Gold Snack Chest"
+			case "405": namefromid := "Gold Skewered Chest"
+			case "406": namefromid := "Gold Swag Chest"
+			case "407": namefromid := "Gold Savage Chest"
+			case "408": namefromid := "Gold Dice Chest"
+			case "409": namefromid := "Gold Clockwork Chest"
+			case "410": namefromid := "Gold Marching Chest"
+			case "411": namefromid := "Gold Toolbox Chest"
+	;		case "412": namefromid := "Gold Elven Chest"
+	;		case "413": namefromid := "Gold Gold Piece Chest"
+	;		case "414": namefromid := "Gold Pouch Chest"
+	;		case "415": namefromid := "Gold Tarrasque Chest"
+	;		case "416": namefromid := "UNKNOWN (" id ")"
+	;		case "417": namefromid := "UNKNOWN (" id ")"
+	;		case "418": namefromid := "UNKNOWN (" id ")"
+	;		case "419": namefromid := "UNKNOWN (" id ")"
+	;		case "420": namefromid := "UNKNOWN (" id ")"
 		}
 	}
 	else {
