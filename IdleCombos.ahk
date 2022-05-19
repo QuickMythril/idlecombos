@@ -378,7 +378,7 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vBackground2Patron x+2 w50, % Background2Patron
 		Gui, MyWindow:Add, Text, x15 y+p w130, Background2 Area:
 		Gui, MyWindow:Add, Text, vBackground2Area x+2 w50, % Background2Area
-		Gui, MyWindow:Add, Text, x15 y142 w130, Background3 Adventure:
+		Gui, MyWindow:Add, Text, x15 y162 w130, Background3 Adventure:
 		Gui, MyWindow:Add, Text, vBackground3Adventure x+2 w50, % Background3Adventure
 		Gui, MyWindow:Add, Text, x15 y+p w130, Background3 Patron:
 		Gui, MyWindow:Add, Text, vBackground3Patron x+2 w50, % Background3Patron
@@ -388,7 +388,7 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vFGCore x200 y33 w150, % FGCore
 		Gui, MyWindow:Add, Text, vBGCore x200 y76 w150, % BGCore
 		Gui, MyWindow:Add, Text, vBG2Core x200 y119 w150, % BG2Core
-		Gui, MyWindow:Add, Text, vBG3Core x200 y142 w150, % BG3Core
+		Gui, MyWindow:Add, Text, vBG3Core x200 y162 w150, % BG3Core
 
 		Gui, Tab, Inventory
 		Gui, MyWindow:Add, Text, x15 y33 w70, Current Gems:
@@ -522,6 +522,10 @@ class MyGui {
 		GuiControl, MyWindow:, Background2Adventure, % Background2Adventure, w250 h210
 		GuiControl, MyWindow:, Background2Area, % Background2Area, w250 h210
 		GuiControl, MyWindow:, Background2Patron, % Background2Patron, w250 h210
+		GuiControl, MyWindow:, Background3Adventure, % Background2Adventure, w250 h210
+		GuiControl, MyWindow:, Background3Area, % Background2Area, w250 h210
+		GuiControl, MyWindow:, Background3Patron, % Background2Patron, w250 h210
+
 		GuiControl, MyWindow:, FGCore, % FGCore, w250 h210
 		GuiControl, MyWindow:, BGCore, % BGCore, w250 h210
 		GuiControl, MyWindow:, BG2Core, % BG2Core, w250 h210
@@ -1629,6 +1633,8 @@ Lg_Blacksmith:
 		BGCore := "`n"
 		BG2Core := "`n"
 		BG3Core := "`n"
+		;need to adjust this to account for 3 bginstance, count from 0-3, not sure values of ActiveInstance
+		;ActiveInstance := UserDetails.details.active_game_instance_id, probably a switch based 
 		If (ActiveInstance == 1) {
 			bginstance := 2
 		}
