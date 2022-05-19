@@ -1710,7 +1710,7 @@ Lg_Blacksmith:
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			BG2Core := BG2Core "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
-				else if(v.instance_id != 0){
+		else if(v.instance_id != 0){
 			if (v.core_id == 1) {
 				BG3Core := "Core: Modest"
 			}
