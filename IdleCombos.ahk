@@ -379,6 +379,7 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vFGCore x200 y33 w150, % FGCore
 		Gui, MyWindow:Add, Text, vBGCore x200 y76 w150, % BGCore
 		Gui, MyWindow:Add, Text, vBG2Core x200 y119 w150, % BG2Core
+		Gui, MyWindow:Add, Text, vBG3Core x200 y142 w150, % BG3Core
 
 		Gui, Tab, Inventory
 		Gui, MyWindow:Add, Text, x15 y33 w70, Current Gems:
@@ -515,6 +516,7 @@ class MyGui {
 		GuiControl, MyWindow:, FGCore, % FGCore, w250 h210
 		GuiControl, MyWindow:, BGCore, % BGCore, w250 h210
 		GuiControl, MyWindow:, BG2Core, % BG2Core, w250 h210
+		GuiControl, MyWindow:, BG3Core, % BG3Core, w250 h210
 		;inventory
 		GuiControl, MyWindow:, CurrentGems, % CurrentGems, w250 h210
 		GuiControl, MyWindow:, SpentGems, % SpentGems, w250 h210
@@ -1659,7 +1661,7 @@ Lg_Blacksmith:
 				BGCore := "Core: Fast"
 			}
 			else if (v.core_id == 3) {
-				BGCore := "Core: Fast"
+				BGCore := "Core: Magic"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
 				BGCore := BGCore " (Reset at " v.area_goal ")"
@@ -1689,7 +1691,7 @@ Lg_Blacksmith:
 				BG2Core := "Core: Fast"
 			}
 			else if (v.core_id == 3) {
-				BGCore := "Core: Fast"
+				BG2Core := "Core: Magic"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
 				BG2Core := BG2Core " (Reset at " v.area_goal ")"
@@ -1707,6 +1709,36 @@ Lg_Blacksmith:
 			}
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			BG2Core := BG2Core "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
+		}
+				else if(v.instance_id != 0){
+			if (v.core_id == 1) {
+				BG3Core := "Core: Modest"
+			}
+			else if (v.core_id == 2) {
+				BG3Core := "Core: Strong"
+			}
+			else if (v.core_id == 3) {
+				BG3Core := "Core: Fast"
+			}
+			else if (v.core_id == 4) {
+				BG3Core := "Core: Magic"
+			}
+			if (v.properties.toggle_preferences.reset == true) {
+				BG3Core := BG3Core " (Reset at " v.area_goal ")"
+			}
+			xptolevel := v.exp_total
+			corelevel := 1
+			levelxp := 8000
+			while (xptolevel > (levelxp - 1)) {
+				corelevel += 1
+				xptolevel -= levelxp
+				levelxp += 4000
+			}
+			if (corelevel > 15) {
+				corelevel := corelevel " - Max 15"
+			}
+			percenttolevel := Floor((xptolevel / levelxp) * 100)
+			BG3Core := BG3Core "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
 		;
 	}
