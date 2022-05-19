@@ -139,6 +139,7 @@ global BrivZone := 0
 global FGCore := "`n`n"
 global BGCore := "`n`n"
 global BG2Core := "`n`n"
+global BG3Core := "`n`n"
 ;Patron globals
 global MirtVariants := ""
 global MirtCompleted := ""
@@ -1609,6 +1610,7 @@ Lg_Blacksmith:
 		FGCore := "`n"
 		BGCore := "`n"
 		BG2Core := "`n"
+		BG3Core := "`n"
 		If (ActiveInstance == 1) {
 			bginstance := 2
 		}
@@ -1625,6 +1627,9 @@ Lg_Blacksmith:
 			}
 			else if (v.core_id == 3) {
 				FGCore := "Core: Fast"
+			}
+			else if (v.core_id == 4) {
+				FGCore := "Core: Magic"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
 				FGCore := FGCore " (Reset at " v.area_goal ")"
@@ -1649,6 +1654,9 @@ Lg_Blacksmith:
 			}
 			else if (v.core_id == 2) {
 				BGCore := "Core: Strong"
+			}
+			else if (v.core_id == 3) {
+				BGCore := "Core: Fast"
 			}
 			else if (v.core_id == 3) {
 				BGCore := "Core: Fast"
@@ -1679,6 +1687,9 @@ Lg_Blacksmith:
 			}
 			else if (v.core_id == 3) {
 				BG2Core := "Core: Fast"
+			}
+			else if (v.core_id == 3) {
+				BGCore := "Core: Fast"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
 				BG2Core := BG2Core " (Reset at " v.area_goal ")"
