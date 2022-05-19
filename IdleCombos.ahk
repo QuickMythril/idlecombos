@@ -105,6 +105,9 @@ global BackgroundPatron := ""
 global Background2Adventure := ""
 global Background2Area := ""
 global Background2Patron := ""
+global Background3Adventure := ""
+global Background3Area := ""
+global Background3Patron := ""
 global AchievementInfo := "This page intentionally left blank.`n`n`n`n`n`n`n"
 global BlessingInfo := "`n`n`n`n`n`n"
 global ChampDetails := ""
@@ -375,6 +378,12 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vBackground2Patron x+2 w50, % Background2Patron
 		Gui, MyWindow:Add, Text, x15 y+p w130, Background2 Area:
 		Gui, MyWindow:Add, Text, vBackground2Area x+2 w50, % Background2Area
+		Gui, MyWindow:Add, Text, x15 y142 w130, Background3 Adventure:
+		Gui, MyWindow:Add, Text, vBackground3Adventure x+2 w50, % Background3Adventure
+		Gui, MyWindow:Add, Text, x15 y+p w130, Background3 Patron:
+		Gui, MyWindow:Add, Text, vBackground3Patron x+2 w50, % Background3Patron
+		Gui, MyWindow:Add, Text, x15 y+p w130, Background3 Area:
+		Gui, MyWindow:Add, Text, vBackground3Area x+2 w50, % Background3Area
 
 		Gui, MyWindow:Add, Text, vFGCore x200 y33 w150, % FGCore
 		Gui, MyWindow:Add, Text, vBGCore x200 y76 w150, % BGCore
@@ -1603,10 +1612,17 @@ Lg_Blacksmith:
 			BackgroundPatron := PatronFromID(v.current_patron_id)
 			bginstance += 1
 		}
-		else {
+		else if (bginstance == 1){
 			Background2Adventure := v.current_adventure_id
 			Background2Area := v.current_area
 			Background2Patron := PatronFromID(v.current_patron_id)
+			bginstance += 1
+		}
+
+		else {
+			Background3Adventure := v.current_adventure_id
+			Background3Area := v.current_area
+			Background3Patron := PatronFromID(v.current_patron_id)
 		}
 		;
 		FGCore := "`n"
