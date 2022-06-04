@@ -2144,15 +2144,19 @@ Hg_Blacksmith:
 	}
 
 	ServerCall(callname, parameters) {
-		URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
+		;servername from settings, instead of the hard coded value
+		URLtoCall := "http://" servername ".idlechampions.com/~idledragons/post.php?call=" callname parameters
 		WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		WR.SetTimeouts("10000", "10000", "10000", "10000")
+		;default values on the below in ms, 0 is INF
+		;from https://docs.microsoft.com/en-us/windows/win32/winhttp/iwinhttprequest-settimeouts
+		WR.SetTimeouts(0, 60000, 30000, 120000)
 		Try {
 			WR.Open("POST", URLtoCall, false)
 			WR.SetRequestHeader("Content-Type","application/x-www-form-urlencoded")
 			WR.Send()
-			WR.WaitForResponse(-1)
+			WR.WaitForResponse()
 			data := WR.ResponseText
+			WR.Close()
 		}
 		UpdateLogTime()
 		FileAppend, (%CurrentTime%) Server request: "%callname%"`n, %OutputLogFile%
