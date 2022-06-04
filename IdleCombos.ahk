@@ -133,6 +133,7 @@ global CurrentTinyBS := ""
 global CurrentSmBS := ""
 global CurrentMdBS := ""
 global CurrentLgBS := ""
+global CurrentHgBS := ""
 global AvailableBSLvs := ""
 ;Loot globals
 global EpicGearCount := 0
@@ -300,6 +301,7 @@ class MyGui {
 		Menu, BlacksmithSubmenu, Add, Use Small Contracts, Sm_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Medium Contracts, Med_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Use Large Contracts, Lg_Blacksmith
+		Menu, BlacksmithSubmenu, Add, Use Huge Contracts, Hg_Blacksmith
 		Menu, BlacksmithSubmenu, Add, Item Level Report, GearReport
 		Menu, BlacksmithSubmenu, Add, Active Patron Feats, PatronFeats
 		Menu, ToolsSubmenu, Add, &Blacksmith, :BlacksmithSubmenu
@@ -341,7 +343,7 @@ class MyGui {
 		Gui, MyWindow:Add, Button, x%col2_x% y%row_y% w60 gReload_Clicked, Reload
 		Gui, MyWindow:Add, Button, x%col3_x% y%row_y% w60 gExit_Clicked, Exit
 
-		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400 h230, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
+		Gui, MyWindow:Add, Tab3, x%col1_x% y%row_y% w400 h250, Summary|Adventures|Inventory||Patrons|Champions|Settings|Log|
 		Gui, Tab
 
 		row_y := row_y + 25
@@ -429,6 +431,8 @@ class MyGui {
 		Gui, MyWindow:Add, Text, vCurrentMdBS x+2 w35 right, % CurrentMdBS
 		Gui, MyWindow:Add, Text, x15 y+p w110, Large Blacksmiths:
 		Gui, MyWindow:Add, Text, vCurrentLgBS x+2 w35 right, % CurrentLgBS
+		Gui, MyWindow:Add, Text, x15 y+p w110, Huge Blacksmiths:
+		Gui, MyWindow:Add, Text, vCurrentHgBS x+2 w35 right, % CurrentHgBS
 
 		Gui, Tab, Patrons
 		Gui, MyWindow:Add, Text, x15 y33 w75, Mirt Variants:
@@ -551,6 +555,7 @@ class MyGui {
 		GuiControl, MyWindow:, CurrentSmBS, % CurrentSmBS, w250 h210
 		GuiControl, MyWindow:, CurrentMdBS, % CurrentMdBS, w250 h210
 		GuiControl, MyWindow:, CurrentLgBS, % CurrentLgBS, w250 h210
+		GuiControl, MyWindow:, CurrentHgBS, % CurrentHgBS, w250 h210
 		GuiControl, MyWindow:, AvailableBSLvs, % AvailableBSLvs, w250 h210
 		;patrons
 		GuiControl, MyWindow:, MirtVariants, % MirtVariants, w250 h210
@@ -1277,6 +1282,12 @@ Lg_Blacksmith:
 		return
 	}
 
+Hg_Blacksmith:
+	{
+		UseBlacksmith(1797)
+		return
+	}
+
 	UseBlacksmith(buffid) {
 		if !UserID {
 			MsgBox % "Need User ID & Hash."
@@ -1288,6 +1299,7 @@ Lg_Blacksmith:
 			case 32: currentcontracts := CurrentSmBS
 			case 33: currentcontracts := CurrentMdBS
 			case 34: currentcontracts := CurrentLgBS
+			case 1797: currentcontracts := CurrentHgBS
 		}	
 		if !(currentcontracts) {
 			MsgBox, 4, , No Blacksmith Contracts of that size detected. Check server for user details?
@@ -1363,6 +1375,7 @@ Lg_Blacksmith:
 					case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
 					case 33: contractsused := (CurrentMdBS - blacksmithresults.buffs_remaining)
 					case 34: contractsused := (CurrentLgBS - blacksmithresults.buffs_remaining)
+					case 1797: contractsused := (CurrentHgBS - blacksmithresults.buffs_remaining)
 				}
 				UpdateLogTime()
 				FileAppend, % "(" CurrentTime ") Contracts Used: " Floor(contractsused) "`n", %OutputLogFile%
@@ -1394,6 +1407,7 @@ Lg_Blacksmith:
 			case 32: contractsused := (CurrentSmBS - blacksmithresults.buffs_remaining)
 			case 33: contractsused := (CurrentMdBS - blacksmithresults.buffs_remaining)
 			case 34: contractsused := (CurrentLgBS - blacksmithresults.buffs_remaining)
+			case 1797: contractsused := (CurrentHgBS - blacksmithresults.buffs_remaining)
 		}
 		UpdateLogTime()
 		FileAppend, % "(" CurrentTime ") Contracts used on " ChampFromID(heroid) ": " Floor(contractsused) "`n", %OutputLogFile%
@@ -1818,6 +1832,7 @@ Lg_Blacksmith:
 			case 32: CurrentSmBS := v.inventory_amount
 			case 33: CurrentMdBS := v.inventory_amount
 			case 34: CurrentLgBS := v.inventory_amount
+			case 1797: CurrentHgBS := v.inventory_amount
 		}
 		AvailableChests := "= " Floor(CurrentGems/50) " Silver Chests"
 		tokencount := (CurrentTinyBounties*12)+(CurrentSmBounties*72)+(CurrentMdBounties*576)+(CurrentLgBounties*1152)
@@ -1831,7 +1846,7 @@ Lg_Blacksmith:
 			AvailableTokens := "= " tokencount " Tokens"
 			CurrentTokens := "(" Round(tokencount/2500, 2) " Free Plays)"
 		}
-		AvailableBSLvs := "= " CurrentTinyBS+(CurrentSmBS*2)+(CurrentMdBS*6)+(CurrentLgBS*24) " Item Levels"
+		AvailableBSLvs := "= " CurrentTinyBS+(CurrentSmBS*2)+(CurrentMdBS*6)+(CurrentLgBS*24)+(CurrentHgBS*120) " Item Levels"
 	}
 
 	ParsePatronData() {
@@ -2194,15 +2209,19 @@ Lg_Blacksmith:
 	}
 
 	ServerCall(callname, parameters) {
-		URLtoCall := "http://ps7.idlechampions.com/~idledragons/post.php?call=" callname parameters
+		;servername from settings, instead of the hard coded value
+		URLtoCall := "http://" servername ".idlechampions.com/~idledragons/post.php?call=" callname parameters
 		WR := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-		WR.SetTimeouts("10000", "10000", "10000", "10000")
+		;default values on the below in ms, 0 is INF
+		;from https://docs.microsoft.com/en-us/windows/win32/winhttp/iwinhttprequest-settimeouts
+		WR.SetTimeouts(0, 60000, 30000, 120000)
 		Try {
 			WR.Open("POST", URLtoCall, false)
 			WR.SetRequestHeader("Content-Type","application/x-www-form-urlencoded")
 			WR.Send()
-			WR.WaitForResponse(-1)
+			WR.WaitForResponse()
 			data := WR.ResponseText
+			WR.Close()
 		}
 		UpdateLogTime()
 		FileAppend, (%CurrentTime%) Server request: "%callname%"`n, %OutputLogFile%
