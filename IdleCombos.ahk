@@ -1422,7 +1422,7 @@ Hg_Blacksmith:
 		if (ErrorLevel=1) {
 			return
 		}
-		if !((patrontoload > -1) && (patrontoload < 4)) {
+		if !((patrontoload > -1) && (patrontoload < 5)) {
 			MsgBox % "Invalid patron_id: " patrontoload
 			return
 		}
