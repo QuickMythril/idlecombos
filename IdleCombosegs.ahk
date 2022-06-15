@@ -5,6 +5,7 @@
 ;3.00
 ;disable log files by default
 ;UPDATES TO MATCH STEAM VERSION
+;changed persistant files so can run side by side with steam
 ;2.00
 ;2/15/22 servers settle down, reduce timer to .5 secs for Chest
 ;open routine 
@@ -58,12 +59,12 @@ global CurrentDictionary := "2.00"
 ;Local File globals
 ;global OutputLogFile := "idlecombolog.txt"
 global OutputLogFile := ""
-global SettingsFile := "idlecombosettings.json"
-global UserDetailsFile := "userdetails.json"
-global ChestOpenLogFile := "chestopenlog.json"
-global BlacksmithLogFile := "blacksmithlog.json"
-global RedeemCodeLogFile := "redeemcodelog.json"
-global JournalFile := "journal.json"
+global SettingsFile := "idlecombosettingsegs.json"
+global UserDetailsFile := "userdetailsegs.json"
+global ChestOpenLogFile := "chestopenlogegs.json"
+global BlacksmithLogFile := "blacksmithlogegs.json"
+global RedeemCodeLogFile := "redeemcodelogegs.json"
+global JournalFile := "journalegs.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files\Epic Games\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
