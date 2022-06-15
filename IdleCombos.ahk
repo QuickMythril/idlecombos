@@ -2,6 +2,10 @@
 #include %A_ScriptDir%
 #include JSON.ahk
 #include idledict.ahk
+;3.10
+;add working core 4 and party 4 thanks Fmagdi
+;hopeful fix for opening to many chest ban thanks deathoone
+;support for huge contracts thanks NeyahPeterson
 ;3.00
 ;disabled log files by default
 ;2.00
@@ -51,7 +55,7 @@
 ;-(Also resized the window finally) :P
 
 ;Special thanks to all the idle dragons who inspired and assisted me!
-global VersionNumber := "3.00"
+global VersionNumber := "3.10"
 global CurrentDictionary := "2.00"
 
 ;Local File globals
@@ -313,6 +317,7 @@ class MyGui {
 		;Menu, AdvSubmenu, Add, Load New BG Adv, LoadBGAdventure
 		Menu, AdvSubmenu, Add, End Background Adv, EndBGAdventure
 		Menu, AdvSubmenu, Add, End Background2 Adv, EndBG2Adventure
+		Menu, AdvSubmenu, Add, End Background3 Adv, EndBG3Adventure
 		Menu, AdvSubmenu, Add, &Kleho Image, KlehoImage
 		Menu, AdvSubmenu, Add, &Incomplete Variants, IncompleteVariants
 		Menu, AdvSubmenu, Add, Adventure List, AdventureList
@@ -526,9 +531,9 @@ class MyGui {
 		GuiControl, MyWindow:, Background2Adventure, % Background2Adventure, w250 h210
 		GuiControl, MyWindow:, Background2Area, % Background2Area, w250 h210
 		GuiControl, MyWindow:, Background2Patron, % Background2Patron, w250 h210
-		GuiControl, MyWindow:, Background3Adventure, % Background2Adventure, w250 h210
-		GuiControl, MyWindow:, Background3Area, % Background2Area, w250 h210
-		GuiControl, MyWindow:, Background3Patron, % Background2Patron, w250 h210
+		GuiControl, MyWindow:, Background3Adventure, % Background3Adventure, w250 h210
+		GuiControl, MyWindow:, Background3Area, % Background3Area, w250 h210
+		GuiControl, MyWindow:, Background3Patron, % Background3Patron, w250 h210
 
 		GuiControl, MyWindow:, FGCore, % FGCore, w250 h210
 		GuiControl, MyWindow:, BGCore, % BGCore, w250 h210
@@ -1418,13 +1423,17 @@ Hg_Blacksmith:
 		return
 	}
 
+	global lastadv := 0			;fmagdi - to be used to save ended adventureid for use as default for next load 
+
 	LoadAdventure() {
+
+		GetUserDetails()
 		while !(CurrentAdventure == "-1") {
 			MsgBox, 5, , Please end your current adventure first.
 			IfMsgBox Cancel
 			return
 		}
-		advtoload := 592
+		advtoload := lastadv		;fmagdi - defaults to last ended adventure id, or to variable default in globals
 		patrontoload := 0
 		InputBox, advtoload, Adventure to Load, Please enter the adventure_id`nyou would like to load., , 250, 150, , , , , %advtoload%
 		if (ErrorLevel=1) {
@@ -1450,6 +1459,8 @@ Hg_Blacksmith:
 	}
 
 	EndAdventure() {
+		GetUserDetails()				;fmagdi - updates info before ending an adventure to be sure you are ending the correct one
+
 		while (CurrentAdventure == "-1") {
 			MsgBox, No current adventure active.
 			return
@@ -1459,6 +1470,9 @@ Hg_Blacksmith:
 		{
 			return
 		}
+
+		lastadv := CurrentAdventure	;fmagdi - saves ended adventure id for use as default when loading next adventure
+
 		advparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" ActiveInstance
 		sResult := ServerCall("softreset", advparams)
 		GetUserDetails()
@@ -1490,7 +1504,7 @@ Hg_Blacksmith:
 	}
 
 	EndBG2Adventure() {
-		if (ActiveInstance == "3") {
+		if (ActiveInstance == "3" or ActiveInstance == "4") {
 			bginstance := 2
 		}
 		else {
@@ -1511,6 +1525,30 @@ Hg_Blacksmith:
 		SB_SetText("Background2 adventure has been ended.")
 		return
 	}
+
+	EndBG3Adventure() {
+		if (ActiveInstance == "4") {
+			bginstance := 3
+		}
+		else {
+			bginstance := 4
+		}
+		while (Background3Adventure == "-1" or Background3Adventure == "") {
+			MsgBox, No background3 adventure active.
+			return
+		}
+		MsgBox, 4, , % "Are you sure you want to end your background3 adventure ?`nParty: " bginstance " AdvID: " Background3Adventure " Patron: " Background3Patron
+		IfMsgBox, No
+		{
+			return
+		}
+		advparams := DummyData "&user_id=" UserID "&hash=" UserHash "&instance_id=" InstanceID "&game_instance_id=" bginstance
+		sResult := ServerCall("softreset", advparams)
+		GetUserDetails()
+		SB_SetText("Background3 adventure has been ended.")
+		return
+	}
+	;	fmagdi -stop
 
 	FirstRun() {
 		MsgBox, 4, , Get User ID and Hash from webrequestlog.txt?
@@ -1636,25 +1674,25 @@ Hg_Blacksmith:
 			Background2Patron := PatronFromID(v.current_patron_id)
 			bginstance += 1
 		}
-
-		else {
+		else if (bginstance == 2){
 			Background3Adventure := v.current_adventure_id
 			Background3Area := v.current_area
 			Background3Patron := PatronFromID(v.current_patron_id)
 		}
-		;
+
 		FGCore := "`n"
 		BGCore := "`n"
 		BG2Core := "`n"
 		BG3Core := "`n"
-		;need to adjust this to account for 3 bginstance, count from 0-3, not sure values of ActiveInstance
-		;ActiveInstance := UserDetails.details.active_game_instance_id, probably a switch based 
-		If (ActiveInstance == 1) {
-			bginstance := 2
-		}
-		Else {
-			bginstance := 1
-		}
+		;		If (ActiveInstance == 1) {
+		;			bginstance := 2
+		;		}
+		;		Else {
+		;			bginstance := 1
+		;		}
+
+		bginstance := 0
+
 		for k, v in UserDetails.details.modron_saves
 		if (v.instance_id == ActiveInstance) {
 			if (v.core_id == 1) {
@@ -1669,6 +1707,7 @@ Hg_Blacksmith:
 			else if (v.core_id == 4) {
 				FGCore := "Core: Magic"
 			}
+
 			if (v.properties.toggle_preferences.reset == true) {
 				FGCore := FGCore " (Reset at " v.area_goal ")"
 			}
@@ -1686,7 +1725,7 @@ Hg_Blacksmith:
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			FGCore := FGCore "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
 		}
-		else if (v.instance_id == bginstance and v.instance_id != 0) {
+		else if (bginstance == 0 and v.instance_id != 0) {
 			if (v.core_id == 1) {
 				BGCore := "Core: Modest"
 			}
@@ -1696,7 +1735,7 @@ Hg_Blacksmith:
 			else if (v.core_id == 3) {
 				BGCore := "Core: Fast"
 			}
-			else if (v.core_id == 3) {
+			else if (v.core_id == 4) {
 				BGCore := "Core: Magic"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
@@ -1715,8 +1754,9 @@ Hg_Blacksmith:
 			}
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			BGCore := BGCore "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
+			bginstance += 1
 		}
-		else if(v.instance_id != 0){
+		else if (bginstance == 1 and v.instance_id != 0) {
 			if (v.core_id == 1) {
 				BG2Core := "Core: Modest"
 			}
@@ -1726,7 +1766,7 @@ Hg_Blacksmith:
 			else if (v.core_id == 3) {
 				BG2Core := "Core: Fast"
 			}
-			else if (v.core_id == 3) {
+			else if (v.core_id == 4) {
 				BG2Core := "Core: Magic"
 			}
 			if (v.properties.toggle_preferences.reset == true) {
@@ -1745,8 +1785,9 @@ Hg_Blacksmith:
 			}
 			percenttolevel := Floor((xptolevel / levelxp) * 100)
 			BG2Core := BG2Core "`nXP: " v.exp_total " (Lv " corelevel ")`n" xptolevel "/" levelxp " (" percenttolevel "%)"
+			bginstance += 1
 		}
-		else if(v.instance_id != 0){
+		else if(bginstance == 2 and v.instance_id != 0){
 			if (v.core_id == 1) {
 				BG3Core := "Core: Modest"
 			}
