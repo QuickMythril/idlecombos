@@ -1,9 +1,12 @@
 # idlecombos
+3.00 is supported Version. </br>
 IMPORTANT - When opening chests with the idlecombos app:</br>
 The game client can save an outdated inventory, overwriting some consumables.</br>
 It's recommended to exit the game first to avoid losing items.</br>
 </br>
-IdleCombos.exe (current standalone exe)</br>
+IMPORTANT - Epic Launcher will not open Idlechampions if</br>
+Idlecombos is open first.</br>
+</br>
 IdleCombos.ahk (current AHK version)</br>
 idledict.ahk (id definitions file)</br>
 json.ahk (json parsing, included in exe)</br>
@@ -16,6 +19,7 @@ Features:</br>
 - Easy buying/opening many chests</br>
   - (Can log results to file)</br>
 - Enter multiple combinations at once</br>
+  - (<img src=https://i.imgur.com/GrCti3P.jpg>)
 - Briv Stack Calculator [github.com/Deatho0ne]</br>
 - Manual starting/stopping adventures</br>
   - (Sometimes can fix stuck accounts)</br>

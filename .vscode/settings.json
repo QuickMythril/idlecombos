@@ -1,0 +1,17 @@
+{
+    "FSharp.suggestGitignore": false,
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "renpy"
+    ],
+    "spellright.parserByClass": {
+        "renpy": {
+            "parser": "code"
+        }
+    }
+}
