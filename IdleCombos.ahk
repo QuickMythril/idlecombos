@@ -177,7 +177,7 @@ global ZarielFPCurrency := ""
 global ZarielChallenges := ""
 global ZarielRequires := ""
 global ZarielCosts := ""
-;Web Toools globals
+;Web Tools globals
 global WebToolCodes := "https://incendar.com/idlechampions_codes.php#123"
 
 ;GUI globals
@@ -742,12 +742,12 @@ Open_Gold:
 Open_Codes:
 	{
 		; GUI MENU
-		Menu, FileMenu, Add, &AutoLoad`tCtrl+A, Get_Codes_Autoload
-		Menu, FileMenu, Add, AutoLoad && &Run`tCtrl+R, Get_Codes_Autoload_Run
+		Menu, FileMenu, Add, &AutoLoad (Web)`tCtrl+A, Get_Codes_Autoload
+		Menu, FileMenu, Add, AutoLoad && &Run (Web)`tCtrl+R, Get_Codes_Autoload_Run
 		Menu, FileMenu, Add, &Submit`tCtrl+S, Redeem_Codes
 		Menu, EditMenu, Add, Paste`tCtrl+V, Paste
 		Menu, EditMenu, Add, Delete`tDel, Delete
-		Menu, HelpMenu, Add, Get &Codes`tCtrl+O, Get_Codes_Page
+		Menu, HelpMenu, Add, Open &Codes (Web)`tCtrl+O, Open_Web_Codes_Page
 		Menu, MyMenuBar, Add, &File, :FileMenu
 		Menu, MyMenuBar, Add, &Edit, :EditMenu
 		Menu, MyMenuBar, Add, &Help, :HelpMenu
@@ -783,7 +783,7 @@ Delete()
 		return
 	}
 
-Get_Codes_Page()
+Open_Web_Codes_Page()
 	{
 		Run, %WebToolCodes%
 		return
@@ -791,7 +791,7 @@ Get_Codes_Page()
 
 Get_Codes_Autoload()
 	{
-		Get_Codes_Page()
+		Open_Web_Codes_Page()
 		winwait, ALL active IDLE Champions combination🔒 codes
 		sleep, 1000
 		send, ^a
