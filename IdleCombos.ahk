@@ -69,6 +69,17 @@ global RedeemCodeLogFile := "redeemcodelog.json"
 global JournalFile := "journal.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
+global GameClientEpic := "C:\ProgramData\Epic\UnrealEngineLauncher\LauncherInstalled.dat"
+if FileExist(GameClientEpic) {
+	FileRead, EpicJSONString, %GameClientEpic%
+	EpicJSONobj := JSON.parse(EpicJSONString)
+	for each, item in EpicJSONobj.InstallationList {
+		if item.AppName = "40cb42e38c0b4a14a1bb133eb3291572" {
+			GameInstallDir := item.InstallLocation "\"
+			break
+		}
+	}
+}
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
 global DictionaryFile := "https://raw.githubusercontent.com/dhusemann/idlecombos/master/idledict.ahk"
 global LocalDictionary := "idledict.ahk"
