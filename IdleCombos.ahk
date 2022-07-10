@@ -69,15 +69,16 @@ global RedeemCodeLogFile := "redeemcodelog.json"
 global JournalFile := "journal.json"
 global CurrentSettings := []
 global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
+global GameIDEpic := "40cb42e38c0b4a14a1bb133eb3291572"
 global GameClientEpic := "C:\ProgramData\Epic\UnrealEngineLauncher\LauncherInstalled.dat"
 global GameClientEpicLauncher := ""
 if FileExist(GameClientEpic) {
 	FileRead, EpicJSONString, %GameClientEpic%
 	EpicJSONobj := JSON.parse(EpicJSONString)
 	for each, item in EpicJSONobj.InstallationList {
-		if item.AppName = "40cb42e38c0b4a14a1bb133eb3291572" {
+		if item.AppName = GameIDEpic {
 			GameInstallDir := item.InstallLocation "\"
-			GameClientEpicLauncher := "com.epicgames.launcher://apps/40cb42e38c0b4a14a1bb133eb3291572?action=launch&silent=true"
+			GameClientEpicLauncher := "com.epicgames.launcher://apps/" GameIDEpic "?action=launch&silent=true"
 			break
 		}
 	}
