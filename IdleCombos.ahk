@@ -742,7 +742,7 @@ Open_Gold:
 Open_Codes:
 	{
 		; GUI MENU
-		Menu, FileMenu, Add, &AutoLoad (Web)`tCtrl+A, Get_Codes_Autoload
+		Menu, FileMenu, Add, Auto&Load (Web)`tCtrl+L, Get_Codes_Autoload
 		Menu, FileMenu, Add, AutoLoad && &Run (Web)`tCtrl+R, Get_Codes_Autoload_Run
 		Menu, FileMenu, Add, &Submit`tCtrl+S, Redeem_Codes
 		Menu, EditMenu, Add, Paste`tCtrl+V, Paste
@@ -771,7 +771,6 @@ Paste()
 		loop, parse, foundCodeString, `n, `r
 		  CodeTotal := a_index
 		GuiControl, , CodestoEnter, %foundCodeString%
-		CodeTotal := 0
 		GuiControl, , CodesPending, Codes: 0/%CodeTotal% - Waiting... (1 code per line)
 		return
 	}
