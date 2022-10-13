@@ -7,7 +7,9 @@
 ;hopeful fix for opening to many chest ban thanks deathoone
 ;support for huge contracts thanks NeyahPeterson
 ;3.00
-;disabled log files by default
+;disable log files by default
+;UPDATES TO MATCH STEAM VERSION
+;changed persistant files so can run side by side with steam
 ;2.00
 ;2/15/22 servers settle down, reduce timer to .5 secs for Chest
 ;open routine 
@@ -19,7 +21,7 @@
 ;once steam idlecombos working merge recent changes into egs client, and maybe
 ;make the dhani paint work. Or focus Idlecombos.
 ;1.98
-;update idledict content, 
+;update idledict content, epic games setup 
 ;added NERDS as evergreen for equipment screen
 ;1.97
 ;include fixes for single instance from mikebaldi
@@ -61,28 +63,14 @@ global CurrentDictionary := "2.00"
 ;Local File globals
 ;global OutputLogFile := "idlecombolog.txt"
 global OutputLogFile := ""
-global SettingsFile := "idlecombosettings.json"
-global UserDetailsFile := "userdetails.json"
-global ChestOpenLogFile := "chestopenlog.json"
-global BlacksmithLogFile := "blacksmithlog.json"
-global RedeemCodeLogFile := "redeemcodelog.json"
-global JournalFile := "journal.json"
+global SettingsFile := "idlecombosettingsegs.json"
+global UserDetailsFile := "userdetailsegs.json"
+global ChestOpenLogFile := "chestopenlogegs.json"
+global BlacksmithLogFile := "blacksmithlogegs.json"
+global RedeemCodeLogFile := "redeemcodelogegs.json"
+global JournalFile := "journalegs.json"
 global CurrentSettings := []
-global GameInstallDir := "C:\Program Files (x86)\Steam\steamapps\common\IdleChampions\"
-global GameIDEpic := "40cb42e38c0b4a14a1bb133eb3291572"
-global GameClientEpic := "C:\ProgramData\Epic\UnrealEngineLauncher\LauncherInstalled.dat"
-global GameClientEpicLauncher := ""
-if FileExist(GameClientEpic) {
-	FileRead, EpicJSONString, %GameClientEpic%
-	EpicJSONobj := JSON.parse(EpicJSONString)
-	for each, item in EpicJSONobj.InstallationList {
-		if item.AppName = GameIDEpic {
-			GameInstallDir := item.InstallLocation "\"
-			GameClientEpicLauncher := "com.epicgames.launcher://apps/" GameIDEpic "?action=launch&silent=true"
-			break
-		}
-	}
-}
+global GameInstallDir := "C:\Program Files\Epic Games\IdleChampions\"
 global WRLFile := GameInstallDir "IdleDragons_Data\StreamingAssets\downloaded_files\webRequestLog.txt"
 global DictionaryFile := "https://raw.githubusercontent.com/dhusemann/idlecombos/master/idledict.ahk"
 global LocalDictionary := "idledict.ahk"
@@ -91,9 +79,6 @@ global ICSettingsFile := A_AppData
 StringTrimRight, ICSettingsFile, ICSettingsFile, 7
 ICSettingsFile := ICSettingsFile "LocalLow\Codename Entertainment\Idle Champions\localSettings.json"
 global GameClient := GameInstallDir "IdleDragons.exe"
-if GameClientEpicLauncher != ""
-	GameClient := GameClientEpicLauncher
-
 
 ;Settings globals
 global ServerName := "ps7"
@@ -106,6 +91,7 @@ global AlwaysSaveCodes := 0
 global NoSaveSetting := 0
 global SettingsCheckValue := 11 ;used to check for outdated settings file
 global NewSettings := JSON.stringify({"servername":"ps7","firstrun":0,"user_id":0,"hash":0,"instance_id":0,"getdetailsonstart":0,"launchgameonstart":0,"alwayssavechests":1,"alwayssavecontracts":1,"alwayssavecodes":1, "NoSaveSetting":0})
+global GameClient := "com.epicgames.launcher://apps/40cb42e38c0b4a14a1bb133eb3291572?action=launch&silent=true"
 
 ;Server globals
 global DummyData := "&language_id=1&timestamp=0&request_id=0&network_id=11&mobile_client_version=999"

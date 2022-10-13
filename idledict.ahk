@@ -1,4 +1,4 @@
-global DictionaryVersion := "1.8"
+global DictionaryVersion := "2.00"
 
 PatronFromID(patronid) {
 	switch patronid {
@@ -113,14 +113,14 @@ ChampFromID(id) {
 			case "58": namefromid := "Briv"
 			case "59": namefromid := "Melf"
 			case "60": namefromid := "Krydle"
-			}
+		}
 	}
 	else if (id < 81) {
 		switch id {
 			case "61": namefromid := "Jaheira"
 			case "62": namefromid := "Nova"
 			case "63": namefromid := "Freely"
-			case "64": namefromid := "B & G"
+			case "64": namefromid := "B && G"
 			case "65": namefromid := "Omin"
 			case "66": namefromid := "Lazaapz"
 			case "67": namefromid := "Dragonbait"
@@ -130,24 +130,87 @@ ChampFromID(id) {
 			case "71": namefromid := "Penelope"
 			case "72": namefromid := "Lucius"
 			case "73": namefromid := "Baeloth"
-			case "74": namefromid := "Y4E6"
-			case "75": namefromid := "Y4E7"
-			case "76": namefromid := "Y4E8"
-			case "77": namefromid := "Y4E9"
-			case "78": namefromid := "Y4E10"
-			case "79": namefromid := "Y4E11"
-			case "80": namefromid := "Y4E12"
+			case "74": namefromid := "Talin"
+			case "75": namefromid := "Hew Maan"
+			case "76": namefromid := "Orisha"
+			case "77": namefromid := "Alyndra"
+			case "78": namefromid := "Orkira"
+			case "79": namefromid := "Shaka"
+			case "80": namefromid := "Mehen"
 		}
 	}
-	else if (id < 86) {
+	else if (id < 101) {
 		switch id {
-			case "81": namefromid := "Y4E13"
-			case "82": namefromid := "Y4E14"
-			case "83": namefromid := "Y4E15"
-			case "84": namefromid := "Y4E16"
-			case "85": namefromid := "Y4E17"
+			case "81": namefromid := "Selise"
+			case "82": namefromid := "Sgt Knox"
+			case "83": namefromid := "Ellywick"
+			case "84": namefromid := "Prudence"
+			case "85": namefromid := "Corazon"
+			case "86": namefromid := "Reya"
+			case "87": namefromid := "NERDS"
+			case "88": namefromid := "Xerophon"
+			case "89": namefromid := "D'hani"
+			case "90": namefromid := "Brig"
+			case "91": namefromid := "Widdle"
+			case "92": namefromid := "Yorven"
+			case "93": namefromid := "Viconia"
+			case "94": namefromid := "Rust"
+			case "95": namefromid := "Vi"
+			case "96": namefromid := "Desmond"
+			case "97": namefromid := "Tatyana"
+			case "98": namefromid := "Gazrick"
+			case "99": namefromid := "Dungeon Master"
+			case "100": namefromid := "Nordom"
 		}
 	}
+	else if (id < 107) {
+		switch id {
+			case "101": namefromid := "Merilwen"
+			case "102": namefromid := "Nahara"
+			case "103": namefromid := "UNKNOWN (" id ")"
+			case "104": namefromid := "UNKNOWN (" id ")"
+			case "105": namefromid := "UNKNOWN (" id ")"
+			case "106": namefromid := "Blooshi"
+			case "107": namefromid := "UNKNOWN (" id ")"
+	;		case "88": namefromid := "UNKNOWN (" id ")"
+	;		case "100": namefromid := "UNKNOWN (" id ")"
+	;		case "90": namefromid := "UNKNOWN (" id ")"
+	;		case "91": namefromid := "UNKNOWN (" id ")"
+	;		case "92": namefromid := "UNKNOWN (" id ")"
+	;		case "93": namefromid := "UNKNOWN (" id ")"
+	;		case "94": namefromid := "UNKNOWN (" id ")"
+	;		case "95": namefromid := "UNKNOWN (" id ")"
+	;		case "96": namefromid := "UNKNOWN (" id ")"
+	;		case "97": namefromid := "UNKNOWN (" id ")"
+	;		case "98": namefromid := "UNKNOWN (" id ")"
+	;		case "99": namefromid := "UNKNOWN (" id ")"
+	;		case "100": namefromid := "UNKNOWN (" id ")"
+		}
+	}
+	;	else if (id < 107) {
+	;	switch id {
+	;		case "101": namefromid := "UNKNOWN (" id ")"
+	;		case "102": namefromid := "UNKNOWN (" id ")"
+	;		case "103": namefromid := "UNKNOWN (" id ")"
+	;		case "104": namefromid := "UNKNOWN (" id ")"
+	;		case "105": namefromid := "UNKNOWN (" id ")"
+	;		case "106": namefromid := "UNKNOWN (" id ")"
+	;		case "107": namefromid := "UNKNOWN (" id ")"
+	;		case "88": namefromid := "UNKNOWN (" id ")"
+	;		case "100": namefromid := "UNKNOWN (" id ")"
+	;		case "90": namefromid := "UNKNOWN (" id ")"
+	;		case "91": namefromid := "UNKNOWN (" id ")"
+	;		case "92": namefromid := "UNKNOWN (" id ")"
+	;		case "93": namefromid := "UNKNOWN (" id ")"
+	;		case "94": namefromid := "UNKNOWN (" id ")"
+	;		case "95": namefromid := "UNKNOWN (" id ")"
+	;		case "96": namefromid := "UNKNOWN (" id ")"
+	;		case "97": namefromid := "UNKNOWN (" id ")"
+	;		case "98": namefromid := "UNKNOWN (" id ")"
+	;		case "99": namefromid := "UNKNOWN (" id ")"
+	;;		case "100": namefromid := "UNKNOWN (" id ")"
+	;	}
+	;}	
 	else {
 		namefromid := "UNKNOWN (" id ")"
 	}
@@ -225,7 +288,7 @@ FeatFromID(id) {
 			case "248": namefromid := "Korth (Global DPS +25%)"
 			case "251": namefromid := "Korth (Calculated +40%)"
 			case "254": namefromid := "Walnut (Global DPS +25%)"
-			}
+		}
 	}
 	else if (id < 340) {
 		switch id {
@@ -275,7 +338,7 @@ FeatFromID(id) {
 			case "405": namefromid := "Nova (Global DPS +25%)"
 		}
 	}
-	else if (id < 458) {
+	else if (id < 483) {
 		switch id {
 			case "410": namefromid := "Nova (Close Encounter +40%)"
 			case "412": namefromid := "Omin (Global DPS +25%)"
@@ -291,8 +354,115 @@ FeatFromID(id) {
 			case "450": namefromid := "Ezmerelda (Training Montage +40%)"
 			case "454": namefromid := "Penelope (Global DPS +25%)"
 			case "457": namefromid := "Penelope (Chwinga Mask +40%)"
+			case "465": namefromid := "Lucius (Self DPS +60%)"
+			case "467": namefromid := "Lucius (Arcane Chromat - Acid +40%)"
+			case "471": namefromid := "Baeloth (Global DPS +25%)"
+			case "473": namefromid := "Baeloth (Gold +25%)"
+			case "477": namefromid := "Baeloth (Morbid Excitement +40%)"
+			case "482": namefromid := "Talin (Global DPS +25%)"
 		}
 	}
+	else if (id < 562) {
+		switch id {
+			case "485": namefromid := "Talin (Quick-Release Hook)"
+			case "488": namefromid := "Hew Maan (Global DPS +25%)"
+			case "490": namefromid := "Hew Maan (Hello, Fellow Humans +40%)"
+			case "501": namefromid := "Orisha (Flaming Wings +40%)"
+			case "503": namefromid := "Orisha (Bardic Connection +40%)"
+			case "505": namefromid := "Orisha (Encore Performance)"
+			case "511": namefromid := "Alyndra (Portent +40%)"
+			case "513": namefromid := "Alyndra (Brows of Judgement +40%)"
+			case "520": namefromid := "Reya (Searing Radiance +40%)"
+			case "522": namefromid := "Reya (Echoes of Zariel +40%)"
+			case "532": namefromid := "Orkira (Elemental Fire +40%)"
+			case "533": namefromid := "Orkira (Healing Flame +25%)"
+			case "539": namefromid := "Shaka (A Celestial Puzzle +40%)"
+			case "539": namefromid := "Shaka (Celestial Resistance +30%)"
+			case "550": namefromid := "Mehen (Gold +25%)"
+			case "551": namefromid := "Mehen (Exiled +40%)"
+			case "552": namefromid := "Mehen (Brimstone Angels +40%)"
+			case "557": namefromid := "Selise (Shield of Psychomancy +40%)"
+			case "560": namefromid := "Selise (Relentless Avenger +50%)"
+			case "561": namefromid := "Selise (Eyes of Tiwaz)"			
+		}
+
+	}
+	else if (id < 668) {
+		switch id {
+			case "565": namefromid := "Sgt Knox (Health +30%)"
+			case "567": namefromid := "Sgt Knox (Rallying Cry +40%)"
+			case "574": namefromid := "Ellywick (Powerful Following +40%)"
+			case "576": namefromid := "Ellywick (Fortunate Soul +40%)"
+			case "588": namefromid := "Prudence (Glee +40%)"
+			case "590": namefromid := "Prudence (Frustration +40%)"
+			case "600": namefromid := "Corazón (Pirate's Code +40%)"
+			case "601": namefromid := "Corazón (G.O.A.T. Pirate +40%)"
+			case "613": namefromid := "D'hani (Paint Them Red +40%)"
+			case "615": namefromid := "D'hani (Friendly Rivalry +40%)"
+			case "636": namefromid := "Brig (Global DPS +25%)"
+			case "638": namefromid := "Brig (Hype +40%)"
+			case "642": namefromid := "Widdle (Global DPS +25%)"
+			case "646": namefromid := "Widdle (Tasty Friends +40%)"
+			case "652": namefromid := "Xerophon (Minion Meets Master +40%)"
+			case "655": namefromid := "Xerophon (STR +1)"
+			case "656": namefromid := "Xerophon (CON +1)"
+			case "657": namefromid := "Xerophon (INT +1)"
+			case "666": namefromid := "Yorven (Survivor's Alacrity)"
+			case "667": namefromid := "Yorven (Bump in the Night)"
+		}
+
+	}
+	else if (id < 746) {
+		switch id {
+			case "669": namefromid := "Yorven (Blood Fury Tattoo +40%)"
+			case "672": namefromid := "Viconia (Global DPS +25%)"
+			case "675": namefromid := "Viconia (Animate Dead +40%)"
+			case "679": namefromid := "Rust (Global DPS +25%)"
+			case "680": namefromid := "Rust (One Gold Piece +40%)"
+			case "682": namefromid := "Rust (Rust For Hire +40%)"
+			case "684": namefromid := "Rust (Close Friends +40%)"
+			case "687": namefromid := "Evelyn (Divine Prayer +40%)"
+			case "694": namefromid := "Walnut (Documancer +40%)"
+			case "703": namefromid := "Vi (Gold +25%)"
+			case "706": namefromid := "Vi (Catch and Release +40%)"
+			case "707": namefromid := "Vi (I'm Too Old For This #*&! +40%)"
+			case "718": namefromid := "Desmond (The Beast Within)"
+			case "719": namefromid := "Desmond (What Lies in Shadow)"
+			case "724": namefromid := "Desmond (Running with the Pack +40%)"
+			case "725": namefromid := "Desmond (Lament the Lost +40%)"
+			case "729": namefromid := "Mehen (Where my girls go, I go.)"
+			case "741": namefromid := "Blooshi (Soul Gatherer +40%)"
+			case "744": namefromid := "Blooshi (Hey! Skull guy! Look how good I'm doing!)"
+			case "745": namefromid := "Tatyana (Health +30%)"
+		}
+		
+	}
+	else if (id < 726) {
+		switch id {
+			case "746": namefromid := "Tatyana (Faithful Friend +40%)"
+			case "748": namefromid := "Tatyana (Rising Fury +40%)"
+			case "754": namefromid := "Gazrick (Frosty Friendship +40%)"
+			case "756": namefromid := "Gazrick (CON +1)"
+			case "767": namefromid := "Tatyana (Overwhelm point +10)"
+			case "769": namefromid := "Nova (Overwhelm point +10)"
+			case "771": namefromid := "Blooshi (Overwhelm point +10)"
+			case "775": namefromid := "Dungeon Master (Patience, Young Ones! +40%)"
+			case "777": namefromid := "Dungeon Master (Words of Encouragement +40%)"
+			case "784": namefromid := "Nordom (Rule of Law +40%)"
+			case "706": namefromid := "Vi (Catch and Release +40%)"
+			case "707": namefromid := "Vi (I'm Too Old For This #*&! +40%)"
+			case "718": namefromid := "Desmond (The Beast Within)"
+			case "719": namefromid := "Desmond (What Lies in Shadow)"
+			case "724": namefromid := "Desmond (Running with the Pack +40%)"
+			case "725": namefromid := "Desmond (Lament the Lost +40%)"
+			;case "638": namefromid := "Brig (Harmonies Hype +40%)"
+			;case "638": namefromid := "Brig (Harmonies Hype +40%)"
+			;case "638": namefromid := "Brig (Harmonies Hype +40%)"
+			;case "638": namefromid := "Brig (Harmonies Hype +40%)"
+		}
+		
+	}
+
 	else {
 		namefromid := "UNKNOWN (" id ")"
 	}
@@ -599,44 +769,44 @@ ChestFromID(id) {
 			case "247": namefromid := "Gold Ezmerelda Chest"
 			case "248": namefromid := "Silver Penelope Chest"
 			case "249": namefromid := "Gold Penelope Chest"
-			case "250": namefromid := "Silver Y4E4 Chest"
-			case "251": namefromid := "Gold Y4E4 Chest"
-			case "252": namefromid := "Silver Y4E5 Chest"
-			case "253": namefromid := "Gold Y4E5 Chest"
-			case "254": namefromid := "Silver Y4E6 Chest"
-			case "255": namefromid := "Gold Y4E6 Chest"
-			case "256": namefromid := "Silver Y4E7 Chest"
-			case "257": namefromid := "Gold Y4E7 Chest"
-			case "258": namefromid := "Silver Y4E8 Chest"
-			case "259": namefromid := "Gold Y4E8 Chest"
-			case "260": namefromid := "Silver Y4E9 Chest"
+			case "250": namefromid := "Silver Lucius Chest"
+			case "251": namefromid := "Gold Lucius Chest"
+			case "252": namefromid := "Silver Baeloth Chest"
+			case "253": namefromid := "Gold Baeloth Chest"
+			case "254": namefromid := "Silver Talin Chest"
+			case "255": namefromid := "Gold Talin Chest"
+			case "256": namefromid := "Silver Hew Mann Chest"
+			case "257": namefromid := "Gold Hew Mann Chest"
+			case "258": namefromid := "Silver Orisha Chest"
+			case "259": namefromid := "Gold Orisha Chest"
+			case "260": namefromid := "Silver Alyndra Chest"
 		}
 	}
 	else if (id < 281) {
 		switch id {
-			case "261": namefromid := "Gold Y4E9 Chest"
-			case "262": namefromid := "Silver Y4E10 Chest"
-			case "263": namefromid := "Gold Y4E10 Chest"
-			case "264": namefromid := "Silver Y4E11 Chest"
-			case "265": namefromid := "Gold Y4E11 Chest"
-			case "266": namefromid := "Silver Y4E12 Chest"
-			case "267": namefromid := "Gold Y4E12 Chest"
-			case "268": namefromid := "Silver Y4E13 Chest"
-			case "269": namefromid := "Gold Y4E13 Chest"
-			case "270": namefromid := "Silver Y4E14 Chest"
-			case "271": namefromid := "Gold Y4E14 Chest"
-			case "272": namefromid := "Silver Y4E15 Chest"
-			case "273": namefromid := "Gold Y4E15 Chest"
-			case "274": namefromid := "Silver Y4E16 Chest"
-			case "275": namefromid := "Gold Y4E16 Chest"
-			case "276": namefromid := "Silver Y4E17 Chest"
-			case "277": namefromid := "Gold Y4E17 Chest"
+			case "261": namefromid := "Gold Alyndra Chest"
+			case "262": namefromid := "Silver Orkira Chest"
+			case "263": namefromid := "Gold Orkira Chest"
+			case "264": namefromid := "Silver Shaka Chest"
+			case "265": namefromid := "Gold Shaka Chest"
+			case "266": namefromid := "Silver Mehan Chest"
+			case "267": namefromid := "Gold Mehan Chest"
+			case "268": namefromid := "Silver Selise Chest"
+			case "269": namefromid := "Gold Selise Chest"
+			case "270": namefromid := "Silver Sgt Knox Chest"
+			case "271": namefromid := "Gold Sgt Knox Chest"
+			case "272": namefromid := "Silver Ellywick Chest"
+			case "273": namefromid := "Gold Ellywick Chest"
+			case "274": namefromid := "Silver Prudence Chest"
+			case "275": namefromid := "Gold Prudence Chest"
+			case "276": namefromid := "Silver Corazon Chest"
+			case "277": namefromid := "Gold Corazon Chest"
 			case "278": namefromid := "Gold Bold Chest"
 			case "279": namefromid := "Gold Rime Chest"
 			case "280": namefromid := "Gold Feathered Hat Chest"
 		}
 	}
-	else if (id < 282) {
+	else if (id < 301) {
 		switch id {
 			case "281": namefromid := "Gold Experimental Chest"
 			case "282": namefromid := "Electrum Chest"
@@ -646,6 +816,161 @@ ChestFromID(id) {
 			case "287": namefromid := "Gold Dragonscale Chest"
 			case "288": namefromid := "Gold Maze Chest"
 			case "289": namefromid := "Gold Freezing Chest"
+			case "290": namefromid := "Gold Coin-Filled Chest"
+			case "291": namefromid := "Gold Agile Chest"
+			case "292": namefromid := "Gold Tactical Chest"
+			case "293": namefromid := "Gold Starburst Chest"
+			case "294": namefromid := "Gold Radiant Chest"
+			case "295": namefromid := "Gold Heroes of Aerois Chest"
+			case "296": namefromid := "Gold Holiday Chest"
+			case "297": namefromid := "Gold Hunter Chest"
+			case "298": namefromid := "Gold Cold Chest"
+			case "299": namefromid := "Gold Grambars Blades Chest"
+			case "300": namefromid := "Gold Bovine Chest"			
+		}
+	}
+	else if (id < 321) {
+		switch id {
+			case "301": namefromid := "Gold Dungeon Director Chest"
+			case "302": namefromid := "Gold Add Venture Chest"
+			case "303": namefromid := "Gold Glowing Chest"
+			case "304": namefromid := "Gold Frilly Chest"
+			case "305": namefromid := "Gold Sunken Chest"
+			case "306": namefromid := "Gold Ancient Chest"
+			case "307": namefromid := "Gold Speedy Chest"
+			case "308": namefromid := "Gold Commentator Chest"
+			case "309": namefromid := "Gold Orator Chest"
+			case "310": namefromid := "Gold One-HewMaan-Band Chest"
+			case "311": namefromid := "Gold Zariel Patron Chest"
+			case "312": namefromid := "Gold Flaming Chest"
+			case "313": namefromid := "Gold Tidal Chest"
+			case "314": namefromid := "Gold Netherese Chest"
+			case "315": namefromid := "Gold Smores Chest"
+			;case "316": namefromid := "UNKNOWN (" id ")"
+			;case "317": namefromid := "UNKNOWN (" id ")"
+			;case "318": namefromid := "UNKNOWN (" id ")"
+			case "319": namefromid := "Gold Illusion Chest"
+			case "320": namefromid := "Gold Coast Chest"
+		}
+	}
+	else if (id < 341) {
+		switch id {
+			case "321": namefromid := "Gold Rock Star Chest"
+			case "322": namefromid := "Gold Twin Chest"
+			case "323": namefromid := "Glory of Bahamut Chest"
+			case "324": namefromid := "Gold Winged Chest"
+			case "325": namefromid := "Gold A-maze-ing Chest"
+			case "326": namefromid := "Gold Spiky Chest"
+			case "327": namefromid := "Gold Silvershield Chest"
+			case "328": namefromid := "Gold Sun Chest"
+			case "329": namefromid := "Gold Moon Chest"
+			case "330": namefromid := "Gold Shard Chest"
+			case "331": namefromid := "Gold Painted Chest"
+			case "332": namefromid := "Gold Performance Chest"
+			case "333": namefromid := "Gold Cloudy Chest"
+			case "334": namefromid := "Silver D'hani Chest"
+			case "335": namefromid := "Gold D'hani Chest"
+			case "336": namefromid := "Silver Briv Chest"
+			case "337": namefromid := "Gold Briv Chest"
+			case "338": namefromid := "Silver Widdle Chest"
+			case "339": namefromid := "Gold Widdle Chest"
+			case "340": namefromid := "Silver Yorven Chest"
+		}
+	}
+	else if (id < 361) {
+		switch id {
+			case "341": namefromid := "Gold Yorven Chest"
+			case "342": namefromid := "Silver Viconia Chest"
+			case "343": namefromid := "Gold Viconia Chest"
+			case "344": namefromid := "Silver Rust Chest"
+			case "345": namefromid := "Gold Rust Chest"
+			case "346": namefromid := "Silver Vi Chest"
+			case "347": namefromid := "Gold Vi Chest"
+			case "348": namefromid := "Silver Desmond Chest"
+			case "349": namefromid := "Gold Desmond Chest"
+			case "350": namefromid := "Silver Tatyana Chest"
+			case "351": namefromid := "Gold Tatyana Chest"
+			case "352": namefromid := "Silver Gazrick Chest"
+			case "353": namefromid := "Gold Gazrick Chest"
+			case "354": namefromid := "Silver Dungeon Master Chest"
+			case "355": namefromid := "Gold Dungeon Master Chest"
+			case "356": namefromid := "Silver Nordom Chest"
+			case "357": namefromid := "Gold Nordom Chest"
+			case "358": namefromid := "Silver Merilwen Chest"
+			case "359": namefromid := "Gold Merilwen Chest"
+			case "360": namefromid := "Silver Nahara Chest"
+		}
+	}
+	else if (id < 381) {
+		switch id {
+			case "361": namefromid := "Gold Nahara Chest"
+			case "362": namefromid := "Silver Y5E15 Chest"
+			case "363": namefromid := "Gold Y5E15 Chest"
+			case "364": namefromid := "Silver Y5E16 Chest"
+			case "365": namefromid := "Gold Y5E16 Chest"
+			case "366": namefromid := "Silver Y5E17 Chest"
+			case "367": namefromid := "Gold Y5E17 Chest"
+			case "368": namefromid := "Gold Barred Chest"
+			case "369": namefromid := "Gold Charred Chest"
+			case "370": namefromid := "Gold Weighted Chest"
+			case "371": namefromid := "Gold Fey Chest"
+			case "372": namefromid := "Gold Contract Chest"
+			case "373": namefromid := "Gold Blasted Chest"
+			case "374": namefromid := "Gold Big Top Chest"
+			case "375": namefromid := "Gold Spinnaker Chest"
+			case "376": namefromid := "Gold Weapons Chest"
+			case "377": namefromid := "Gold Powered Chest"
+			case "378": namefromid := "Gold Pumpkin Chest"
+			case "379": namefromid := "Gold Polymorphed Chest"
+			case "380": namefromid := "Gold Captain Boo Chest"
+		}
+	}
+	else if (id < 401) {
+		switch id {
+			case "381": namefromid := "Gold Freshly Painted Chest"
+			case "382": namefromid := "Gold Branched Chest"
+			case "383": namefromid := "Gold Blazed Chest"
+			case "384": namefromid := "Gold Spotlight Chest"
+			case "385": namefromid := "Gold Pirate Chest"
+			case "386": namefromid := "Gold Gingerbread Chest"
+			case "387": namefromid := "Gold Candy Cane Chest"
+			case "388": namefromid := "Gold Carrot Chest"
+			case "389": namefromid := "Gold Overstuffed Chest"
+			case "390": namefromid := "Gold Ice Dagger Chest"
+			case "391": namefromid := "Gold Spell-Covered Chest"
+			case "392": namefromid := "Gold Elven Chest"
+			case "393": namefromid := "Gold Gold Piece Chest"
+			case "394": namefromid := "Gold Pouch Chest"
+			case "395": namefromid := "Gold Tarrasque Chest"
+			case "396": namefromid := "Gold Wheeled Chest"
+			case "397": namefromid := "Gold Shadow Chest"
+			case "398": namefromid := "Gold Shenanigan Chest"
+			case "399": namefromid := "Gold Raven Queens Chest"
+			case "400": namefromid := "Gold Shadow-Eberron Chest"
+		}
+	}
+	else if (id < 412) {
+		switch id {
+			case "401": namefromid := "Gold Rescue Chest"
+			case "402": namefromid := "Gold New Moon Chest"
+			case "403": namefromid := "Gold Vampiric Chest"
+			case "404": namefromid := "Gold Snack Chest"
+			case "405": namefromid := "Gold Skewered Chest"
+			case "406": namefromid := "Gold Swag Chest"
+			case "407": namefromid := "Gold Savage Chest"
+			case "408": namefromid := "Gold Dice Chest"
+			case "409": namefromid := "Gold Clockwork Chest"
+			case "410": namefromid := "Gold Marching Chest"
+			case "411": namefromid := "Gold Toolbox Chest"
+	;		case "412": namefromid := "Gold Elven Chest"
+	;		case "413": namefromid := "Gold Gold Piece Chest"
+	;		case "414": namefromid := "Gold Pouch Chest"
+	;		case "415": namefromid := "Gold Tarrasque Chest"
+	;		case "416": namefromid := "UNKNOWN (" id ")"
+	;		case "417": namefromid := "UNKNOWN (" id ")"
+	;		case "418": namefromid := "UNKNOWN (" id ")"
+	;		case "419": namefromid := "UNKNOWN (" id ")"
+	;		case "420": namefromid := "UNKNOWN (" id ")"
 		}
 	}
 	else {
@@ -710,7 +1035,7 @@ KlehoFromID(id) {
 			case "58": namefromid := "11a478"
 			case "59": namefromid := "12a483"
 			case "60": namefromid := "13a488"
-			}
+		}
 	}
 	else if (id < 81) {
 		switch id {
@@ -805,7 +1130,7 @@ ChestIDFromChampID(id) {
 			case "58": chestfromchamp := "175"
 			case "59": chestfromchamp := "177"
 			case "60": chestfromchamp := "179"
-			}
+		}
 	}
 	else if (id < 81) {
 		switch id {
